@@ -1,0 +1,80 @@
+
+/* globales */
+html {
+    font-size: 62.5%;
+    box-sizing: border-box;
+}
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+body {
+    font-size: 1.6rem;
+}
+
+.contenedor {
+    max-width: 120rem;
+    width: 95%;
+    margin: 0 auto;
+}
+/*Sistema de tamaños*/
+.contenedor-detalle-cliente {
+  display: grid;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4rem;
+  margin-bottom: 4rem;
+  margin-top: 4rem;
+
+  @include adaptar(765px) {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    justify-content: center;
+  }
+  .contenedor-card {
+    display: flex;
+    justify-content: center;
+
+    @include adaptar(765px) {
+      justify-content: flex-end;
+    }
+
+    .card-comision {
+      word-wrap: break-word;
+      min-width: 38rem;
+      width: 40%;
+      background-color: white;
+    }
+  }
+}
+h1 {
+    font-size: 3.5rem;
+    @include adaptar( 768px ) {
+        font-size: 5.2rem;
+
+    }
+
+}
+
+h2 {
+    font-size: 2.5rem;
+    @include adaptar( 768px ) {
+        font-size: 3rem;
+
+    }
+}
+
+h3 {
+    font-size: 2rem;
+    @include adaptar( 768px ) {
+        font-size: 2.5rem;
+
+    }
+}
+p{
+    font-size: 1.8rem;
+    @include adaptar( 768px ){
+        font-size: 2rem;
+
+    }
+}

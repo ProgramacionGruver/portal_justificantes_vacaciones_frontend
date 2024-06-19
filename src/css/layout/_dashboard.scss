@@ -1,0 +1,131 @@
+.contenedor-dashboard{
+  padding: 4rem;
+
+  .contenedor-banner-fecha{
+    display: grid;
+
+    @include adaptar(768px) {
+       grid-template-columns: 65% 35%;
+    }
+
+    .card-banner {
+      background-color: #1052A0;
+    }
+
+    .contenedor-date{
+      padding-left: 3rem;
+      display: flex;
+      justify-content: center;
+    }
+
+  }
+
+  .contenedor-requisicones-ingresos{
+    display: grid;
+
+    @include adaptar(768px) {
+      grid-template-columns: 65% 35%;
+      padding-top: 3rem;
+    }
+
+    .contenedor-resumen-requisiciones{
+      display: flex;
+      flex-direction: column;
+
+      .card-resumen{
+        display: grid;
+        gap: 3rem;
+        @include adaptar(768px) {
+          grid-template-columns: repeat(2, 1fr);
+          padding-bottom: 3rem;
+
+        }
+      }
+    }
+
+    .card-ingresos{
+      padding-left: 3rem;
+    }
+  }
+
+}
+
+.avatar {
+  background-color: $primary;
+  font-size: 4rem;
+}
+.cards-dashboard {
+    display: grid;
+    gap: 1.5rem;
+    @include adaptar(768px) {
+       grid-template-columns: repeat( 3,1fr );
+
+    }
+
+    .contenido-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      h3 {
+        text-align: center;
+      }
+      span {
+        font-size: 4rem;
+      }
+      p {
+        font-size: 2.5rem;
+      }
+    }
+}
+
+.cards-historial {
+  display: grid;
+  gap: 1.5rem;
+  @include adaptar(768px) {
+     grid-template-columns: repeat( 2,1fr );
+  }
+
+  .contenido-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h3 {
+      text-align: center;
+    }
+    span {
+      font-size: 4rem;
+    }
+    p {
+      font-size: 2.5rem;
+    }
+  }
+}
+
+.cards-candidatos {
+  display: grid;
+  margin-top: 5rem;
+  gap: 35rem;
+  @include adaptar(768px) {
+     grid-template-columns: repeat( 2,1fr );
+  }
+  .contenido-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    h3 {
+      text-align: center;
+    }
+    span {
+      font-size: 4rem;
+    }
+    p {
+      font-size: 2.5rem;
+    }
+  }
+}
