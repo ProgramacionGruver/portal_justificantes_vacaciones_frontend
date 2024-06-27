@@ -42,7 +42,7 @@ import { formatearFecha } from 'src/helpers/formatearFecha'
         {
           name: 'tipoSolicitud',
           label: 'Tipo',
-          field: (row) => row.catalogo_tipo_solicitude.nombreSolicitd,
+          field: (row) => row.catalogo_tipo_solicitude.nombreSolicitud,
           align: 'left',
           sortable: true
         },

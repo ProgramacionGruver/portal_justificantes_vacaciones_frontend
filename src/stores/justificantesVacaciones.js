@@ -103,7 +103,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       const { data } = await api.get('/obtenerTipoSolicitudes')
       todosTipoSolicitudes.value = [...data]
       todosTipoSolicitudesFiltrados.value = data.map(tipo => {
-        return { label: tipo.nombreSolicitd, value: tipo.idTipoSolicitud }
+        return { label: tipo.nombreSolicitud, value: tipo.idTipoSolicitud }
       })
     } catch (error) {
       notificacion('negative', error.response.data.message)
