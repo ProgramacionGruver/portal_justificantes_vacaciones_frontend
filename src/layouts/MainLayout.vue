@@ -41,6 +41,7 @@ import NavBar from '../components/NavBar.vue'
 import { storeToRefs } from 'pinia'
 import { useAutenticacionStore } from '../stores/autenticaciones'
 import { useRouter } from 'vue-router'
+import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 
 export default {
   components: {
@@ -53,10 +54,22 @@ export default {
     const { cerrarSesion } = useUsuario
     // const { autenticarUsuario } = useUsuario
 
+    const useJustificantesVacaciones = useJustificantesVacacionesStore()
+    const { obtenerUsuarios, obtenerEmpresas, obtenerSucursales, obtenerDepartamentos, obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
+
     const router = useRouter()
 
     onMounted(async () => {
       // autenticarUsuario()
+      await obtenerUsuarios()
+      await obtenerEmpresas()
+      await obtenerSucursales()
+      await obtenerDepartamentos()
+      await obtenerEstatus()
+      await obtenerMotivos()
+      await obtenerTipoSolicitudes()
+      await obtenerDetalleEmpleadoYJefeDirecto(usuarioAutenticado.value.numero_empleado)
+      await obtenerSolicitudesPorEmpleado(usuarioAutenticado.value.numero_empleado)
     })
     const logout = () => {
       router.push('/')
