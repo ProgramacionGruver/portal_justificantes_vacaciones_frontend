@@ -20,3 +20,11 @@ export const trimestres = [
   { nombre: 'Cuarto Trimestre', numero: 4, meses: [10, 11, 12] }
 
 ]
+
+export const coloresBotones = [
+  {estado:'FALTA', color: 'red'},
+  {estado:'RETARDO', color: 'deep-orange-5'},
+  {estado:'AUSENCIAS Y RETARDOS', color: 'pink-4'},
+  {estado:'VACACIONES', color: 'light-green-5'},
+  {estado:'DIAS ECONOMICOS', color: 'cyan-6'},
+]

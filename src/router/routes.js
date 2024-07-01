@@ -23,6 +23,13 @@ const routes = [
         label: 'Solicitudes',
         name: 'solicitudes',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/solicitudes/MisSolicitudes.vue')
+      },
+      {
+        path: 'asistencia',
+        icono: 'calendar_month',
+        label: 'Asistencias',
+        name: 'asistencia',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/AsistenciasModule.vue')
       }
     ]
   }
