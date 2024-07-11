@@ -96,7 +96,8 @@
                   <label>Seleccione los días a justificar <span style="color: red;">*</span></label>
                 </q-card-section>
                 <div class="q-my-sm flex flex-center">
-                  <q-date landscape multiple mask="YYYY-MM-DD" v-model="solicitudObj.fechasSeleccionadas"></q-date>
+                  <q-date landscape multiple mask="YYYY-MM-DD" v-model="solicitudObj.fechasSeleccionadas"
+                    :locale="myLocale"></q-date>
                 </div>
               </div>
               <div class="row q-my-sm">
@@ -141,7 +142,7 @@
                 </q-card-section>
                 <div class="q-my-sm flex flex-center">
                   <q-date v-model="solicitudObj.fechasSeleccionadas" landscape multiple mask="YYYY-MM-DD"
-                    label="Selecciona fechas de vacaciones" />
+                    label="Selecciona fechas de vacaciones" :locale="myLocale" />
                 </div>
               </div>
               <div class="row q-my-sm">
@@ -186,7 +187,7 @@
                 </q-card-section>
                 <div class="q-my-sm flex flex-center">
                   <q-date v-model="solicitudObj.fechasSeleccionadas" landscape multiple mask="YYYY-MM-DD"
-                    label="Selecciona fechas de vacaciones" />
+                    label="Selecciona fechas de vacaciones" :locale="myLocale" />
                 </div>
               </div>
               <div class="q-mt-lg">
@@ -218,22 +219,32 @@
             <div class="text-h5 q-pa-sm text-center bg-primary text-white">
               Envío por correo
             </div>
-
-            <div class="row q-my-sm">
-              <q-card-section class="col-6 q-pt-none">
-                <label>Email del solicitante <span style="color: red;">*</span></label>
-                <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
-              </q-card-section>
-              <q-card-section class="col-6 q-pt-none">
-                <label>Email del jefe inmediato <span style="color: red;">*</span></label>
-                <q-input outlined readonly v-model="detalleJefeDirecto.correo"></q-input>
-              </q-card-section>
-            </div>
-            <q-stepper-navigation>
-              <q-btn :loading="cargandoEnvioSolicitud" color="primary" @click="validarPasoTres" label="Enviar solicitud"
-                class="q-ml-sm" />
-              <q-btn color="primary" flat @click="step = 2" label="atras" class="q-ml-sm" />
-            </q-stepper-navigation>
+            <q-form ref="formularioCorreos" @submit.prevent="validarPasoTres">
+              <div class="row q-my-sm">
+                <q-card-section class="col-6 q-pt-none">
+                  <label>Email del solicitante <span style="color: red;">*</span></label>
+                  <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
+                </q-card-section>
+                <q-card-section class="col-5 q-pt-none">
+                  <label>Email del jefe inmediato <span style="color: red;">*</span></label>
+                  <q-input outlined :readonly="!emailJefeIncorrecto" v-model="emailJefeDirecto" lazy-rules
+                    :rules="validarCorreo"></q-input>
+                </q-card-section>
+                <q-card-section class="col-1 q-pt-none">
+                  <div class="checkbox-container">
+                    <q-checkbox v-model="emailJefeIncorrecto">
+                      <q-tooltip style="font-size: 1.25rem;">Activa solo en caso de ser incorrecto el correo electronico
+                        de jefe inmediato</q-tooltip>
+                    </q-checkbox>
+                  </div>
+                </q-card-section>
+              </div>
+              <q-stepper-navigation>
+                <q-btn :loading="cargandoEnvioSolicitud" color="primary" type="submit" label="Enviar solicitud"
+                  class="q-ml-sm" />
+                <q-btn color="primary" flat @click="step = 2" label="atras" class="q-ml-sm" />
+              </q-stepper-navigation>
+            </q-form>
           </q-step>
         </q-stepper>
       </q-card-section>
@@ -249,6 +260,7 @@ import { ref, watch } from 'vue'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 import { storeToRefs } from 'pinia'
 import { notificacion } from 'src/helpers/mensajes'
+import { validarCorreo } from 'src/helpers/inputReglas'
 
 export default {
   setup() {
@@ -289,7 +301,6 @@ export default {
     const stepperSolicitud = ref(false)
     const step = ref(1)
     const previousStep = ref(1)
-    const group = ref(1)
     const errorSeleccion = ref(false)
 
     const AUSENCIAS_Y_RETARDOS = 1
@@ -300,7 +311,12 @@ export default {
     const PASE_DE_SALIDA = 2
     const FALTA = 3
 
+    const emailJefeDirecto = ref('')
+    const emailJefeIncorrecto = ref(false)
+
     const MOTIVO_VACACIONES = 7
+
+    const formularioCorreos = ref(null)
 
     const solicitudInit = {
       folio: '',
@@ -322,6 +338,8 @@ export default {
       await obtenerDetalleVacacionesDiasEconomicos(numero_empleado)
       solicitudObj.value = { ...solicitudInit }
       step.value = 1
+      emailJefeIncorrecto.value = false
+      emailJefeDirecto.value = detalleJefeDirecto.value.correo
       stepperSolicitud.value = true
     }
 
@@ -375,6 +393,10 @@ export default {
     }
 
     const validarPasoTres = async () => {
+      if (!await formularioCorreos.value.validate()) {
+        notificacion('warning', 'Revise que la información esté completa')
+        return
+      }
       const sucursal = todasSucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.siglasCentroTrabajo)
       const departamento = todosDepartamentos.value.find(departamento => departamento.nombreDepartamento === detalleUsuario.value.departamento)
 
@@ -384,16 +406,23 @@ export default {
         solicitudObj.value.claveEmpresa = sucursal.claveEmpresa
         solicitudObj.value.claveDepartamento = departamento.claveDepartamento
 
+        // Ordena las fechas solicitadas
+        solicitudObj.value.fechasSeleccionadas.sort((a, b) => {
+          if (a < b) return -1
+          if (a > b) return 1
+          return 0
+        })
+
         if (detalleUsuario.value?.correo !== '' && detalleJefeDirecto.value?.correo !== '') {
           switch (solicitudObj.value.idTipoSolicitud) {
             case AUSENCIAS_Y_RETARDOS:
-              await solicitarAusenciasYRetardos(solicitudObj.value)
+              await solicitarAusenciasYRetardos(solicitudObj.value, emailJefeDirecto.value)
               break
             case VACACIONES:
-              await solicitarVacaciones(solicitudObj.value)
+              await solicitarVacaciones(solicitudObj.value, emailJefeDirecto.value)
               break
             case DIAS_ECONOMICOS:
-              await solicitarDiasEconomicos(solicitudObj.value)
+              await solicitarDiasEconomicos(solicitudObj.value, emailJefeDirecto.value)
               break
           }
           stepperSolicitud.value = false
@@ -432,7 +461,6 @@ export default {
       PASE_DE_ENTRADA,
       PASE_DE_SALIDA,
       FALTA,
-      group,
       opcionesTipoPase,
       detalleVacacionesDiasEconomicos,
       abrir,
@@ -443,12 +471,31 @@ export default {
       opcionesDiaEconomico,
       detalleUsuario,
       detalleJefeDirecto,
-      cargandoEnvioSolicitud
+      cargandoEnvioSolicitud,
+      myLocale: {
+        /* starting with Sunday */
+        days: 'Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado'.split('_'),
+        daysShort: 'Dom_Lun_Mar_Mié_Jue_Vie_Sáb'.split('_'),
+        months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+        monthsShort: 'Ene_Feb_Mar_Abr_May_Jun_Jul_Ago_Sep_Oct_Nov_Dic'.split('_'),
+        firstDayOfWeek: 1, // 0-6, 0 - Sunday, 1 Monday, ...
+        format24h: true,
+        pluralDay: 'dias'
+      },
+      emailJefeIncorrecto,
+      emailJefeDirecto,
+      validarCorreo,
+      formularioCorreos
     }
   }
 }
 </script>
 
 <style scoped>
-/* Añade tus estilos aquí */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
 </style>

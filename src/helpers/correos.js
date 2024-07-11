@@ -1,4 +1,4 @@
-import { formatearMonto } from './formatearFecha'
+import { formatearFecha, formatearFechaCorreo, formatearMonto } from './formatearFecha'
 import { formatearPorcentaje, formatearCapitalCase } from './formatos'
 
 const rojo = '#b91c1c'
@@ -351,3 +351,54 @@ export const mensajeOrdenesDeServicioProceso = (ordenes, ordenesZonas) => {
   //      <td colspan='1' style='padding: 12px;' bgcolor='#e8eef6'>Tercera:</td>
   //      <td colspan='3' style='padding: 12px;'>  ${descripcionEstadoAutorizacion(comision.terceraAutorizacionEstado)}  ${tercerResponsable} </td>
   //    </tr>
+
+  export const mensajeCorreoAutorizacionJustificantesVacaciones = (solicitudCreada, url) => {
+    return `
+      <p>Se ha generado una solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud} </p>
+
+      <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
+        <thead bgcolor='#1052A0' text='white'>
+            <tr>
+              <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>Solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud}</th>
+            </tr>
+        </thead>
+        <tbody bgcolor='white' text='black'>
+            <tr>
+              <td style='padding: 12px;'>Folio:</td>
+              <td style='padding: 12px;'>${solicitudCreada.folio}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Fecha de solicitud:</td>
+              <td style='padding: 12px;'>${formatearFechaCorreo(solicitudCreada.createdAt)}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Número de empleado:</td>
+              <td style='padding: 12px;'>${solicitudCreada.usuario.numero_empleado}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Nombre: </td>
+              <td style='padding: 12px;'>${solicitudCreada.usuario.nombre}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Empresa: </td>
+              <td style='padding: 12px;'>${solicitudCreada.empresa.nombreEmpresa}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Centro de trabajo: </td>
+              <td style='padding: 12px;'>${solicitudCreada.sucursale.nombreSucursal}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Puesto </td>
+              <td style='padding: 12px;'>${solicitudCreada.usuario.puesto}</td>
+            </tr>
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para mas informacion:</td>
+              <td style='padding: 12px;'><a
+                    href='${url}'
+                    style='color: #58ACFA; text-decoration: none;'>Autorizar o rechazar solicitud </a></td>
+            </tr>
+        </tbody>
+      </table>
+      `
+
+  }

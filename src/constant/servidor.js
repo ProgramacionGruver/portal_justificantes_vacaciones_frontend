@@ -1,1 +1,3 @@
 export const ID_SERVIDOR = 26
+
+export const ID_FORM_JUSTIFICANTES_VACACIONES = 2011
