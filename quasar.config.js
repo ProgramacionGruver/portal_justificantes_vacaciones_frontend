@@ -96,7 +96,8 @@ module.exports = configure(function (/* ctx */) {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
       config: {
-        notify: {}
+        notify: {},
+        lang: 'es'
       },
 
       // iconSet: 'material-icons', // Quasar icon set
