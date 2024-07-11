@@ -9,7 +9,7 @@ import axios from 'axios'
 // for each client)
 const api = axios.create({
   //  baseURL: 'https://api.example.com'
-   baseURL: 'http://localhost:4040/justificantesVacaciones/api'
+   baseURL: 'http://localhost:4022/justificantesVacaciones/api'
    })
 
 export default boot(({ app }) => {
