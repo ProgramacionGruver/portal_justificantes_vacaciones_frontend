@@ -28,3 +28,9 @@ export const coloresBotones = [
   {estado:'VACACIONES', color: 'light-green-5'},
   {estado:'DIAS ECONOMICOS', color: 'cyan-6'},
 ]
+
+export const coloresAutorizaciones= [
+  {estado:'AUTORIZADO', color: 'green'},
+  {estado:'PENDIENTE', color: 'grey'},
+  {estado:'RECHAZADO', color: 'red'},
+]

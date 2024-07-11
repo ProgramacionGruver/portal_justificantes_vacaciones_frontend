@@ -59,7 +59,7 @@
                 {{ col.value.value }}
               </div>
               <q-btn
-                v-else
+                v-else-if="col.value.estado === 'RETARDO' || col.value.estado === 'FALTA'"
                 class="q-mx-sm text-white"
                 size="1.2rem"
                 unelevated
@@ -67,11 +67,22 @@
                 :color="colorBoton(col.value)"
                 :label="col.value.value"
               />
+              <q-btn
+                v-else
+                class="q-mx-sm text-white"
+                size="1.2rem"
+                unelevated
+                rounded
+                :color="colorBoton(col.value)"
+                :label="col.value.value"
+                @click="verSolicitud(col.value.solicitud)"
+              />
             </template>
           </q-td>
         </q-tr>
       </template>
     </q-table>
+    <ModalVerSolicitud ref="modalVerSolicitud"></ModalVerSolicitud>
   </div>
 </template>
 <script>
@@ -80,9 +91,11 @@ import { storeToRefs } from 'pinia'
 import { useAsistenciasStore } from 'src/stores/asistencias'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { coloresBotones } from 'src/constant/constantes'
+import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
 
   export default {
     components: {
+      ModalVerSolicitud
     },
     setup () {
 
@@ -92,6 +105,7 @@ import { coloresBotones } from 'src/constant/constantes'
 
       const dynamicColumns = ref([])
       const columns = ref([])
+      const modalVerSolicitud = ref(null)
 
       const basecolumns = [
       {
@@ -201,12 +215,18 @@ import { coloresBotones } from 'src/constant/constantes'
         return colores.color
       }
 
+      const verSolicitud = (solicitud) => {
+        modalVerSolicitud.value.abrir(solicitud)
+      }
+
       return {
         columns,
         asistencias,
         objBusqueda,
         colorBoton,
-        cargando
+        cargando,
+        modalVerSolicitud,
+        verSolicitud
       }
     }
   }
