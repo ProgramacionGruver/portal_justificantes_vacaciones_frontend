@@ -42,6 +42,9 @@ import { storeToRefs } from 'pinia'
 import { useAutenticacionStore } from '../stores/autenticaciones'
 import { useRouter } from 'vue-router'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
+import { useEmpresasStore } from 'src/stores/empresas'
+import { useSucursalesStore } from 'src/stores/sucursales'
+import { useDepartamentosStore } from 'src/stores/departamentos'
 
 export default {
   components: {
@@ -54,8 +57,17 @@ export default {
     const { cerrarSesion } = useUsuario
     // const { autenticarUsuario } = useUsuario
 
+    const useEmpresas = useEmpresasStore()
+    const { obtenerEmpresas } = useEmpresas
+
+    const useSucursales = useSucursalesStore()
+    const { obtenerSucursales } = useSucursales
+
+    const useDepartamentos = useDepartamentosStore()
+    const { obtenerDepartamentos } = useDepartamentos
+
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { obtenerUsuarios, obtenerEmpresas, obtenerSucursales, obtenerDepartamentos, obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
+    const { obtenerUsuarios, obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
 
     const router = useRouter()
 
