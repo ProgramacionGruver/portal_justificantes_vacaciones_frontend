@@ -9,7 +9,7 @@ export const useAsistenciasStore = defineStore("asistencias", () => {
     const obtenerAsistencias = async (objBusqueda) => {
         try {
             cargando.value= true
-            const { data } = await api.post('/obtenerAsistencias', objBusqueda)
+            const { data } = await api.post('/obtener/asistencias', objBusqueda)
             asistencias.value = data
         } catch (error) {
             console.log(error)

@@ -112,3 +112,12 @@ export const obtenerTextoEstado = (estado) => {
 
   return formato
 }
+
+export const obtenerTextoSabados = (estado) => {
+  switch (estado) {
+    case true:
+      return 'Si'
+    case false:
+      return 'No'
+  }
+}

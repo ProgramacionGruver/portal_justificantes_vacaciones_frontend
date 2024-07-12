@@ -1,0 +1,265 @@
+<template>
+  <div class="q-pa-md">
+    <h2>Catalogo de Usuarios</h2>
+    <q-separator color="primary" class="q-mb-lg"></q-separator>
+    <q-table :columns="columns" :rows="catalogoUsuarios" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
+    loading-label="Buscando información. . . "  row-key="numero_empleado">
+    <template v-slot:top>
+          <div class="fit row q-gutter-sm q-mb-sm justify-end">
+            <div class="col">
+              <q-input outlined dense v-model="buscar" :disable="cargando" placeholder="Buscar">
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <div class="fit row q-gutter-sm">
+            <q-btn-dropdown dense outline class="col q-ma-sm" color="grey" label="Empresas">
+              <q-checkbox class="q-pa-md" dense :disable="todasEmpresasSeleccionadas" v-model="todasEmpresasSeleccionadas"
+                label="Todas" @update:model-value="filtrar('TODASEMPRESAS')" />
+              <q-separator class="q-mx-md bg-gray"></q-separator>
+              <q-option-group class="q-pa-md" dense :options="empresas" v-model="modelEmpresasSeleccionadas"
+                @update:model-value="filtrar('OPCIONESEMPRESAS')" type="checkbox" />
+            </q-btn-dropdown>
+            <q-btn-dropdown dense outline class="col q-ma-sm " color="grey" label="Sucursales">
+              <q-checkbox class="q-pa-md" dense :disable="todasSucursalesSeleccionadas"
+                v-model="todasSucursalesSeleccionadas" label="Todas" @update:model-value="filtrar('TODASSUCURSALES')" />
+              <q-separator class="q-mx-sm bg-gray"></q-separator>
+              <q-option-group class="q-pa-md" dense :options="sucursalesFiltradas" v-model="modelSucursalesSeleccionadas"
+                @update:model-value="filtrar('OPCIONESSUCURSALES')" type="checkbox" />
+            </q-btn-dropdown>
+            <q-btn-dropdown dense outline class="col q-ma-sm " color="grey" label="Departamentos">
+              <q-checkbox class="q-pa-md" dense :disable="todosDepartamentosSeleccionados"
+                v-model="todosDepartamentosSeleccionados" label="Todos"
+                @update:model-value="filtrar('TODOSDEPARTAMENTOS')" />
+              <q-separator class="q-mx-sm bg-gray"></q-separator>
+              <q-option-group class="q-pa-md" dense :options="departamentosFiltrados"
+                v-model="modelDepartamentosSeleccionados" @update:model-value="filtrar('OPCIONESDEPARTAMENTOS')"
+                type="checkbox" />
+            </q-btn-dropdown>
+          </div>
+
+          <div class="fit row q-gutter-sm">
+            <div class="col q-ma-sm">
+              <q-select outlined dense :disable="cargando" :options="anios" v-model="anioSeleccionado"
+                @update:model-value="cargarPresupuestos" map-options option-value="name" />
+            </div>
+            <div class="col q-ma-sm">
+              <q-select outlined dense map-options :disable="cargando" :options="meses" v-model="mesSeleccionado"
+                @update:model-value="cargarPresupuestos" option-value="name" />
+            </div>
+          </div>
+      </template>
+      <template v-slot:body-cell-estatus="props">
+        <div style="padding-top: 1rem;">
+          <q-chip class="text-white" unelevated rounded
+            :color="colorEstatus(props.row.estatus)"
+            :label="nombreEstatus(props.row.estatus)"
+          />
+        </div>
+      </template>
+      <template v-slot:body-cell-acciones="props">
+          <q-td>
+            <q-btn flat color="primary" icon="edit" @click="editarCatalogo(props.row)">
+              <q-tooltip>
+                Editar
+              </q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+    </q-table>
+    <modal-catalogo-vacaciones ref="modalCatalogo"></modal-catalogo-vacaciones>
+  </div>
+</template>
+<script>
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { formatearFecha } from 'src/helpers/formatearFecha'
+import { filtrarElementos, filtrarElementosDuplicados } from 'src/helpers/filtros'
+import { useCatalogosStore } from 'src/stores/catalogos.js'
+import { useEmpresasStore } from 'src/stores/empresas'
+import { useSucursalesStore } from 'src/stores/sucursales.js'
+import { useDepartamentosStore } from 'src/stores/catalogos/departamentos.js'
+import ModalCatalogoVacaciones from 'src/components/ModalCatalogoVacaciones.vue'
+
+export default {
+    components: {
+      ModalCatalogoVacaciones
+    },
+    setup () {
+
+      const useCatalogos = useCatalogosStore()
+      const { obtenerCatalogoUsuarios } = useCatalogos
+      const { catalogoUsuarios, cargando } = storeToRefs(useCatalogos)
+
+      const useEmpresas = useEmpresasStore()
+      const { empresas, listaClavesEmpresas, todasEmpresasSeleccionadas, modelEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+      const { obtenerEmpresasCatalogo } = useEmpresas
+
+      const useSucursales = useSucursalesStore()
+      const { sucursales, sucursalesFiltradas, listaClavesSucursales, todasSucursalesSeleccionadas, modelSucursalesSeleccionadas } = storeToRefs(useSucursales)
+      const { obtenerSucursalesCatalogo } = useSucursales
+
+      const useDepartamentos = useDepartamentosStore()
+      const { departamentos, departamentosFiltrados, listaClavesDepartamentos, todosDepartamentosSeleccionados, modelDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
+      const { obtenerDepartamentosCatalogo } = useDepartamentos
+
+      const modalCatalogo = ref(null)
+      const empresaSeleccionada = ref({ claveEmpresa: 'MB' })
+
+      const columns = [
+        {
+          name: "numero_empleado",
+          label: "Numero Empleado",
+          align: "left",
+          field: "numero_empleado",
+          sortable: true
+        },
+        {
+          name: "nombre",
+          label: "Nombre",
+          align: "left",
+          field: "nombre",
+          sortable: true
+        },
+        {
+          name: "fechaAlta",
+          label: "Fecha Ingreso",
+          align: "left",
+          field: (row) => formatearFecha(row.fechaAlta),
+          sortable: true
+        },
+        {
+          name: "estatus",
+          label: "Estatus",
+          align: "left",
+          field: "estatus",
+          sortable: true
+        },
+        {
+          name: "aniosLaborados",
+          label: "Años en la empresa",
+          align: "left",
+          field: "aniosLaborados",
+          sortable: true
+        },
+        {
+          name: "diasVacacionesLey",
+          label: "Vacaciones",
+          align: "left",
+          field: "diasVacacionesLey",
+          sortable: true
+        },
+        {
+          name: "diasVacacionesRestantes",
+          label: "Vacaciones Restantes",
+          align: "left",
+          field: "diasVacacionesLey",
+          sortable: true
+        },
+        {
+          name: "diasEconomicosLey",
+          label: "Dias Economicos",
+          align: "left",
+          field: "diasEconomicosLey",
+          sortable: true
+        },
+        {
+          name: "diasEconomicosRestantes",
+          label: "Dias Economicos Restantes",
+          align: "left",
+          field: "diasEconomicosRestantes",
+          sortable: true
+        },
+        {
+          name: "turnoLunesViernes",
+          label: "Turno Lunes-Viernes",
+          align: "left",
+          field: "turnoLunesViernes",
+          sortable: true
+        },
+        {
+          name: "turnoSabados",
+          label: "Turno Sabados",
+          align: "left",
+          field: "turnoSabados",
+          sortable: true
+        },
+      ]
+
+      onMounted(async () => {
+        await obtenerCatalogoUsuarios()
+        await obtenerEmpresasCatalogo()
+        await obtenerSucursalesCatalogo()
+        await obtenerDepartamentosCatalogo()
+        filtrar('TODASEMPRESAS')
+      })
+
+      const filtrar = (tipoFiltro) => {
+        switch (tipoFiltro) {
+          case 'TODASEMPRESAS':
+            todasEmpresasSeleccionadas.value = true
+            modelEmpresasSeleccionadas.value = []
+            sucursalesFiltradas.value = filtrarElementos(listaClavesEmpresas.value, sucursales.value, 'claveEmpresa')
+            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+            break
+          case 'OPCIONESEMPRESAS':
+            todasEmpresasSeleccionadas.value = false
+            sucursalesFiltradas.value = filtrarElementos(modelEmpresasSeleccionadas.value, sucursales.value, 'claveEmpresa')
+            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+            break
+          case 'TODASSUCURSALES':
+            todasSucursalesSeleccionadas.value = true
+            modelSucursalesSeleccionadas.value = []
+            departamentosFiltrados.value = todasEmpresasSeleccionadas.value ?
+              filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+              : filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+            break
+          case 'OPCIONESSUCURSALES':
+            todasSucursalesSeleccionadas.value = false
+            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelSucursalesSeleccionadas.value, departamentos.value, 'claveSucursal'), 'claveDepartamento')
+            break
+          case 'TODOSDEPARTAMENTOS':
+            todosDepartamentosSeleccionados.value = true
+            modelDepartamentosSeleccionados.value = []
+            break
+          case 'OPCIONESDEPARTAMENTOS':
+            todosDepartamentosSeleccionados.value = false
+            break
+        }
+      }
+
+      const editarCatalogo = (catalogoObj) => {
+        modalCatalogo.value.abrir(catalogoObj)
+      }
+
+      const nombreEstatus = (estado) => {
+        if (estado === true) {
+          return 'Activo';
+        } else {
+          return 'Baja';
+        }
+      }
+
+      const colorEstatus = (estado) => {
+        if ( estado === true) {
+          return 'green';
+        } else {
+          return 'red';
+        }
+      }
+
+      return {
+        buscar: ref(''),
+        columns,
+        cargando,
+        catalogoUsuarios,
+        editarCatalogo,
+        modalCatalogo,
+        nombreEstatus,
+        colorEstatus
+      }
+    }
+  }
+</script>

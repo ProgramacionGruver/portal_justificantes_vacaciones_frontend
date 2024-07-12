@@ -30,6 +30,20 @@ const routes = [
         label: 'Asistencias',
         name: 'asistencia',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/AsistenciasModule.vue')
+      },
+      {
+        path: 'catalogoVacaciones',
+        icono: 'format_list_numbered',
+        label: 'Catálogo Vacaciones',
+        name: 'catalogoVacaciones',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoVacacionesModule.vue')
+      },
+      {
+        path: 'catalogoUsuarios',
+        icono: 'person_search',
+        label: 'Catálogo Usuarios',
+        name: 'catalogoUsuarios',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoUsuariosModule.vue')
       }
     ]
   }
