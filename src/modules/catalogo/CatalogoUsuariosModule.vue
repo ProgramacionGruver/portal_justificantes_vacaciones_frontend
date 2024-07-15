@@ -67,46 +67,29 @@
               </q-tooltip>
             </q-btn>
           </q-td>
-        </template>
+      </template>
     </q-table>
-    <modal-catalogo-vacaciones ref="modalCatalogo"></modal-catalogo-vacaciones>
+    <modal-catalogo-usuarios ref="modalCatalogo"></modal-catalogo-usuarios>
   </div>
 </template>
 <script>
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { filtrarElementos, filtrarElementosDuplicados } from 'src/helpers/filtros'
 import { useCatalogosStore } from 'src/stores/catalogos.js'
-import { useEmpresasStore } from 'src/stores/empresas'
-import { useSucursalesStore } from 'src/stores/sucursales.js'
-import { useDepartamentosStore } from 'src/stores/catalogos/departamentos.js'
-import ModalCatalogoVacaciones from 'src/components/ModalCatalogoVacaciones.vue'
+import ModalCatalogoUsuarios from 'src/components/ModalCatalogoUsuarios.vue'
 
 export default {
     components: {
-      ModalCatalogoVacaciones
+      ModalCatalogoUsuarios
     },
     setup () {
 
       const useCatalogos = useCatalogosStore()
-      const { obtenerCatalogoUsuarios } = useCatalogos
+      const { obtenerCatalogoUsuarios, obtenerCatalogoTurnos } = useCatalogos
       const { catalogoUsuarios, cargando } = storeToRefs(useCatalogos)
 
-      const useEmpresas = useEmpresasStore()
-      const { empresas, listaClavesEmpresas, todasEmpresasSeleccionadas, modelEmpresasSeleccionadas } = storeToRefs(useEmpresas)
-      const { obtenerEmpresasCatalogo } = useEmpresas
-
-      const useSucursales = useSucursalesStore()
-      const { sucursales, sucursalesFiltradas, listaClavesSucursales, todasSucursalesSeleccionadas, modelSucursalesSeleccionadas } = storeToRefs(useSucursales)
-      const { obtenerSucursalesCatalogo } = useSucursales
-
-      const useDepartamentos = useDepartamentosStore()
-      const { departamentos, departamentosFiltrados, listaClavesDepartamentos, todosDepartamentosSeleccionados, modelDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
-      const { obtenerDepartamentosCatalogo } = useDepartamentos
-
       const modalCatalogo = ref(null)
-      const empresaSeleccionada = ref({ claveEmpresa: 'MB' })
 
       const columns = [
         {
@@ -186,49 +169,17 @@ export default {
           field: "turnoSabados",
           sortable: true
         },
+        {
+          name: "acciones",
+          align: "left",
+          field: "acciones",
+        },
       ]
 
       onMounted(async () => {
         await obtenerCatalogoUsuarios()
-        await obtenerEmpresasCatalogo()
-        await obtenerSucursalesCatalogo()
-        await obtenerDepartamentosCatalogo()
-        filtrar('TODASEMPRESAS')
+        await obtenerCatalogoTurnos()
       })
-
-      const filtrar = (tipoFiltro) => {
-        switch (tipoFiltro) {
-          case 'TODASEMPRESAS':
-            todasEmpresasSeleccionadas.value = true
-            modelEmpresasSeleccionadas.value = []
-            sucursalesFiltradas.value = filtrarElementos(listaClavesEmpresas.value, sucursales.value, 'claveEmpresa')
-            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
-            break
-          case 'OPCIONESEMPRESAS':
-            todasEmpresasSeleccionadas.value = false
-            sucursalesFiltradas.value = filtrarElementos(modelEmpresasSeleccionadas.value, sucursales.value, 'claveEmpresa')
-            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
-            break
-          case 'TODASSUCURSALES':
-            todasSucursalesSeleccionadas.value = true
-            modelSucursalesSeleccionadas.value = []
-            departamentosFiltrados.value = todasEmpresasSeleccionadas.value ?
-              filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
-              : filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
-            break
-          case 'OPCIONESSUCURSALES':
-            todasSucursalesSeleccionadas.value = false
-            departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelSucursalesSeleccionadas.value, departamentos.value, 'claveSucursal'), 'claveDepartamento')
-            break
-          case 'TODOSDEPARTAMENTOS':
-            todosDepartamentosSeleccionados.value = true
-            modelDepartamentosSeleccionados.value = []
-            break
-          case 'OPCIONESDEPARTAMENTOS':
-            todosDepartamentosSeleccionados.value = false
-            break
-        }
-      }
 
       const editarCatalogo = (catalogoObj) => {
         modalCatalogo.value.abrir(catalogoObj)

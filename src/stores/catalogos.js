@@ -6,6 +6,8 @@ import { notificacion } from 'src/helpers/mensajes'
 export const useCatalogosStore = defineStore("catalogos", () => {
     const catalogoVacaciones = ref([])
     const catalogoUsuarios = ref([])
+    const catalogoTurnos = ref([])
+    const opcionesTurnos = ref([])
     const cargando = ref(false)
 
     const obtenerCatalogoVacaciones = async () => {
@@ -55,25 +57,53 @@ export const useCatalogosStore = defineStore("catalogos", () => {
     }
 
     const obtenerCatalogoUsuarios = async () => {
+        try {
+            cargando.value= true
+            const { data } = await api.get('/catalogoUsuarios')
+            catalogoUsuarios.value = data
+        } catch (error) {
+            console.log(error)
+        }finally{
+            cargando.value = false
+        }
+    }
+
+    const editarCatalogoUsuarios = async (catalogoObj) => {
       try {
-          cargando.value= true
-          const { data } = await api.get('/catalogoUsuarios')
-          catalogoUsuarios.value = data
+        const { data } = await api.put(`/catalogoUsuarios/${catalogoObj.idUsuario}`,catalogoObj)
+        const index = catalogoUsuarios.value.findIndex((catalogo) => catalogo.idUsuario === catalogoObj.idUsuario)
+        catalogoUsuarios.value.splice(index, 1, catalogoObj)
+        notificacion("positive", " Usuario Actualizado Correctamente")
+      } catch (error) {
+        notificacion("negative", error.response.data.message)
+      }
+    }
+
+    const obtenerCatalogoTurnos= async () => {
+      try {
+          const { data } = await api.get('/catalogoTurnos')
+          catalogoTurnos.value = data
+          opcionesTurnos.value = [
+            { label: 'No labora', turno: null },
+            ...data.map(turno => ({ label: turno.turno, ...turno }))
+          ]
       } catch (error) {
           console.log(error)
-      }finally{
-          cargando.value = false
       }
   }
 
     return {
         catalogoVacaciones,
         catalogoUsuarios,
+        catalogoTurnos,
+        opcionesTurnos,
         cargando,
         obtenerCatalogoVacaciones,
         obtenerCatalogoUsuarios,
         agregarCatalogoVacaciones,
         editarCatalogoVacaciones,
-        eliminarCatalogoVacaciones
+        eliminarCatalogoVacaciones,
+        obtenerCatalogoTurnos,
+        editarCatalogoUsuarios
     }
 })

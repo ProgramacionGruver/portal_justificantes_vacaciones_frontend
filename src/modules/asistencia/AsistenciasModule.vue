@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <h2>Reporte de Asistencias</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table :columns="columns" :rows="asistencias" :loading="cargando" no-data-label="No se encontró informacion disponible."
+    <q-table :columns="columns" :rows="asistencias" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
     loading-label="Buscando información. . . "  row-key="numero_empleado">
       <template v-slot:top>
           <div class="fit row q-gutter-sm q-mb-sm justify-end">
@@ -221,6 +221,7 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
 
       return {
         columns,
+        buscar: ref(''),
         asistencias,
         objBusqueda,
         colorBoton,
