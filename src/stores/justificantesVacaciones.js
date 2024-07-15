@@ -10,22 +10,25 @@ import { mensajeCorreoAutorizacionJustificantesVacaciones } from 'src/helpers/co
 export const useJustificantesVacacionesStore = defineStore('justificantesVacaciones', () => {
   const todosUsuarios = ref([])
   const todosUsuariosFiltrados = ref([])
-  const todasEmpresas = ref([])
-  const todasEmpresasFiltradas = ref([])
-  const todasSucursales = ref([])
-  const todasSucursalesFiltradas = ref([])
-  const todosDepartamentos = ref([])
-  const todosDepartamentosFiltrados = ref([])
   const todosEstatus = ref([])
   const todosEstatusFiltrados = ref([])
   const todosMotivos = ref([])
   const todosMotivosFiltrados = ref([])
+  const motivosSeleccionados = ref([])
+  const todosMotivosSeleccionados = ref(true)
+  const listaIdsMotivos = ref([])
   const todosTipoSolicitudes = ref([])
   const todosTipoSolicitudesFiltrados = ref([])
+  const tiposSolicitudSeleccionados = ref([])
+  const todosTipoSolicitudesSeleccionados = ref(true)
+  const listaIdsTipoSolicitudes = ref([])
   const detalleUsuario = ref([])
   const detalleJefeDirecto = ref([])
   const todasSolicitudesEmpleado = ref([])
+  const historialSolicitudes = ref([])
+  const historialSolicitudesFiltradas = ref([])
   const cargandoMisSolicitudes = ref(false)
+  const cargandoHistorialSolicitudes = ref(false)
   const cargandoEnvioSolicitud = ref(false)
 
   const detalleVacacionesDiasEconomicos = ref(null)
@@ -38,40 +41,6 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       todosUsuarios.value = [...data]
       todosUsuariosFiltrados.value = data.map(usuario => {
         return { label: `${usuario.numero_empleado}-${usuario.nombre}-${usuario.siglasCentroTrabajo}`, value: usuario }
-      })
-    } catch (error) {
-      notificacion('negative', error.response.data.message)
-    }
-  }
-
-  const obtenerEmpresas = async () => {
-    try {
-      const { data } = await api.get('/obtenerEmpresas')
-      todasEmpresas.value = [...data]
-      todasEmpresasFiltradas.value = data.map(empresa => { return { label: empresa.nombreEmpresa, value: empresa.claveEmpresa } })
-    } catch (error) {
-      notificacion('negative', error.response.data.message)
-    }
-  }
-
-  const obtenerSucursales = async () => {
-    try {
-      const { data } = await api.get('/obtenerSucursales')
-      todasSucursales.value = [...data]
-      todasSucursalesFiltradas.value = data.map(sucursal => {
-        return { label: sucursal.nombreSucursal, value: sucursal.claveSucursal }
-      })
-    } catch (error) {
-      notificacion('negative', error.response.data.message)
-    }
-  }
-
-  const obtenerDepartamentos = async () => {
-    try {
-      const { data } = await api.get('/obtenerDepartamentos')
-      todosDepartamentos.value = [...data]
-      todosDepartamentosFiltrados.value = data.map(departamento => {
-        return { label: departamento.nombreDepartamento, value: departamento.claveDepartamento }
       })
     } catch (error) {
       notificacion('negative', error.response.data.message)
@@ -97,6 +66,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       todosMotivosFiltrados.value = data.map(motivo => {
         return { label: motivo.nombreMotivo, value: motivo.idMotivo }
       })
+      listaIdsMotivos.value = todosMotivosFiltrados.value.map(motivo => { return motivo.value })
     } catch (error) {
       notificacion('negative', error.response.data.message)
     }
@@ -109,6 +79,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       todosTipoSolicitudesFiltrados.value = data.map(tipo => {
         return { label: tipo.nombreSolicitud, value: tipo.idTipoSolicitud }
       })
+      listaIdsTipoSolicitudes.value = todosTipoSolicitudesFiltrados.value.map(tipoSolicitud => { return tipoSolicitud.value })
     } catch (error) {
       notificacion('negative', error.response.data.message)
     }
@@ -142,6 +113,18 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       notificacion('negative', error.response.data.message)
     } finally {
       cargandoMisSolicitudes.value = false
+    }
+  }
+
+  const obtenerTodasSolicitudes = async () => {
+    try {
+      cargandoHistorialSolicitudes.value = true
+      const { data } = await api.get('/obtenerTodasSolicitudes')
+      historialSolicitudes.value = data
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoHistorialSolicitudes.value = false
     }
   }
 
@@ -266,33 +249,34 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   return {
     todosUsuarios,
     todosUsuariosFiltrados,
-    todasEmpresas,
-    todasEmpresasFiltradas,
-    todasSucursales,
-    todasSucursalesFiltradas,
-    todosDepartamentos,
-    todosDepartamentosFiltrados,
     todosEstatus,
     todosEstatusFiltrados,
     todosMotivos,
     todosMotivosFiltrados,
+    motivosSeleccionados,
+    todosMotivosSeleccionados,
+    listaIdsMotivos,
     todosTipoSolicitudes,
     todosTipoSolicitudesFiltrados,
+    tiposSolicitudSeleccionados,
+    todosTipoSolicitudesSeleccionados,
+    listaIdsTipoSolicitudes,
     detalleVacacionesDiasEconomicos,
     detalleUsuario,
     detalleJefeDirecto,
     todasSolicitudesEmpleado,
+    historialSolicitudes,
+    historialSolicitudesFiltradas,
     cargandoMisSolicitudes,
+    cargandoHistorialSolicitudes,
     cargandoEnvioSolicitud,
     urlForm,
     obtenerUsuarios,
-    obtenerEmpresas,
-    obtenerSucursales,
-    obtenerDepartamentos,
     obtenerEstatus,
     obtenerMotivos,
     obtenerTipoSolicitudes,
     obtenerSolicitudesPorEmpleado,
+    obtenerTodasSolicitudes,
     obtenerDetalleVacacionesDiasEconomicos,
     obtenerDetalleEmpleadoYJefeDirecto,
     obtenerUsuariosAutorizan,
