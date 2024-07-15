@@ -14,7 +14,7 @@ export const useSucursalesStore = defineStore("sucursales", () => {
     try {
 
       const { data } = await api.get('/obtenerSucursales')
-      sucursales.value = data
+      sucursales.value = data.map(sucursal => { return { ...sucursal, label: sucursal.nombreSucursal, value: sucursal.claveSucursal } })
       sucursalesFiltradas.value = data.map(sucursal => {
         return { ...sucursal, label: sucursal.nombreSucursal, value: sucursal.claveSucursal }
       })

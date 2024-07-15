@@ -15,7 +15,7 @@ export const useEmpresasStore = defineStore("empresas", () => {
     try {
 
       const { data } = await api.get('/obtenerEmpresas')
-      empresas.value = data
+      empresas.value = data.map(empresa => { return { ...empresa, label: empresa.nombreEmpresa, value: empresa.claveEmpresa } })
       empresasFiltradas.value = data.map(empresa => { return { ...empresa, label: empresa.nombreEmpresa, value: empresa.claveEmpresa } })
       listaClavesEmpresas.value = empresasFiltradas.value.map(empresa => { return empresa.value })
     } catch (error) {
