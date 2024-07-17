@@ -32,11 +32,11 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/AsistenciasModule.vue')
       },
       {
-        path: 'catalogoVacaciones',
-        icono: 'format_list_numbered',
-        label: 'Catálogo Vacaciones',
-        name: 'catalogoVacaciones',
-        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoVacacionesModule.vue')
+        path: 'diasGanados',
+        icono: 'fact_check',
+        label: 'Dias Ganados',
+        name: 'diasGanados',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/diasGanados/DiasGanadosModule.vue')
       },
       {
         path: 'catalogoUsuarios',
@@ -44,7 +44,15 @@ const routes = [
         label: 'Catálogo Usuarios',
         name: 'catalogoUsuarios',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoUsuariosModule.vue')
-      }
+      },
+      {
+        path: 'catalogoVacaciones',
+        icono: 'format_list_numbered',
+        label: 'Catálogo Vacaciones',
+        name: 'catalogoVacaciones',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoVacacionesModule.vue')
+      },
+
     ]
   }
 ]
