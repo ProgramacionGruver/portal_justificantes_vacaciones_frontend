@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { apiUsuarios } from 'src/boot/axiosUsuarios'
 import { ref } from 'vue'
 import { notificacion } from 'src/helpers/mensajes'
+import { ca } from 'date-fns/locale'
+import { useRouter } from 'vue-router'
 
 export const useAutenticacionStore = defineStore('autenticaciones', () => {
   const empleado = ref(null)
@@ -11,6 +13,9 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
   const empleadoTerceraAutorizacion = ref(null)
   const usuarioAutenticado = ref(null)
   const isLogin = ref(false)
+  const objUsuario = ref(null)
+  const infoUsuario = ref(null)
+  const router = useRouter();
 
   const obtenerEmpleado = async (empleado) => {
     try {
@@ -75,6 +80,41 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     }
   }
 
+  const obtenerInfoColaborador = async (numero_empleado) => {
+    try {
+      const { data } = await apiUsuarios.get(`/info/colaborador/${numero_empleado}`)
+      objUsuario.value = data
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const registrarContrasenia = async (idUsuario, contrasenia) => {
+    try {
+      const { data } = await apiUsuarios.put('/registrar/contrasenia', { idUsuario, contrasenia })
+
+      infoUsuario.value = {
+        contrasenia: data.contrasenia,
+        usuario: data.usuario
+      }
+
+      notificacion('positive', data.message)
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+      router.push('/')
+    }
+  }
+
+  const iniciarSesionNumEmpleado = async (usuario) => {
+    try {
+      const { data } = await apiUsuarios.post('/usuarios/loginNumEmpleado', { usuario })
+      isLogin.value = true
+      localStorage.setItem('token', data)
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    }
+  }
+
   return {
     empleado,
     obtenerEmpleado,
@@ -87,6 +127,11 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     cerrarSesion,
     autenticarUsuario,
     usuarioAutenticado,
-    isLogin
+    isLogin,
+    objUsuario,
+    obtenerInfoColaborador,
+    registrarContrasenia,
+    iniciarSesionNumEmpleado,
+    infoUsuario
   }
 })
