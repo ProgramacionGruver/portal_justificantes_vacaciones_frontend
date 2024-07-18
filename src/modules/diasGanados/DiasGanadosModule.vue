@@ -1,8 +1,8 @@
 <template>
   <div class="q-pa-md">
-    <h2>Catalogo de Usuarios</h2>
+    <h2>Dias Ganados</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table :columns="columns" :rows="catalogoUsuarios" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
+    <q-table :columns="columns" :rows="diasGanados" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
     loading-label="Buscando información. . . "  row-key="numero_empleado">
     <template v-slot:top>
           <div class="fit row q-gutter-sm q-mb-sm justify-end">
@@ -13,6 +13,8 @@
                 </template>
               </q-input>
             </div>
+            <q-btn dense color="primary" icon-right="playlist_add"
+            label="Agregar" no-caps :disable="cargando" @click="agregarDias()"/>
           </div>
           <div class="fit row q-gutter-sm">
             <q-btn-dropdown dense outline class="col q-ma-sm" color="grey" label="Empresas">
@@ -51,45 +53,32 @@
             </div>
           </div>
       </template>
-      <template v-slot:body-cell-estatus="props">
-        <div style="padding-top: 1rem;">
-          <q-chip class="text-white" unelevated rounded
-            :color="colorEstatus(props.row.estatus)"
-            :label="nombreEstatus(props.row.estatus)"
-          />
-        </div>
-      </template>
-      <template v-slot:body-cell-acciones="props">
-          <q-td>
-            <q-btn flat color="primary" icon="edit" @click="editarCatalogo(props.row)">
-              <q-tooltip>
-                Editar
-              </q-tooltip>
-            </q-btn>
-          </q-td>
-      </template>
     </q-table>
-    <modal-catalogo-usuarios ref="modalCatalogo"></modal-catalogo-usuarios>
   </div>
+  <modal-dias-ganados ref="modalDias"></modal-dias-ganados>
 </template>
 <script>
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { useCatalogosStore } from 'src/stores/catalogos.js'
-import ModalCatalogoUsuarios from 'src/components/ModalCatalogoUsuarios.vue'
+import { useDiasGanadosStore } from 'src/stores/diasGanados'
+import { useColaboradoresStore } from 'src/stores/colaboradores'
+import ModalDiasGanados from 'src/components/ModalDiasGanados.vue'
 
 export default {
     components: {
-      ModalCatalogoUsuarios
+      ModalDiasGanados
     },
     setup () {
 
-      const useCatalogos = useCatalogosStore()
-      const { obtenerCatalogoUsuarios, obtenerCatalogoTurnos } = useCatalogos
-      const { catalogoUsuarios, cargando } = storeToRefs(useCatalogos)
+      const useDiasGanados = useDiasGanadosStore()
+      const { obtenerDiasGanados } = useDiasGanados
+      const { diasGanados, cargando } = storeToRefs(useDiasGanados)
 
-      const modalCatalogo = ref(null)
+      const useColaboradores = useColaboradoresStore()
+      const { obtenerColaboradores } = useColaboradores
+
+      const modalDias = ref(null)
 
       const columns = [
         {
@@ -100,59 +89,10 @@ export default {
           sortable: true
         },
         {
-          name: "nombre",
+          name: "nombreEmpleado",
           label: "Nombre",
           align: "left",
-          field: "nombre",
-          sortable: true
-        },
-        {
-          name: "fechaAlta",
-          label: "Fecha Ingreso",
-          align: "left",
-          field: (row) => formatearFecha(row.fechaAlta),
-          sortable: true
-        },
-        {
-          name: "estatus",
-          label: "Estatus",
-          align: "left",
-          field: "estatus",
-          sortable: true
-        },
-        {
-          name: "aniosLaborados",
-          label: "Años en la empresa",
-          align: "left",
-          field: "aniosLaborados",
-          sortable: true
-        },
-        {
-          name: "diasVacacionesLey",
-          label: "Vacaciones",
-          align: "left",
-          field: "diasVacacionesLey",
-          sortable: true
-        },
-        {
-          name: "diasVacacionesRestantes",
-          label: "Vacaciones Restantes",
-          align: "left",
-          field: "diasVacacionesLey",
-          sortable: true
-        },
-        {
-          name: "diasEconomicosLey",
-          label: "Dias Economicos",
-          align: "left",
-          field: "diasEconomicosLey",
-          sortable: true
-        },
-        {
-          name: "diasEconomicosRestantes",
-          label: "Dias Economicos Restantes",
-          align: "left",
-          field: "diasEconomicosRestantes",
+          field: "nombreEmpleado",
           sortable: true
         },
         {
@@ -163,60 +103,51 @@ export default {
           sortable: true
         },
         {
-          name: "turnoLunesViernes",
-          label: "Turno Lunes-Viernes",
+          name: "motivo",
+          label: "Motivo",
           align: "left",
-          field: "turnoLunesViernes",
+          field: "motivo",
           sortable: true
         },
         {
-          name: "turnoSabados",
-          label: "Turno Sabados",
+          name: "descripcionMotivo",
+          label: "Descripción",
           align: "left",
-          field: "turnoSabados",
+          field: "descripcionMotivo",
           sortable: true
         },
         {
-          name: "acciones",
+          name: "editedBy",
+          label: "Agregado por",
           align: "left",
-          field: "acciones",
+          field: "editedBy",
+          sortable: true
+        },
+        {
+          name: "createdAt",
+          label: "Fecha Registro",
+          align: "left",
+          field: (row) => formatearFecha(row.createdAt),
+          sortable: true
         },
       ]
 
       onMounted(async () => {
-        await obtenerCatalogoUsuarios()
-        await obtenerCatalogoTurnos()
+        await obtenerDiasGanados()
+        await obtenerColaboradores()
       })
 
-      const editarCatalogo = (catalogoObj) => {
-        modalCatalogo.value.abrir(catalogoObj)
-      }
-
-      const nombreEstatus = (estado) => {
-        if (estado === true) {
-          return 'Activo';
-        } else {
-          return 'Baja';
-        }
-      }
-
-      const colorEstatus = (estado) => {
-        if ( estado === true) {
-          return 'green';
-        } else {
-          return 'red';
-        }
+      const agregarDias = () => {
+        modalDias.value.abrir()
       }
 
       return {
         buscar: ref(''),
         columns,
         cargando,
-        catalogoUsuarios,
-        editarCatalogo,
-        modalCatalogo,
-        nombreEstatus,
-        colorEstatus
+        diasGanados,
+        agregarDias,
+        modalDias
       }
     }
   }

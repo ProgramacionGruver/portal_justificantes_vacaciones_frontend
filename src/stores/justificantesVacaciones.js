@@ -40,7 +40,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       const { data } = await api.get('/obtenerUsuarios')
       todosUsuarios.value = [...data]
       todosUsuariosFiltrados.value = data.map(usuario => {
-        return { label: `${usuario.numero_empleado}-${usuario.nombre}-${usuario.siglasCentroTrabajo}`, value: usuario }
+        return { label: `${usuario.numero_empleado}-${usuario.nombre}-${usuario.claveSucursal}`, value: usuario }
       })
     } catch (error) {
       notificacion('negative', error.response.data.message)

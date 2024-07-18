@@ -397,7 +397,7 @@ export default {
         notificacion('warning', 'Revise que la información esté completa')
         return
       }
-      const sucursal = todasSucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.siglasCentroTrabajo)
+      const sucursal = todasSucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.claveSucursal)
       const departamento = todosDepartamentos.value.find(departamento => departamento.nombreDepartamento === detalleUsuario.value.departamento)
 
       if (sucursal && departamento) {

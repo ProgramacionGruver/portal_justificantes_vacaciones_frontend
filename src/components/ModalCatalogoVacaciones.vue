@@ -4,7 +4,6 @@
       <q-card-section class="bg-primary text-white row items-center q-pb-none">
         <h2 class="text-h4">Agregar Registro Vacaciones</h2>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
       <q-card-section>
         <q-form ref="formulario">
