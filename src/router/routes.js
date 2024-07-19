@@ -61,6 +61,11 @@ const routes = [
       },
 
     ]
+  },
+  {
+    path: '/cambiar/contrasena',
+    name: 'cambiarContrasena',
+    component: () => import(/* webpackChunkName: "cambiarContrasena" */ 'pages/CambiarContrasenia.vue')
   }
 ]
 
