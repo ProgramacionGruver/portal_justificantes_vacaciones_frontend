@@ -20,9 +20,16 @@ const routes = [
       {
         path: 'solicitudes',
         icono: 'description',
-        label: 'Solicitudes',
+        label: 'Mis solicitudes',
         name: 'solicitudes',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/solicitudes/MisSolicitudes.vue')
+      },
+      {
+        path: 'historialSolicitudes',
+        icono: 'description',
+        label: 'Historial de solicitudes',
+        name: 'todasSolicitudes',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/historialSolicitudes/HistorialSolicitudes.vue')
       },
       {
         path: 'asistencia',

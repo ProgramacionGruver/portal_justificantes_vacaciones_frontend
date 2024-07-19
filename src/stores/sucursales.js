@@ -6,7 +6,7 @@ export const useSucursalesStore = defineStore("sucursales", () => {
 
   const sucursales = ref([])
   const sucursalesFiltradas = ref([])
-  const sucursalesSeleccionadas = ref([])
+  const modelSucursalesSeleccionadas = ref([])
   const listaClavesSucursales = ref([])
   const todasSucursalesSeleccionadas = ref(true)
 
@@ -28,7 +28,7 @@ export const useSucursalesStore = defineStore("sucursales", () => {
   return {
     sucursales,
     sucursalesFiltradas,
-    sucursalesSeleccionadas,
+    modelSucursalesSeleccionadas,
     todasSucursalesSeleccionadas,
     listaClavesSucursales,
     obtenerSucursales,

@@ -5,6 +5,8 @@ import { notificacion } from 'src/helpers/mensajes'
 
 export const useDiasGanadosStore = defineStore("diasGanados", () => {
     const diasGanados = ref([])
+    const diasGanadosFiltrados = ref([])
+
     const cargando = ref(false)
 
     const obtenerDiasGanados = async () => {
@@ -12,6 +14,7 @@ export const useDiasGanadosStore = defineStore("diasGanados", () => {
             cargando.value= true
             const { data } = await api.get('/diasGanados')
             diasGanados.value = data
+            diasGanadosFiltrados.value = data
         } catch (error) {
             console.log(error)
         }finally{
@@ -35,6 +38,7 @@ export const useDiasGanadosStore = defineStore("diasGanados", () => {
 
     return {
         diasGanados,
+        diasGanadosFiltrados,
         cargando,
         obtenerDiasGanados,
         agregarDiasGanados

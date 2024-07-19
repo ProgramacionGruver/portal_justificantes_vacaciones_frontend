@@ -4,6 +4,8 @@ import { ref } from 'vue'
 
 export const useAsistenciasStore = defineStore("asistencias", () => {
     const asistencias = ref([])
+    const asistenciasFiltradas = ref([])
+
     const cargando = ref(false)
 
     const obtenerAsistencias = async (objBusqueda) => {
@@ -11,6 +13,7 @@ export const useAsistenciasStore = defineStore("asistencias", () => {
             cargando.value= true
             const { data } = await api.post('/obtener/asistencias', objBusqueda)
             asistencias.value = data
+            asistenciasFiltradas.value = data
         } catch (error) {
             console.log(error)
         }finally{
@@ -20,6 +23,7 @@ export const useAsistenciasStore = defineStore("asistencias", () => {
 
     return {
         asistencias,
+        asistenciasFiltradas,
         obtenerAsistencias,
         cargando
     }

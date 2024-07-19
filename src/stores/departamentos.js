@@ -8,7 +8,7 @@ export const useDepartamentosStore = defineStore("departamentos", () => {
 
   const departamentos = ref([])
   const departamentosFiltrados = ref([])
-  const departamentosSeleccionados = ref([])
+  const modelDepartamentosSeleccionados = ref([])
   const todosDepartamentosSeleccionados = ref(true)
   const opcionesDepartamentos = ref([])
   const listaClavesDepartamentos = ref([])
@@ -34,7 +34,7 @@ export const useDepartamentosStore = defineStore("departamentos", () => {
   return {
     departamentos,
     departamentosFiltrados,
-    departamentosSeleccionados,
+    modelDepartamentosSeleccionados,
     todosDepartamentosSeleccionados,
     opcionesDepartamentos,
     listaClavesDepartamentos,

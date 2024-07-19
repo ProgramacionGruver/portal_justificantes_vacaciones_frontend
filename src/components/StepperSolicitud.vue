@@ -5,7 +5,6 @@
         <div class="text-h4 text-center q-mb-sm">CREAR SOLICITUD</div>
         <q-separator />
       </q-card-section>
-
       <q-card-section class="q-pt-none padings-form">
         <q-stepper v-model="step" ref="stepper" color="primary" animated>
           <q-step :name="1" title="Selecciona el tipo de solicitud" icon="settings">
@@ -22,12 +21,18 @@
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
                     unchecked-icon="panorama_fish_eye" :val="3" label="Días económicos" />
                   <!-- mostrar si detecta que tiene días vencidos etc...  -->
-                  <!-- <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
-                    unchecked-icon="panorama_fish_eye" :val="3" label="Vacaciones vencidas" />
-                    <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
-                    unchecked-icon="panorama_fish_eye" :val="3" label="Sábados 5s" />
-                    <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
-                    unchecked-icon="panorama_fish_eye" :val="3" label="Días ganados" /> -->
+                  <q-radio
+                    v-if="detalleVacacionesDiasEconomicos?.vacacionesVencidas && detalleVacacionesDiasEconomicos?.vacacionesVencidas > 0"
+                    v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
+                    unchecked-icon="panorama_fish_eye" :val="5" label="Vacaciones vencidas" />
+                  <q-radio
+                    v-if="detalleVacacionesDiasEconomicos?.sabados5s && detalleVacacionesDiasEconomicos?.sabados5s > 0"
+                    v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
+                    unchecked-icon="panorama_fish_eye" :val="6" label="Sábados 5s" />
+                  <q-radio
+                    v-if="detalleVacacionesDiasEconomicos?.diasGanados && detalleVacacionesDiasEconomicos?.diasGanados > 0"
+                    v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
+                    unchecked-icon="panorama_fish_eye" :val="4" label="Días ganados" />
                 </div>
               </q-card-section>
             </div>
@@ -35,7 +40,6 @@
               <q-btn color="primary" @click="validarPasoUno" label="continuar" class="q-ml-sm" />
             </q-stepper-navigation>
           </q-step>
-
           <q-step :name="2" title="Llena la solicitud" icon="create_new_folder">
             <div class="text-h5 q-pa-sm text-center bg-primary text-white">
               Datos de la solicitud
@@ -112,32 +116,54 @@
               </div>
             </q-form>
 
-            <q-form v-if="solicitudObj.idTipoSolicitud === VACACIONES" ref="formulario">
-              <div class="row q-my-sm">
-                <q-card-section class="col-6 q-pt-none">
-                  <label>Fecha de ingreso </label>
-                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.fechaAlta"></q-input>
-                </q-card-section>
-                <q-card-section class="col-6 q-pt-none">
-                  <label> Años en GRUVER </label>
-                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.aniosLaborados"></q-input>
+            <q-form
+              v-if="[VACACIONES, DIAS_GANADOS, VACACIONES_VENCIDAS, SABADOS_5S].includes(solicitudObj.idTipoSolicitud)"
+              ref="formulario">
+              <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === SABADOS_5S">
+                <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
+                  <label>Sábados 5s</label>
+                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.sabados5s"></q-input>
                 </q-card-section>
               </div>
-              <div class="row q-my-sm">
-                <q-card-section class="col-6 q-pt-none">
-                  <label>Dias que corresponden por años laborados </label>
-                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasVacacionesLey"></q-input>
+              <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === VACACIONES_VENCIDAS">
+                <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
+                  <label>Vacaciones vencidas</label>
+                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.vacacionesVencidas"></q-input>
                 </q-card-section>
-                <q-card-section class="col-6 q-pt-none">
-                  <label>Dias disponibles </label>
-                  <q-input readonly outlined
-                    v-model="detalleVacacionesDiasEconomicos.diasVacacionesRestantes"></q-input>
+              </div>
+              <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === DIAS_GANADOS">
+                <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
+                  <label>Dias ganados disponibles</label>
+                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasGanados"></q-input>
                 </q-card-section>
+              </div>
+              <div v-if="solicitudObj.idTipoSolicitud === VACACIONES">
+                <div class="row q-my-sm">
+                  <q-card-section class="col-6 q-pt-none">
+                    <label>Fecha de ingreso </label>
+                    <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.fechaAlta"></q-input>
+                  </q-card-section>
+                  <q-card-section class="col-6 q-pt-none">
+                    <label> Años en GRUVER </label>
+                    <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.aniosLaborados"></q-input>
+                  </q-card-section>
+                </div>
+                <div class="row q-my-sm">
+                  <q-card-section class="col-6 q-pt-none">
+                    <label>Dias que corresponden por años laborados </label>
+                    <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasVacacionesLey"></q-input>
+                  </q-card-section>
+                  <q-card-section class="col-6 q-pt-none">
+                    <label>Dias disponibles </label>
+                    <q-input readonly outlined
+                      v-model="detalleVacacionesDiasEconomicos.diasVacacionesRestantes"></q-input>
+                  </q-card-section>
+                </div>
               </div>
               <div class=" q-my-sm">
                 <q-card-section>
                   <label> Seleccione como máximo <span style="color: red;"><b>{{
-                    detalleVacacionesDiasEconomicos.diasVacacionesRestantes }}</b></span>
+                    numeroDiasRestantes }}</b></span>
                     días <span style="color: red;">*</span></label>
                 </q-card-section>
                 <div class="q-my-sm flex flex-center">
@@ -214,7 +240,6 @@
               <q-btn color="primary" flat @click="step = 1" label="atras" class="q-ml-sm" />
             </q-stepper-navigation>
           </q-step>
-
           <q-step :name="3" title="Envío por correo" icon="settings" :done="step > 4">
             <div class="text-h5 q-pa-sm text-center bg-primary text-white">
               Envío por correo
@@ -233,8 +258,11 @@
                 <q-card-section class="col-1 q-pt-none">
                   <div class="checkbox-container">
                     <q-checkbox v-model="emailJefeIncorrecto">
-                      <q-tooltip style="font-size: 1.25rem;">Activa solo en caso de ser incorrecto el correo electronico
-                        de jefe inmediato</q-tooltip>
+                      <q-tooltip>
+                        <p class="text-h5">Activa solo en caso de ser incorrecto el correo electronico
+                          de jefe inmediato.</p>
+                        <p class="text-h5">Notifica a R.H. para que se realice el canbio desde el origen</p>
+                      </q-tooltip>
                     </q-checkbox>
                   </div>
                 </q-card-section>
@@ -256,17 +284,26 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 import { storeToRefs } from 'pinia'
 import { notificacion } from 'src/helpers/mensajes'
 import { validarCorreo } from 'src/helpers/inputReglas'
+import { useSucursalesStore } from 'src/stores/sucursales'
+import { useDepartamentosStore } from 'src/stores/departamentos'
+import dayjs from 'dayjs'
 
 export default {
   setup() {
+    const useSucursales = useSucursalesStore()
+    const { sucursales } = storeToRefs(useSucursales)
+
+    const useDepartamentos = useDepartamentosStore()
+    const { departamentos } = storeToRefs(useDepartamentos)
+
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos } = useJustificantesVacaciones
-    const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto, todasSucursales, todosDepartamentos } = storeToRefs(useJustificantesVacaciones)
+    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s } = useJustificantesVacaciones
+    const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto } = storeToRefs(useJustificantesVacaciones)
 
     const opcionesTipoPase = [
       {
@@ -306,15 +343,29 @@ export default {
     const AUSENCIAS_Y_RETARDOS = 1
     const VACACIONES = 2
     const DIAS_ECONOMICOS = 3
+    const DIAS_GANADOS = 4
+    const VACACIONES_VENCIDAS = 5
+    const SABADOS_5S = 6
 
     const PASE_DE_ENTRADA = 1
     const PASE_DE_SALIDA = 2
     const FALTA = 3
 
+    const MOTIVO_VACACIONES = 7
+    const MOTIVO_DIAS_GANADOS = 8
+    const MOTIVO_VACACIONES_VENCIDAS = 9
+    const MOTIVO_SABADOS_5S = 10
+
     const emailJefeDirecto = ref('')
     const emailJefeIncorrecto = ref(false)
 
-    const MOTIVO_VACACIONES = 7
+    const numeroDiasRestantes = computed(() => {
+      return solicitudObj.value?.idTipoSolicitud === VACACIONES ? detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes :
+        solicitudObj.value?.idTipoSolicitud === DIAS_ECONOMICOS ? detalleVacacionesDiasEconomicos.value.diasEconomicosRestantes :
+          solicitudObj.value?.idTipoSolicitud === DIAS_GANADOS ? detalleVacacionesDiasEconomicos.value.diasGanados :
+            solicitudObj.value?.idTipoSolicitud === VACACIONES_VENCIDAS ? detalleVacacionesDiasEconomicos.value.vacacionesVencidas :
+              solicitudObj.value?.idTipoSolicitud === SABADOS_5S ? detalleVacacionesDiasEconomicos.value.sabados5s : 0
+    })
 
     const formularioCorreos = ref(null)
 
@@ -343,7 +394,16 @@ export default {
       stepperSolicitud.value = true
     }
 
+    const verificarCamposCompletos = (campos) => {
+      return campos.every(campo => campo !== '' && campo !== undefined && campo !== null)
+    }
+
     const validarPasoUno = () => {
+      // Limpiar fechas seleccionadas antes del paso 2
+      solicitudObj.value.fechasSeleccionadas = []
+      solicitudObj.value.fechaDiaSolicitado = ''
+      solicitudObj.value.horaDiaSolicitado = ''
+
       if (typeof solicitudObj.value.idTipoSolicitud !== 'number') {
         notificacion('warning', 'Selecciona un tipo de solicitud')
       } else {
@@ -352,42 +412,63 @@ export default {
     }
 
     const validarPasoDos = () => {
-      switch (solicitudObj.value.idTipoSolicitud) {
-        case AUSENCIAS_Y_RETARDOS:
-          if (typeof solicitudObj.value.idMotivo === 'number') {
-            if ([PASE_DE_ENTRADA, PASE_DE_SALIDA].includes(solicitudObj.value.idMotivo)) {
-              if (solicitudObj.value.fechaDiaSolicitado !== '' && solicitudObj.value.horaDiaSolicitado !== '' && solicitudObj.value.descripcionMotivo !== '') {
-                step.value++
-              } else {
-                notificacion('warning', 'Revise que la información esté completa')
-              }
-            }
+      const { idTipoSolicitud, idMotivo, fechaDiaSolicitado, horaDiaSolicitado, descripcionMotivo, fechasSeleccionadas } = solicitudObj.value
 
-            if ([FALTA].includes(solicitudObj.value.idMotivo)) {
-              if (solicitudObj.value.fechasSeleccionadas?.length > 0 && solicitudObj.value.descripcionMotivo !== '') {
-                step.value++
-              } else {
-                notificacion('warning', 'Revise que la información esté completa')
-              }
-            }
-          } else {
+      const notificarError = () => {
+        notificacion('warning', 'Revise que la información esté completa')
+        return
+      }
+
+      switch (idTipoSolicitud) {
+        case AUSENCIAS_Y_RETARDOS:
+          if (typeof idMotivo !== 'number') {
             notificacion('warning', 'Seleccione un tipo de pase')
+            return
+          }
+          if ([PASE_DE_ENTRADA, PASE_DE_SALIDA].includes(idMotivo)) {
+            if (verificarCamposCompletos([fechaDiaSolicitado, horaDiaSolicitado, descripcionMotivo])) {
+              step.value++
+            } else {
+              notificarError()
+            }
+          }
+          if (idMotivo === FALTA) {
+            if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0) {
+              step.value++
+            } else {
+              notificarError()
+            }
           }
           break
+
         case VACACIONES:
-          if (solicitudObj.value?.fechasSeleccionadas?.length > 0 && solicitudObj.value?.descripcionMotivo !== '') {
-            solicitudObj.value.idMotivo = MOTIVO_VACACIONES
+        case DIAS_GANADOS:
+        case VACACIONES_VENCIDAS:
+        case SABADOS_5S:
+          if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0) {
+            //  "computed property names"
+            solicitudObj.value.idMotivo = {
+              [VACACIONES]: MOTIVO_VACACIONES,
+              [DIAS_GANADOS]: MOTIVO_DIAS_GANADOS,
+              [VACACIONES_VENCIDAS]: MOTIVO_VACACIONES_VENCIDAS,
+              [SABADOS_5S]: MOTIVO_SABADOS_5S
+            }[idTipoSolicitud]
             step.value++
           } else {
-            notificacion('warning', 'Revise que la información esté completa')
+            notificarError()
           }
           break
+
         case DIAS_ECONOMICOS:
-          if (solicitudObj.value?.fechasSeleccionadas?.length > 0 && typeof solicitudObj.value.idMotivo === 'number' && solicitudObj.value.descripcionMotivo !== '') {
+          if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0 && typeof idMotivo === 'number') {
             step.value++
           } else {
-            notificacion('warning', 'Revise que la información esté completa')
+            notificarError()
           }
+          break
+
+        default:
+          notificacion('warning', 'Tipo de solicitud no válido')
           break
       }
     }
@@ -397,8 +478,8 @@ export default {
         notificacion('warning', 'Revise que la información esté completa')
         return
       }
-      const sucursal = todasSucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.claveSucursal)
-      const departamento = todosDepartamentos.value.find(departamento => departamento.nombreDepartamento === detalleUsuario.value.departamento)
+      const sucursal = sucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.siglasCentroTrabajo)
+      const departamento = departamentos.value.find(departamento => departamento.departamento.nombreDepartamento === detalleUsuario.value.departamento)
 
       if (sucursal && departamento) {
         solicitudObj.value.numero_empleado = detalleUsuario.value.numero_empleado
@@ -424,6 +505,15 @@ export default {
             case DIAS_ECONOMICOS:
               await solicitarDiasEconomicos(solicitudObj.value, emailJefeDirecto.value)
               break
+            case DIAS_GANADOS:
+              await solicitarDiasGanados(solicitudObj.value, emailJefeDirecto.value)
+              break
+            case VACACIONES_VENCIDAS:
+              await solicitarVacacionesVencidas(solicitudObj.value, emailJefeDirecto.value)
+              break
+            case SABADOS_5S:
+              await solicitarSabados5s(solicitudObj.value, emailJefeDirecto.value)
+              break
           }
           stepperSolicitud.value = false
         } else {
@@ -431,21 +521,63 @@ export default {
         }
       }
 
-
     }
 
     // observa los cambios en las fechas seleccionadas del q-date
-    watch(() => solicitudObj.value.fechasSeleccionadas, (newVal) => {
-      if ([VACACIONES, DIAS_ECONOMICOS].includes(solicitudObj.value.idTipoSolicitud)) {
-        const numeroDiasRestantes = solicitudObj.value?.idTipoSolicitud === VACACIONES ? detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes : solicitudObj.value?.idTipoSolicitud === DIAS_ECONOMICOS ? detalleVacacionesDiasEconomicos.value.diasEconomicosRestantes : 0
+    watch(() => solicitudObj.value.fechasSeleccionadas, (nuevoValor) => {
+      if ([VACACIONES, DIAS_ECONOMICOS, DIAS_GANADOS, VACACIONES_VENCIDAS].includes(solicitudObj.value.idTipoSolicitud)) {
 
-        if (newVal && newVal.length > numeroDiasRestantes) {
+        if (nuevoValor && nuevoValor.length > numeroDiasRestantes.value) {
           errorSeleccion.value = true
           // corta el arreglo de fechas según el límite de días
-          solicitudObj.value.fechasSeleccionadas = solicitudObj.value?.idTipoSolicitud === VACACIONES ? newVal.slice(0, detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes) : solicitudObj.value?.idTipoSolicitud === DIAS_ECONOMICOS ? newVal.slice(0, detalleVacacionesDiasEconomicos.value.diasEconomicosRestantes) : 0
+          solicitudObj.value.fechasSeleccionadas = nuevoValor.slice(0, numeroDiasRestantes.value)
           notificacion('warning', `Alcanzaste el límite de días disponibles restantes`)
         } else {
           errorSeleccion.value = false
+        }
+      }
+
+      if (solicitudObj.value.idTipoSolicitud === SABADOS_5S) {
+        let error = false;
+
+        // Verificar que todas las fechas seleccionadas sean sábados
+        const todosSabados = nuevoValor?.every(fecha => dayjs(fecha).day() === 6);
+        if (!todosSabados) {
+          errorSeleccion.value = true;
+          notificacion('warning', `Solo puedes seleccionar días sábado.`);
+          error = true;
+        } else {
+          // Agrupar las fechas por mes
+          const agrupadasPorMes = nuevoValor.reduce((acumulador, fecha) => {
+            const mes = dayjs(fecha).format('YYYY-MM');
+            if (!acumulador[mes]) acumulador[mes] = [];
+            acumulador[mes].push(fecha);
+            return acumulador;
+          }, {});
+
+          // Verificar que no haya más de un sábado por mes usando métodos modernos de JavaScript
+          const masDeUnSabadoPorMes = Object.values(agrupadasPorMes).some(fechas => fechas.length > 1);
+
+          if (masDeUnSabadoPorMes) {
+            errorSeleccion.value = true;
+            notificacion('warning', `Solo puedes seleccionar un sábado por mes.`);
+            error = true;
+          } else {
+            // Limitar el número de días seleccionados según el límite permitido
+            if (nuevoValor.length > numeroDiasRestantes.value) {
+              solicitudObj.value.fechasSeleccionadas = nuevoValor.slice(0, numeroDiasRestantes.value);
+              notificacion('warning', `Alcanzaste el límite de días disponibles restantes`);
+              errorSeleccion.value = true;
+            } else {
+              errorSeleccion.value = false;
+            }
+          }
+        }
+
+        if (error) {
+          solicitudObj.value.fechasSeleccionadas = []; // Limpiar la selección si hay un error
+        } else {
+          errorSeleccion.value = false;
         }
       }
     }, { deep: true })
@@ -458,9 +590,13 @@ export default {
       AUSENCIAS_Y_RETARDOS,
       VACACIONES,
       DIAS_ECONOMICOS,
+      DIAS_GANADOS,
+      VACACIONES_VENCIDAS,
+      SABADOS_5S,
       PASE_DE_ENTRADA,
       PASE_DE_SALIDA,
       FALTA,
+      numeroDiasRestantes,
       opcionesTipoPase,
       detalleVacacionesDiasEconomicos,
       abrir,

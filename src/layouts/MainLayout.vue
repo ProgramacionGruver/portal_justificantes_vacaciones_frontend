@@ -67,13 +67,12 @@ export default {
     const { obtenerDepartamentos } = useDepartamentos
 
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { obtenerUsuarios, obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
+    const { obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
 
     const router = useRouter()
 
     onMounted(async () => {
       // autenticarUsuario()
-      await obtenerUsuarios()
       await obtenerEmpresas()
       await obtenerSucursales()
       await obtenerDepartamentos()

@@ -7,7 +7,7 @@ export const useEmpresasStore = defineStore("empresas", () => {
 
   const empresas = ref([])
   const empresasFiltradas = ref([])
-  const empresasSeleccionadas = ref([])
+  const modelEmpresasSeleccionadas = ref([])
   const listaClavesEmpresas = ref([])
   const todasEmpresasSeleccionadas = ref(true)
 
@@ -53,7 +53,7 @@ export const useEmpresasStore = defineStore("empresas", () => {
   return {
     empresas,
     empresasFiltradas,
-    empresasSeleccionadas,
+    modelEmpresasSeleccionadas,
     todasEmpresasSeleccionadas,
     listaClavesEmpresas,
     obtenerEmpresas,

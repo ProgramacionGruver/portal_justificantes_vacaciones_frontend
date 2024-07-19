@@ -6,7 +6,23 @@ import { notificacion } from 'src/helpers/mensajes'
 export const useCatalogosStore = defineStore("catalogos", () => {
     const catalogoVacaciones = ref([])
     const catalogoUsuarios = ref([])
+    const catalogoUsuariosFiltrados = ref([])
+    const estatusActividad = ref([{ label: 'ACTIVO', value: true }, { label: 'BAJA', value: false }])
+    const estatusActividadFiltrados = ref([{ label: 'ACTIVO', value: true }, { label: 'BAJA', value: false }])
+    const modelEstatusActividadSeleccionados = ref([])
+    const listaEstatusActividad = ref([true, false])
+    const todosEstatusActividadSeleccionados = ref(true)
     const catalogoTurnos = ref([])
+    const turnosLunesViernes = ref([])
+    const turnosLunesViernesFiltrados = ref([])
+    const modelTurnosLunesViernesSeleccionados = ref([])
+    const listaTurnosLunesViernes = ref([])
+    const todosTurnosLunesViernesSeleccionados = ref(true)
+    const turnosSabados = ref([])
+    const turnosSabadosFiltrados = ref([])
+    const modelTurnosSabadosSeleccionados = ref([])
+    const listaTurnosSabados = ref([])
+    const todosTurnosSabadosSeleccionados = ref(true)
     const opcionesTurnos = ref([])
     const cargando = ref(false)
 
@@ -61,6 +77,7 @@ export const useCatalogosStore = defineStore("catalogos", () => {
             cargando.value= true
             const { data } = await api.get('/catalogoUsuarios')
             catalogoUsuarios.value = data
+            catalogoUsuariosFiltrados.value = data
         } catch (error) {
             console.log(error)
         }finally{
@@ -83,6 +100,18 @@ export const useCatalogosStore = defineStore("catalogos", () => {
       try {
           const { data } = await api.get('/catalogoTurnos')
           catalogoTurnos.value = data
+
+          turnosLunesViernesFiltrados.value = data.map(turno => { return { label: turno.turno, value: turno.turno } })
+          turnosLunesViernesFiltrados.value = [{ label: 'No labora', value: null }, ...turnosLunesViernesFiltrados.value]
+
+          turnosSabadosFiltrados.value = data.map(turno => { return { label: turno.turno, value: turno.turno } })
+          turnosSabadosFiltrados.value = [{ label: 'No labora', value: null }, ...turnosSabadosFiltrados.value]
+
+          listaTurnosLunesViernes.value = data.map(turno => { return turno.turno })
+          listaTurnosLunesViernes.value = [null, ...listaTurnosLunesViernes.value]
+          listaTurnosSabados.value = data.map(turno => { return turno.turno })
+          listaTurnosSabados.value = [null, ...listaTurnosSabados.value]
+
           opcionesTurnos.value = [
             { label: 'No labora', turno: null },
             ...data.map(turno => ({ label: turno.turno, ...turno }))
@@ -95,9 +124,25 @@ export const useCatalogosStore = defineStore("catalogos", () => {
     return {
         catalogoVacaciones,
         catalogoUsuarios,
+        catalogoUsuariosFiltrados,
         catalogoTurnos,
         opcionesTurnos,
         cargando,
+        estatusActividad,
+        estatusActividadFiltrados,
+        modelEstatusActividadSeleccionados,
+        listaEstatusActividad,
+        todosEstatusActividadSeleccionados,
+        turnosLunesViernes,
+        turnosLunesViernesFiltrados,
+        modelTurnosLunesViernesSeleccionados,
+        listaTurnosLunesViernes,
+        todosTurnosLunesViernesSeleccionados,
+        turnosSabados,
+        turnosSabadosFiltrados,
+        modelTurnosSabadosSeleccionados,
+        listaTurnosSabados,
+        todosTurnosSabadosSeleccionados,
         obtenerCatalogoVacaciones,
         obtenerCatalogoUsuarios,
         agregarCatalogoVacaciones,

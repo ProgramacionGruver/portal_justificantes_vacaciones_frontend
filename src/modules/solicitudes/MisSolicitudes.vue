@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <h2>Mis solicitudes</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table rows-per-page-label="Registros por página" :rows-per-page-options="[5, 7, 10, 15, 20, 25, 50, 0]"
+    <q-table rows-per-page-label="Registros por página" :rows-per-page-options="[7, 10, 15, 20, 25, 50, 0]"
       loading-label="Cargando..." :loading="cargandoMisSolicitudes" :columns="columns" :rows="todasSolicitudesEmpleado"
       no-data-label="Sin información">
       <template v-slot:top-left>

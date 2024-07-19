@@ -8,8 +8,6 @@ import { ID_FORM_JUSTIFICANTES_VACACIONES } from 'src/constant/servidor'
 import { mensajeCorreoAutorizacionJustificantesVacaciones } from 'src/helpers/correos'
 
 export const useJustificantesVacacionesStore = defineStore('justificantesVacaciones', () => {
-  const todosUsuarios = ref([])
-  const todosUsuariosFiltrados = ref([])
   const todosEstatus = ref([])
   const todosEstatusFiltrados = ref([])
   const todosMotivos = ref([])
@@ -34,18 +32,6 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const detalleVacacionesDiasEconomicos = ref(null)
 
   const urlForm = ref('')
-
-  const obtenerUsuarios = async () => {
-    try {
-      const { data } = await api.get('/obtenerUsuarios')
-      todosUsuarios.value = [...data]
-      todosUsuariosFiltrados.value = data.map(usuario => {
-        return { label: `${usuario.numero_empleado}-${usuario.nombre}-${usuario.claveSucursal}`, value: usuario }
-      })
-    } catch (error) {
-      notificacion('negative', error.response.data.message)
-    }
-  }
 
   const obtenerEstatus = async () => {
     try {
@@ -121,6 +107,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       cargandoHistorialSolicitudes.value = true
       const { data } = await api.get('/obtenerTodasSolicitudes')
       historialSolicitudes.value = data
+      historialSolicitudesFiltradas.value = data
     } catch (error) {
       notificacion('negative', error.response.data.message)
     } finally {
@@ -226,6 +213,93 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
+  const solicitarDiasGanados = async (solicitudObj, destinatario) => {
+    try {
+      cargandoEnvioSolicitud.value = true
+      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
+      const usuariosAutorizanObj = {
+        primeraAutorizacion: detalleJefeDirecto.value,
+        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
+      }
+      solicitudObj.usuariosAutorizan = usuariosAutorizanObj
+      const { data } = await api.post('/solicitarDiasGanados', solicitudObj)
+      todasSolicitudesEmpleado.value.unshift(data)
+
+      const eventoObj = {
+        nombreEvento: `-${data.folio}_1`,
+        formulario: ID_FORM_JUSTIFICANTES_VACACIONES
+      }
+
+      await crearEventoForm(eventoObj)
+
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [destinatario])
+
+      notificacion('positive', 'Solicitud generada exitosamente')
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoEnvioSolicitud.value = false
+    }
+  }
+
+  const solicitarVacacionesVencidas = async (solicitudObj, destinatario) => {
+    try {
+      cargandoEnvioSolicitud.value = true
+      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
+      const usuariosAutorizanObj = {
+        primeraAutorizacion: detalleJefeDirecto.value,
+        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
+      }
+      solicitudObj.usuariosAutorizan = usuariosAutorizanObj
+      const { data } = await api.post('/solicitarVacacionesVencidas', solicitudObj)
+      todasSolicitudesEmpleado.value.unshift(data)
+
+      const eventoObj = {
+        nombreEvento: `-${data.folio}_1`,
+        formulario: ID_FORM_JUSTIFICANTES_VACACIONES
+      }
+
+      await crearEventoForm(eventoObj)
+
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [destinatario])
+
+      notificacion('positive', 'Solicitud generada exitosamente')
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoEnvioSolicitud.value = false
+    }
+  }
+
+  const solicitarSabados5s = async (solicitudObj, destinatario) => {
+    try {
+      cargandoEnvioSolicitud.value = true
+      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
+      const usuariosAutorizanObj = {
+        primeraAutorizacion: detalleJefeDirecto.value,
+        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
+      }
+      solicitudObj.usuariosAutorizan = usuariosAutorizanObj
+      const { data } = await api.post('/solicitarSabados5s', solicitudObj)
+      todasSolicitudesEmpleado.value.unshift(data)
+
+      const eventoObj = {
+        nombreEvento: `-${data.folio}_1`,
+        formulario: ID_FORM_JUSTIFICANTES_VACACIONES
+      }
+
+      await crearEventoForm(eventoObj)
+
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [destinatario])
+
+      notificacion('positive', 'Solicitud generada exitosamente')
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoEnvioSolicitud.value = false
+    }
+  }
+
   const crearEventoForm = async (eventoObj) => {
     try {
       const { data } = await apiForm.post('/generarEventoAutorizacion', eventoObj)
@@ -247,8 +321,6 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   }
 
   return {
-    todosUsuarios,
-    todosUsuariosFiltrados,
     todosEstatus,
     todosEstatusFiltrados,
     todosMotivos,
@@ -271,7 +343,6 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     cargandoHistorialSolicitudes,
     cargandoEnvioSolicitud,
     urlForm,
-    obtenerUsuarios,
     obtenerEstatus,
     obtenerMotivos,
     obtenerTipoSolicitudes,
@@ -283,5 +354,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     solicitarAusenciasYRetardos,
     solicitarVacaciones,
     solicitarDiasEconomicos,
+    solicitarDiasGanados,
+    solicitarVacacionesVencidas,
+    solicitarSabados5s
   }
 })

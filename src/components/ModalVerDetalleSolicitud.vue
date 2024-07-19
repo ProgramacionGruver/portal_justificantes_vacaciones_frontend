@@ -5,6 +5,12 @@
       <h3 class="text-center">Detalles de la solicitud</h3>
       <q-separator color="primary" class="q-my-md" />
       <div class="row q-my-sm">
+        <div class="col-12">
+          <label>Nombre del colaborador</label>
+          <q-input :label="`${solicitud.usuario.nombre}`" outlined readonly />
+        </div>
+      </div>
+      <div class="row q-my-sm">
         <div class="col-6 q-pr-sm">
           <label>Folio</label>
           <q-input :label="`${solicitud.folio}`" outlined readonly />
