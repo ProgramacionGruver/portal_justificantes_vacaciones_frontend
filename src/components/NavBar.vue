@@ -13,10 +13,6 @@
         opacity: 0.2
       }" style="height: 80%; max-width: 100%;">
     <q-list>
-      <!-- <div class="q-px-md q-py-md text-h4">
-        Dashboard
-      </div> -->
-      <q-separator />
       <template v-for="(menuItem, index) in menulist" :key="index">
         <q-item clickable v-ripple :to="{ name: menuItem.name }" exact active-class="my-menu-link">
           <q-item-section avatar>
@@ -29,25 +25,6 @@
         </q-item>
 
         <q-separator />
-        <!-- <div v-if="menuItem.name === 'dashboard'">
-          <div class="q-px-md q-py-md q-mt-md text-h4">
-            Reporte
-          </div>
-          <q-separator />
-        </div> -->
-        <div v-if="menuItem.name === 'registro'">
-          <div class="q-px-md q-py-md q-mt-md text-h4">
-            Configuración
-          </div>
-          <q-separator />
-        </div>
-        <!--
-       <div v-if="menuItem.name === ''">
-            <div class="q-px-md q-py-md q-mt-md text-h4">
-              A
-            </div>
-            <q-separator />
-       </div> -->
       </template>
 
     </q-list>
@@ -57,14 +34,24 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAutenticacionStore } from 'src/stores/autenticaciones.js'
+import { storeToRefs } from 'pinia';
 
 const menulist = ref([])
 const router = useRouter()
+
+const useUsuario = useAutenticacionStore()
+const { usuarioAutenticado } = storeToRefs(useUsuario)
+
 onMounted(() => {
-  menulist.value = router.options.routes.find(r => {
+  const modulosPermiso = usuarioAutenticado.value.modulos.map(e => e.moduloPortale.nombreModulo)
+  menulist.value = router.options.routes.find((r) => {
     return r.name === 'principal'
-  }).children.filter(route => route.label)
-  if (router.currentRoute.value.name === 'principal') router.replace({ name: 'dashboard' })
+  }).children.filter(route => modulosPermiso.includes(route.name))
+
+  if (router.currentRoute.value.name === 'principal') {
+    router.replace({ name: 'dashboard' })
+  }
 })
 
 </script>

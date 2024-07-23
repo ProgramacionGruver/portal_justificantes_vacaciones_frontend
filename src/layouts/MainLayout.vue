@@ -45,6 +45,8 @@ import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacacio
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
+import { useModulosStore } from 'src/stores/permisosModulos'
+import { ID_SERVIDOR } from 'src/constant/servidor'
 
 export default {
   components: {
@@ -69,6 +71,9 @@ export default {
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
     const { obtenerEstatus, obtenerMotivos, obtenerTipoSolicitudes, obtenerDetalleEmpleadoYJefeDirecto, obtenerSolicitudesPorEmpleado} = useJustificantesVacaciones
 
+    const useModulos = useModulosStore()
+    const { obtenerUsuariosModulo, obtenerPermisosSucursalesByUser } = useModulos
+
     const router = useRouter()
 
     onMounted(async () => {
@@ -79,6 +84,9 @@ export default {
       await obtenerEstatus()
       await obtenerMotivos()
       await obtenerTipoSolicitudes()
+      await obtenerUsuariosModulo(ID_SERVIDOR)
+      await obtenerPermisosSucursalesByUser(usuarioAutenticado.value.idUsuario)
+
       await obtenerDetalleEmpleadoYJefeDirecto(usuarioAutenticado.value.numero_empleado)
       await obtenerSolicitudesPorEmpleado(usuarioAutenticado.value.numero_empleado)
     })

@@ -18,6 +18,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/dashboard/DashBoard.vue')
       },
       {
+        path: 'panel_control',
+        icono: 'admin_panel_settings',
+        label: 'Panel de control',
+        name: 'panelControl',
+        component: () => import(/* webpackChunkName: "panel_control" */'src/modules/panelControl/PanelControl.vue')
+      },
+      {
         path: 'solicitudes',
         icono: 'description',
         label: 'Mis solicitudes',
@@ -28,7 +35,7 @@ const routes = [
         path: 'historialSolicitudes',
         icono: 'description',
         label: 'Historial de solicitudes',
-        name: 'todasSolicitudes',
+        name: 'historialSolicitudes',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/historialSolicitudes/HistorialSolicitudes.vue')
       },
       {
