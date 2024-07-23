@@ -102,10 +102,10 @@ export const useCatalogosStore = defineStore("catalogos", () => {
           catalogoTurnos.value = data
 
           turnosLunesViernesFiltrados.value = data.map(turno => { return { label: turno.turno, value: turno.turno } })
-          turnosLunesViernesFiltrados.value = [{ label: 'No labora', value: null }, ...turnosLunesViernesFiltrados.value]
+          turnosLunesViernesFiltrados.value = [{ label: 'Sin Registro', value: null }, ...turnosLunesViernesFiltrados.value]
 
           turnosSabadosFiltrados.value = data.map(turno => { return { label: turno.turno, value: turno.turno } })
-          turnosSabadosFiltrados.value = [{ label: 'No labora', value: null }, ...turnosSabadosFiltrados.value]
+          turnosSabadosFiltrados.value = [{ label: 'Sin Registro', value: null }, ...turnosSabadosFiltrados.value]
 
           listaTurnosLunesViernes.value = data.map(turno => { return turno.turno })
           listaTurnosLunesViernes.value = [null, ...listaTurnosLunesViernes.value]
@@ -113,7 +113,7 @@ export const useCatalogosStore = defineStore("catalogos", () => {
           listaTurnosSabados.value = [null, ...listaTurnosSabados.value]
 
           opcionesTurnos.value = [
-            { label: 'No labora', turno: null },
+            { label: 'Sin Registro', turno: null },
             ...data.map(turno => ({ label: turno.turno, ...turno }))
           ]
       } catch (error) {

@@ -13,6 +13,12 @@
                 </template>
               </q-input>
             </div>
+            <div class="col-3 q-ma-sm">
+              <q-input dense filled v-model="objBusqueda.fechaInicio" type="date" @update:model-value="limpiarFechaFin()"/>
+            </div>
+            <div class="col-3 q-ma-sm">
+              <q-input dense filled v-model="objBusqueda.fechaFin" type="date" @update:model-value="busquedaFechas()"/>
+            </div>
           </div>
           <div class="fit row q-gutter-sm">
             <q-btn-dropdown dense outline class="col q-my-sm" color="grey" label="Empresas">
@@ -39,18 +45,6 @@
               type="checkbox" />
           </q-btn-dropdown>
           </div>
-          <div class="fit row q-gutter-sm">
-            <div class="col q-ma-sm">
-              <q-select outlined dense :options="tipoGratificacion" v-model="gratificacionSeleccionado" map-options
-                label="Tipo Asistencia" />
-            </div>
-            <div class="col-3 q-ma-sm">
-              <q-input dense filled v-model="objBusqueda.fechaInicio" type="date" />
-            </div>
-            <div class="col-3 q-ma-sm">
-              <q-input dense filled v-model="objBusqueda.fechaFin" type="date"/>
-            </div>
-          </div>
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
@@ -67,7 +61,7 @@
                 {{ col.value.value }}
               </div>
               <q-btn
-                v-else-if="col.value.estado === 'RETARDO' || col.value.estado === 'FALTA'"
+                v-else-if="col.value.estado === 'RETARDO' || col.value.estado === 'FALTA' || col.value.estado === 'TURNO ESPECIAL'"
                 class="q-mx-sm text-white"
                 size="1.2rem"
                 unelevated
@@ -126,6 +120,9 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
       const dynamicColumns = ref([])
       const columns = ref([])
       const modalVerSolicitud = ref(null)
+      const hoy = new Date()
+      const unaSemanaAntes = new Date()
+      unaSemanaAntes.setDate(hoy.getDate() - 7)
 
       const basecolumns = [
       {
@@ -149,14 +146,14 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
       ]
 
       const objBusqueda = ref({
-        fechaInicio: `2024-06-01`,
-        fechaFin: '2024-06-14'
+        fechaInicio: unaSemanaAntes.toISOString().split('T')[0],
+        fechaFin: hoy.toISOString().split('T')[0],
       })
 
       onMounted(async () => {
         await obtenerAsistencias(objBusqueda.value)
         await columnasDinamicas()
-        limpiarFiltros()
+        await limpiarFiltros()
       })
 
       const columnasDinamicas = async() => {
@@ -192,6 +189,7 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                       label: `${formatearFecha(fechaRegistro)} ${dia.charAt(0).toUpperCase() + dia.slice(1)}`,
                       align: "center",
                       field: row => {
+                        const turnoEspecial = row.turnoEspecial
                         const diaData = row.semanas[semana] && row.semanas[semana][dia]
                         if (diaData) {
                           if (diaData.solicitud) {
@@ -213,6 +211,16 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                               estado: 'COMPLETO',
                               retardo: diaData.retardo
                             }
+                          }else if(turnoEspecial){
+                          return {
+                              value: `${turnoEspecial.turno}`,
+                              estado: `TURNO ESPECIAL`,
+                          }
+                        }
+                        }else if(turnoEspecial){
+                          return {
+                              value: `${turnoEspecial.turno}`,
+                              estado: `TURNO ESPECIAL`,
                           }
                         }
                         return {
@@ -233,7 +241,7 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
       const colorBoton = (entrada) => {
         const { estado } = entrada
         const colores = coloresBotones.find(e => e.estado === estado)
-        return colores.color
+        return colores?.color
       }
 
       const verSolicitud = (solicitud) => {
@@ -260,11 +268,26 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
           todosDepartamentosSeleccionados, listaClavesDepartamentos, modelDepartamentosSeleccionados)
       }
 
-      const limpiarFiltros = () => {
+      const limpiarFiltros = async() => {
         limpiarFiltrosEmpresaSucursalDepartamento(todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
           todasSucursalesSeleccionadas, modelSucursalesSeleccionadas, todosDepartamentosSeleccionados,
           modelDepartamentosSeleccionados, sucursales, sucursalesFiltradas,
           listaClavesEmpresas, departamentos, departamentosFiltrados)
+      }
+
+      const limpiarFechaFin = () => {
+        objBusqueda.value.fechaFin = null
+      }
+
+      const busquedaFechas = async() => {
+        if (objBusqueda.value.fechaInicio && objBusqueda.value.fechaFin) {
+          asistenciasFiltradas.value = []
+          columns.value = []
+          dynamicColumns.value = []
+          await obtenerAsistencias(objBusqueda.value)
+          await columnasDinamicas()
+          await limpiarFiltros()
+        }
       }
 
       return {
@@ -285,7 +308,9 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
         departamentosFiltrados,
         modelDepartamentosSeleccionados,
         todosDepartamentosSeleccionados,
-        filtrar
+        filtrar,
+        limpiarFechaFin,
+        busquedaFechas
       }
     }
   }
