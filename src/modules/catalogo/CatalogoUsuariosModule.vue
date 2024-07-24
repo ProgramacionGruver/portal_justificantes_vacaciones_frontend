@@ -214,6 +214,13 @@ export default {
         sortable: true
       },
       {
+        name: "vacacionesVencidas",
+        label: "Dias Vacaciones Vencidos",
+        align: "left",
+        field: "vacacionesVencidas",
+        sortable: true
+      },
+      {
         name: "turnoLunesViernes",
         label: "Turno Lunes-Viernes",
         align: "left",

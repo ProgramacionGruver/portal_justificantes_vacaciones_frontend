@@ -67,7 +67,25 @@
                             v-model="catalagoObj.diasEconomicosRestantes"
                       />
                     </div>
-                  </div>
+                </div>
+                <div class="q-gutter-x-sm row">
+                  <div class="q-my-xs col">
+                      <label>Dias Vacaciones Vencidas</label>
+                      <q-input
+                            filled
+                            type="number"
+                            v-model="catalagoObj.vacacionesVencidas"
+                      />
+                    </div>
+                    <div class="q-my-xs col">
+                      <label>Dias Vencidos Restantes</label>
+                      <q-input
+                            filled
+                            type="number"
+                            v-model="catalagoObj.vacacionesVencidasRestantes"
+                      />
+                    </div>
+                </div>
             </q-tab-panel>
           </q-tab-panels>
 
