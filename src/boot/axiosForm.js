@@ -7,8 +7,8 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const apiForm = axios.create({ baseURL: 'https://backend.gruver.com.mx/formularios/api' })
-// const apiForm = axios.create({ baseURL: 'http://localhost:4009/formularios/api' })
+// const apiForm = axios.create({ baseURL: 'https://backend.gruver.com.mx/formularios/api' })
+const apiForm = axios.create({ baseURL: 'http://localhost:4009/formularios/api' })
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

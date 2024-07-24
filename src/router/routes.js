@@ -32,6 +32,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/solicitudes/MisSolicitudes.vue')
       },
       {
+        path: 'prorrogas',
+        icono: 'pending_actions',
+        label: 'Solicitud de prórroga',
+        name: 'prorrogas',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/prorrogas/MisProrrogas.vue')
+      },
+      {
         path: 'historialSolicitudes',
         icono: 'description',
         label: 'Historial de solicitudes',
