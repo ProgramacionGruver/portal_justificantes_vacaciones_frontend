@@ -9,6 +9,7 @@ export const useSucursalesStore = defineStore("sucursales", () => {
   const modelSucursalesSeleccionadas = ref([])
   const listaClavesSucursales = ref([])
   const todasSucursalesSeleccionadas = ref(true)
+  const sucursalesAgrupadas = ref([])
 
   const obtenerSucursales = async () => {
     try {
@@ -25,12 +26,23 @@ export const useSucursalesStore = defineStore("sucursales", () => {
     }
   }
 
+  const obtenerSucursalesAgrupadasEmpresas = async () => {
+    try {
+      const { data } = await api.get('/sucursalesAgrupadasEmpresas');
+      sucursalesAgrupadas.value = data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return {
     sucursales,
     sucursalesFiltradas,
     modelSucursalesSeleccionadas,
     todasSucursalesSeleccionadas,
     listaClavesSucursales,
+    sucursalesAgrupadas,
     obtenerSucursales,
+    obtenerSucursalesAgrupadasEmpresas
   }
 })
