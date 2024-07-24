@@ -37,7 +37,8 @@
         </div>
       </div>
       <p class="q-my-lg text-center">Autorizaciones</p>
-      <q-table wrap-cells class="q-my-md" :rows="solicitud.solicitud_detalles" :columns="columnasDetalles" rows-per-page-label="Registros por página" no-data-label="Sin información">
+      <q-table wrap-cells class="q-my-md" :rows="solicitud.solicitud_detalles" :columns="columnasDetalles"
+        rows-per-page-label="Registros por página" no-data-label="Sin información">
         <template v-slot:header="props">
           <q-tr :props="props">
             <q-th auto-width />
@@ -59,8 +60,9 @@
           </q-tr>
           <q-tr v-show="filasExpandidas[props.row.idSolicitudDetalle]" :props="props">
             <q-td colspan="100%">
-              <q-table wrap-cells dense flat :rows="props.row.autorizaciones_solicitudes" :columns="columnasAutorizaciones"
-                no-data-label="No se encontró información" rows-per-page-label="Registros por página" row-key="idAutorizacion">
+              <q-table wrap-cells dense flat :rows="props.row.autorizaciones_solicitudes"
+                :columns="columnasAutorizaciones" no-data-label="No se encontró información"
+                rows-per-page-label="Registros por página" row-key="idAutorizacion">
                 <template v-slot:body="props">
                   <q-tr :props="props">
                     <q-td class="text-center"> {{ props.row.idTipoAutorizacion }}</q-td>
@@ -86,6 +88,8 @@ import { ref } from 'vue'
 
 export default {
   setup() {
+    const PRORROGA = 7
+
     const modalDetalleSolicitud = ref(false)
     const solicitud = ref(null)
     const filasExpandidas = ref({})
@@ -93,8 +97,8 @@ export default {
     const columnasDetalles = [
       {
         name: 'fechaDiaSolicitado',
-        label: 'Día',
-        field: (row) => formatearFecha(row.fechaDiaSolicitado),
+        label: 'Día(s)',
+        field: (row) => solicitud.value.idTipoSolicitud === PRORROGA ? row.numeroDiasProrroga : formatearFecha(row.fechaDiaSolicitado),
         align: 'center',
         sortable: true,
       },
@@ -128,6 +132,7 @@ export default {
     }
 
     return {
+      PRORROGA,
       modalDetalleSolicitud,
       solicitud,
       columnasDetalles,

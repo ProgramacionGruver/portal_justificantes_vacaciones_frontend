@@ -22,7 +22,7 @@
                     unchecked-icon="panorama_fish_eye" :val="3" label="Días económicos" />
                   <!-- mostrar si detecta que tiene días vencidos etc...  -->
                   <q-radio
-                    v-if="detalleVacacionesDiasEconomicos?.vacacionesVencidas && detalleVacacionesDiasEconomicos?.vacacionesVencidas > 0"
+                    v-if="detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes && detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes > 0"
                     v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
                     unchecked-icon="panorama_fish_eye" :val="5" label="Vacaciones vencidas" />
                   <q-radio
@@ -128,7 +128,7 @@
               <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === VACACIONES_VENCIDAS">
                 <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
                   <label>Vacaciones vencidas</label>
-                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.vacacionesVencidas"></q-input>
+                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.vacacionesVencidasRestantes"></q-input>
                 </q-card-section>
               </div>
               <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === DIAS_GANADOS">
@@ -363,7 +363,7 @@ export default {
       return solicitudObj.value?.idTipoSolicitud === VACACIONES ? detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes :
         solicitudObj.value?.idTipoSolicitud === DIAS_ECONOMICOS ? detalleVacacionesDiasEconomicos.value.diasEconomicosRestantes :
           solicitudObj.value?.idTipoSolicitud === DIAS_GANADOS ? detalleVacacionesDiasEconomicos.value.diasGanados :
-            solicitudObj.value?.idTipoSolicitud === VACACIONES_VENCIDAS ? detalleVacacionesDiasEconomicos.value.vacacionesVencidas :
+            solicitudObj.value?.idTipoSolicitud === VACACIONES_VENCIDAS ? detalleVacacionesDiasEconomicos.value.vacacionesVencidasRestantes :
               solicitudObj.value?.idTipoSolicitud === SABADOS_5S ? detalleVacacionesDiasEconomicos.value.sabados5s : 0
     })
 

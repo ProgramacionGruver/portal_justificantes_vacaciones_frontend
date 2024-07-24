@@ -8,8 +8,8 @@ import axios from 'axios'
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({
-  baseURL: 'https://backend.gruver.com.mx/justificantesVacaciones/api'
-  //  baseURL: 'http://localhost:4022/justificantesVacaciones/api'
+  // baseURL: 'https://backend.gruver.com.mx/justificantesVacaciones/api'
+   baseURL: 'http://localhost:4022/justificantesVacaciones/api'
    })
 
 export default boot(({ app }) => {

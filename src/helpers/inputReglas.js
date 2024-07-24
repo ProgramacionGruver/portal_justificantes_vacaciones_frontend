@@ -30,6 +30,11 @@ export const validarDigitosEnteros = [
   val => ((val - Math.floor(val) === 0) && val >= 0) || 'Solo numeros enteros.'
 ]
 
+export const validarEnterosPositivos = [
+  val => (val !== null && val !== '' && !isNaN(parseInt(val))) || 'Ingresa un número válido.',
+  val => ((val - Math.floor(val) === 0) && val > 0) || 'Solo números enteros mayores a 0.'
+]
+
 export const validarDigitosPostivos = [
   val => (val !== null && val !== '' && !isNaN(parseInt(val))) || 'Ingresa un numero valido.',
   val => ((val - Math.floor(val) === 0) && val > 0) || 'El kilometraje del servicio no puede ser menor o igual a cero.'
