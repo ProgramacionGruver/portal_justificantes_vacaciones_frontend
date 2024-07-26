@@ -1,5 +1,23 @@
 <template>
   <q-layout view="hHh LpR fFf">
+    <div v-if="cargando">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 100vw;
+          height: 100vh;
+        "
+      >
+        <q-spinner-ios size="200px" color="primary" />
+        <div class="text-h2 q-mt-xl">
+          Obteniendo la información del portal, espere un momento...
+        </div>
+      </div>
+    </div>
+    <div v-else>
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
@@ -32,6 +50,7 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+  </div>
   </q-layout>
 </template>
 
@@ -75,20 +94,22 @@ export default {
     const { obtenerUsuariosModulo, obtenerPermisosSucursalesByUser } = useModulos
 
     const router = useRouter()
+    const cargando = ref(false)
 
     onMounted(async () => {
+      cargando.value = true
       // autenticarUsuario()
+      await obtenerEstatus()
+      await obtenerTipoSolicitudes()
+      await obtenerMotivos()
+      await obtenerSolicitudesPorEmpleado(usuarioAutenticado.value.numero_empleado)
+      cargando.value = false
+      await obtenerDetalleEmpleadoYJefeDirecto(usuarioAutenticado.value.numero_empleado)
+      await obtenerUsuariosModulo(ID_SERVIDOR)
+      await obtenerPermisosSucursalesByUser(usuarioAutenticado.value.idUsuario)
       await obtenerEmpresas()
       await obtenerSucursales()
       await obtenerDepartamentos()
-      await obtenerEstatus()
-      await obtenerMotivos()
-      await obtenerTipoSolicitudes()
-      await obtenerUsuariosModulo(ID_SERVIDOR)
-      await obtenerPermisosSucursalesByUser(usuarioAutenticado.value.idUsuario)
-
-      await obtenerDetalleEmpleadoYJefeDirecto(usuarioAutenticado.value.numero_empleado)
-      await obtenerSolicitudesPorEmpleado(usuarioAutenticado.value.numero_empleado)
     })
     const logout = () => {
       router.push('/')
@@ -99,6 +120,7 @@ export default {
       // inicialesUsuario,
       usuarioAutenticado,
       logout,
+      cargando,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

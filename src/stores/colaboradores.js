@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { apiUsuarios } from 'src/boot/axiosUsuarios'
+import { api } from 'src/boot/axios'
 
 export const useColaboradoresStore = defineStore('colaboradores', () => {
   const colaboradores = ref([])
@@ -8,12 +8,12 @@ export const useColaboradoresStore = defineStore('colaboradores', () => {
 
   const obtenerColaboradores = async () => {
     try {
-      const { data } = await apiUsuarios.get('/usuarios')
+      const { data } = await api.get('/obtenerUsuarios')
       colaboradores.value = data
 
       opcionesColaboradores.value = data.map(empleado => {
         return {
-          label: `${empleado.numero_empleado} - ${empleado.nombre} - ${empleado.siglasCentroTrabajo}`,
+          label: `${empleado.numero_empleado} - ${empleado.nombre} - ${empleado.claveSucursal}`,
           value: empleado
         }
       })

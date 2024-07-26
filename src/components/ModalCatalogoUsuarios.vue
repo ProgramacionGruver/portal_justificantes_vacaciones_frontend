@@ -86,6 +86,24 @@
                       />
                     </div>
                 </div>
+                <div class="q-gutter-x-sm row">
+                  <div class="q-my-xs col">
+                      <label>Dias Ganados</label>
+                      <q-input
+                            filled
+                            type="number"
+                            v-model="catalagoObj.diasGanados"
+                      />
+                    </div>
+                    <div class="q-my-xs col">
+                      <label>Sabados 5s</label>
+                      <q-input
+                            filled
+                            type="number"
+                            v-model="catalagoObj.sabados5s"
+                      />
+                    </div>
+                </div>
             </q-tab-panel>
           </q-tab-panels>
 

@@ -1,6 +1,8 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { api } from 'src/boot/axios'
 import { ref } from 'vue'
+import { filtrarElementos, llenarOpcionesSucursales } from 'src/helpers/filtros'
+import { useModulosStore } from 'src/stores/permisosModulos'
 
 export const useSucursalesStore = defineStore("sucursales", () => {
 
@@ -10,18 +12,25 @@ export const useSucursalesStore = defineStore("sucursales", () => {
   const listaClavesSucursales = ref([])
   const todasSucursalesSeleccionadas = ref(true)
   const sucursalesAgrupadas = ref([])
+  const sucursalesAcceso = ref([])
+
+  const useModulos = useModulosStore()
+  const { permisosSucursales } = storeToRefs(useModulos)
 
   const obtenerSucursales = async () => {
     try {
 
       const { data } = await api.get('/obtenerSucursales')
-      sucursales.value = data.map(sucursal => { return { ...sucursal, label: sucursal.nombreSucursal, value: sucursal.claveSucursal } })
-      sucursalesFiltradas.value = data.map(sucursal => {
-        return { ...sucursal, label: sucursal.nombreSucursal, value: sucursal.claveSucursal }
-      })
-      listaClavesSucursales.value = sucursalesFiltradas.value.map((sucursal) => { return sucursal.value })
+      sucursales.value = [...data]
+      sucursales.value = llenarOpcionesSucursales(sucursales.value)
 
-    } catch (error) {
+      //Permisos de sucursales por user en modulos
+      sucursalesAcceso.value = permisosSucursales.value.map( permiso => { return permiso.claveSucursal} )
+      sucursales.value = filtrarElementos(sucursalesAcceso.value, sucursales.value, 'claveSucursal')
+      sucursalesFiltradas.value = sucursales.value
+      listaClavesSucursales.value = sucursales.value.map( elemento => elemento.claveSucursal)
+
+      } catch (error) {
       console.log(error)
     }
   }

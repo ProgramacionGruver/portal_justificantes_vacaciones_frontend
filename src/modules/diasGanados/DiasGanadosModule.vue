@@ -55,7 +55,7 @@ import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
-import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento, limpiarFiltrosEmpresaSucursalDepartamento} from 'src/helpers/filtros'
+import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento} from 'src/helpers/filtros'
 import ModalDiasGanados from 'src/components/ModalDiasGanados.vue'
 
 export default {
@@ -65,21 +65,25 @@ export default {
     setup () {
 
       const useEmpresas = useEmpresasStore()
-      const { listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+      const { primeraCarga, listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+      const { obtenerEmpresas } = useEmpresas
 
       const useSucursales = useSucursalesStore()
       const { listaClavesSucursales, sucursales, sucursalesFiltradas, modelSucursalesSeleccionadas, todasSucursalesSeleccionadas } = storeToRefs(useSucursales)
+      const { obtenerSucursales } = useSucursales
 
       const useDepartamentos = useDepartamentosStore()
       const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
+      const { obtenerDepartamentos } = useDepartamentos
 
       const useDiasGanados = useDiasGanadosStore()
       const { obtenerDiasGanados } = useDiasGanados
-      const { diasGanados, diasGanadosFiltrados, cargando } = storeToRefs(useDiasGanados)
+      const { diasGanados, diasGanadosFiltrados } = storeToRefs(useDiasGanados)
 
       const useColaboradores = useColaboradoresStore()
       const { obtenerColaboradores } = useColaboradores
 
+      const cargando = ref(false)
       const modalDias = ref(null)
 
       const columns = [
@@ -91,10 +95,10 @@ export default {
           sortable: true
         },
         {
-          name: "nombreEmpleado",
+          name: "nombre",
           label: "Nombre",
           align: "left",
-          field: "nombreEmpleado",
+          field: "nombre",
           sortable: true
         },
         {
@@ -135,16 +139,29 @@ export default {
       ]
 
       onMounted(async () => {
-        await obtenerDiasGanados()
-        await obtenerColaboradores()
-        limpiarFiltros()
+        try{
+          cargando.value = true
+          if(primeraCarga.value){
+            primeraCarga.value = false
+            await obtenerEmpresas()
+            await obtenerSucursales()
+            await obtenerDepartamentos()
+          }
+          await obtenerColaboradores()
+          await obtenerDiasGanados()
+          await filtrar('TODASEMPRESAS')
+        }catch{
+
+        }finally{
+          cargando.value = false
+        }
       })
 
       const agregarDias = () => {
         modalDias.value.abrir()
       }
 
-      const filtrar = (tipoFiltro) => {
+      const filtrar = async(tipoFiltro) => {
 
         // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
         filtrarOpciones(tipoFiltro,
@@ -163,13 +180,6 @@ export default {
           todasSucursalesSeleccionadas, listaClavesSucursales, modelSucursalesSeleccionadas,
           todosDepartamentosSeleccionados, listaClavesDepartamentos, modelDepartamentosSeleccionados)
 
-      }
-
-      const limpiarFiltros = () => {
-        limpiarFiltrosEmpresaSucursalDepartamento(todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
-        todasSucursalesSeleccionadas, modelSucursalesSeleccionadas, todosDepartamentosSeleccionados,
-        modelDepartamentosSeleccionados, sucursales, sucursalesFiltradas,
-        listaClavesEmpresas, departamentos, departamentosFiltrados)
       }
 
       return {

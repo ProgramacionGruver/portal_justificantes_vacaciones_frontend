@@ -84,7 +84,7 @@ import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacacio
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { obtenerIconoYColorAutorizacion, obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
-import { filtrarElementos, filtrarElementosPorEmpresaSucursalDepartamento, filtrarOpcionesHistorialSolicitudes, limpiarFiltrosEmpresaSucursalDepartamento } from 'src/helpers/filtros'
+import { filtrarElementos, filtrarElementosPorEmpresaSucursalDepartamento, filtrarOpcionesHistorialSolicitudes } from 'src/helpers/filtros'
 import ModalVerDetalleSolicitud from '../../components/ModalVerDetalleSolicitud.vue'
 
 export default {
@@ -93,20 +93,24 @@ export default {
   },
   setup() {
     const useEmpresas = useEmpresasStore()
-    const { listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+    const { primeraCarga, listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+    const { obtenerEmpresas } = useEmpresas
 
     const useSucursales = useSucursalesStore()
     const { listaClavesSucursales, sucursales, sucursalesFiltradas, modelSucursalesSeleccionadas, todasSucursalesSeleccionadas } = storeToRefs(useSucursales)
+    const { obtenerSucursales } = useSucursales
 
     const useDepartamentos = useDepartamentosStore()
     const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
+    const { obtenerDepartamentos } = useDepartamentos
 
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
     const { obtenerTodasSolicitudes } = useJustificantesVacaciones
     const { todosMotivosFiltrados, todosMotivosSeleccionados, motivosSeleccionados, listaIdsMotivos, todosTipoSolicitudesFiltrados
-      , todosTipoSolicitudesSeleccionados, tiposSolicitudSeleccionados, listaIdsTipoSolicitudes, cargandoHistorialSolicitudes, historialSolicitudes, historialSolicitudesFiltradas } = storeToRefs(useJustificantesVacaciones)
+      , todosTipoSolicitudesSeleccionados, tiposSolicitudSeleccionados, listaIdsTipoSolicitudes, historialSolicitudes, historialSolicitudesFiltradas } = storeToRefs(useJustificantesVacaciones)
 
     const modalDetalle = ref(null)
+    const cargandoHistorialSolicitudes = ref(false)
 
     const columns = [
       {
@@ -153,8 +157,21 @@ export default {
     ]
 
     onMounted(async () => {
-      await obtenerTodasSolicitudes()
-      limpiarFiltros()
+      try{
+        cargandoHistorialSolicitudes.value = true
+        if(primeraCarga.value){
+          primeraCarga.value = false
+          await obtenerEmpresas()
+          await obtenerSucursales()
+          await obtenerDepartamentos()
+        }
+        await obtenerTodasSolicitudes()
+        await filtrar('TODASEMPRESAS')
+      }catch{
+
+      }finally{
+        cargandoHistorialSolicitudes.value = false
+      }
     })
 
     const verDetalleSolicitud = (row) => {
@@ -165,7 +182,7 @@ export default {
       return historialSolicitudes.value?.[0]?.solicitud_detalles?.[0]?.autorizaciones_solicitudes?.length ?? 0
     })
 
-    const filtrar = (tipoFiltro) => {
+    const filtrar = async(tipoFiltro) => {
 
       // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
       filtrarOpcionesHistorialSolicitudes(tipoFiltro,
@@ -196,19 +213,6 @@ export default {
         filtrarElementos(listaIdsMotivos.value, historialSolicitudesFiltradas.value, 'idMotivo')
         : filtrarElementos(motivosSeleccionados.value, historialSolicitudesFiltradas.value, 'idMotivo')
     }
-
-    const limpiarFiltros = () => {
-      limpiarFiltrosEmpresaSucursalDepartamento(todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
-        todasSucursalesSeleccionadas, modelSucursalesSeleccionadas, todosDepartamentosSeleccionados,
-        modelDepartamentosSeleccionados, sucursales, sucursalesFiltradas,
-        listaClavesEmpresas, departamentos, departamentosFiltrados)
-        todosTipoSolicitudesSeleccionados.value = true
-        tiposSolicitudSeleccionados.value = []
-        todosMotivosSeleccionados.value = true
-        motivosSeleccionados.value = []
-    }
-
-
 
     return {
       columns,

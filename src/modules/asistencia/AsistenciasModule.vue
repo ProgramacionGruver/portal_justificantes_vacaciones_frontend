@@ -96,7 +96,7 @@ import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useAsistenciasStore } from 'src/stores/asistencias'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { coloresBotones } from 'src/constant/constantes'
-import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento, limpiarFiltrosEmpresaSucursalDepartamento} from 'src/helpers/filtros'
+import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento} from 'src/helpers/filtros'
 import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
 
   export default {
@@ -105,18 +105,22 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
     },
     setup () {
       const useEmpresas = useEmpresasStore()
-      const { listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+      const { primeraCarga, listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+      const { obtenerEmpresas } = useEmpresas
 
       const useSucursales = useSucursalesStore()
       const { listaClavesSucursales, sucursales, sucursalesFiltradas, modelSucursalesSeleccionadas, todasSucursalesSeleccionadas } = storeToRefs(useSucursales)
+      const { obtenerSucursales } = useSucursales
 
       const useDepartamentos = useDepartamentosStore()
       const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
+      const { obtenerDepartamentos } = useDepartamentos
 
       const useAsistencias = useAsistenciasStore()
       const { obtenerAsistencias } = useAsistencias
-      const { asistencias, asistenciasFiltradas, cargando } = storeToRefs(useAsistencias)
+      const { asistencias, asistenciasFiltradas } = storeToRefs(useAsistencias)
 
+      const cargando = ref(false)
       const dynamicColumns = ref([])
       const columns = ref([])
       const modalVerSolicitud = ref(null)
@@ -151,9 +155,22 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
       })
 
       onMounted(async () => {
-        await obtenerAsistencias(objBusqueda.value)
-        await columnasDinamicas()
-        await limpiarFiltros()
+        try{
+          cargando.value = true
+          if(primeraCarga.value){
+            primeraCarga.value = false
+            await obtenerEmpresas()
+            await obtenerSucursales()
+            await obtenerDepartamentos()
+          }
+          await obtenerAsistencias(objBusqueda.value)
+          await columnasDinamicas()
+          await filtrar('TODASEMPRESAS')
+        }catch{
+
+        }finally{
+          cargando.value = false
+        }
       })
 
       const columnasDinamicas = async() => {
@@ -189,12 +206,8 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                       label: `${formatearFecha(fechaRegistro)} ${dia.charAt(0).toUpperCase() + dia.slice(1)}`,
                       align: "center",
                       field: row => {
-                        if(row.numero_empleado === 7377){
-                          console.log(row)
-                        }
-                        const turnoEspecial = row.turnoEspecial
                         const diaData = row.semanas[semana] && row.semanas[semana][dia]
-                        if (diaData) {
+                        if (diaData && typeof diaData === 'object' && Object.keys(diaData).length > 0) {
                           if (diaData.solicitud) {
                             return {
                               value: diaData.solicitud.nombreSolicitud,
@@ -208,21 +221,27 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                               estado: 'RETARDO',
                               retardo: diaData.retardo
                             }
+                          }else if (diaData.sinTurno) {
+                            return {
+                              value: `${diaData.horaRegistro}/SIN TURNO`,
+                              estado: 'COMPLETO',
+                              retardo: diaData.retardo
+                            }
                           }else if (diaData.horaRegistro) {
                             return {
                               value: diaData.horaRegistro,
                               estado: 'COMPLETO',
                               retardo: diaData.retardo
                             }
-                          }else if(turnoEspecial && dia ==="sabado"){
-                            return {
-                                value: `${turnoEspecial.turno}`,
-                                estado: `TURNO ESPECIAL`,
-                            }
                           }
-                        }else if(turnoEspecial){
+                        }else if(row.turnoEspecialSabado && dia ==="sabado"){
                           return {
-                              value: `${turnoEspecial.turno}`,
+                              value: `${row.turnoEspecialSabado.turno}`,
+                              estado: `TURNO ESPECIAL`,
+                          }
+                        }else if(row.turnoEspecialSemana){
+                          return {
+                              value: `${row.turnoEspecialSemana.turno}`,
                               estado: `TURNO ESPECIAL`,
                           }
                         }
@@ -251,7 +270,7 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
         modalVerSolicitud.value.abrir(solicitud)
       }
 
-      const filtrar = (tipoFiltro) => {
+      const filtrar = async(tipoFiltro) => {
 
         // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
         filtrarOpciones(tipoFiltro,
@@ -271,13 +290,6 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
           todosDepartamentosSeleccionados, listaClavesDepartamentos, modelDepartamentosSeleccionados)
       }
 
-      const limpiarFiltros = async() => {
-        limpiarFiltrosEmpresaSucursalDepartamento(todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
-          todasSucursalesSeleccionadas, modelSucursalesSeleccionadas, todosDepartamentosSeleccionados,
-          modelDepartamentosSeleccionados, sucursales, sucursalesFiltradas,
-          listaClavesEmpresas, departamentos, departamentosFiltrados)
-      }
-
       const limpiarFechaFin = () => {
         objBusqueda.value.fechaFin = null
       }
@@ -287,9 +299,16 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
           asistenciasFiltradas.value = []
           columns.value = []
           dynamicColumns.value = []
-          await obtenerAsistencias(objBusqueda.value)
-          await columnasDinamicas()
-          await limpiarFiltros()
+          try{
+            cargando.value = true
+            await obtenerAsistencias(objBusqueda.value)
+            await columnasDinamicas()
+            await filtrar('TODASEMPRESAS')
+          }catch{
+
+          }finally{
+            cargando.value = false
+          }
         }
       }
 

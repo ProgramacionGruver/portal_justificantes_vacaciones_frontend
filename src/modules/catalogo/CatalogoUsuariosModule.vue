@@ -101,7 +101,7 @@ import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useCatalogosStore } from 'src/stores/catalogos.js'
 import ModalCatalogoUsuarios from 'src/components/ModalCatalogoUsuarios.vue'
-import { filtrarOpcionesCatalogoUsuarios, filtrarElementosPorEmpresaSucursalDepartamento, filtrarElementos, limpiarFiltrosEmpresaSucursalDepartamento } from 'src/helpers/filtros'
+import { filtrarOpcionesCatalogoUsuarios, filtrarElementosPorEmpresaSucursalDepartamento, filtrarElementos } from 'src/helpers/filtros'
 
 export default {
   components: {
@@ -109,19 +109,21 @@ export default {
   },
   setup() {
     const useEmpresas = useEmpresasStore()
-    const { empresas, listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+    const { primeraCarga, empresas, listaClavesEmpresas, empresasFiltradas, modelEmpresasSeleccionadas, todasEmpresasSeleccionadas } = storeToRefs(useEmpresas)
+    const { obtenerEmpresas } = useEmpresas
 
     const useSucursales = useSucursalesStore()
     const { listaClavesSucursales, sucursales, sucursalesFiltradas, modelSucursalesSeleccionadas, todasSucursalesSeleccionadas } = storeToRefs(useSucursales)
+    const { obtenerSucursales } = useSucursales
 
     const useDepartamentos = useDepartamentosStore()
     const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
+    const { obtenerDepartamentos } = useDepartamentos
 
     const useCatalogos = useCatalogosStore()
     const { obtenerCatalogoUsuarios, obtenerCatalogoTurnos } = useCatalogos
     const { catalogoUsuarios,
       catalogoUsuariosFiltrados,
-      cargando,
       estatusActividad,
       estatusActividadFiltrados,
       modelEstatusActividadSeleccionados,
@@ -140,6 +142,7 @@ export default {
       opcionesTurnos
     } = storeToRefs(useCatalogos)
 
+    const cargando = ref(false)
     const modalCatalogo = ref(null)
 
     const columns = [
@@ -214,6 +217,13 @@ export default {
         sortable: true
       },
       {
+        name: "sabados5s",
+        label: "Sabados 5s",
+        align: "left",
+        field: "sabados5s",
+        sortable: true
+      },
+      {
         name: "vacacionesVencidas",
         label: "Dias Vacaciones Vencidos",
         align: "left",
@@ -242,9 +252,22 @@ export default {
     ]
 
     onMounted(async () => {
-      await obtenerCatalogoUsuarios()
-      await obtenerCatalogoTurnos()
-      limpiarFiltros()
+      try{
+        cargando.value = true
+        if(primeraCarga.value){
+          primeraCarga.value = false
+          await obtenerEmpresas()
+          await obtenerSucursales()
+          await obtenerDepartamentos()
+        }
+        await obtenerCatalogoUsuarios()
+        await obtenerCatalogoTurnos()
+        await filtrar('TODASEMPRESAS')
+      }catch{
+
+      }finally{
+        cargando.value = false
+      }
     })
 
     const editarCatalogo = (catalogoObj) => {
@@ -267,7 +290,7 @@ export default {
       }
     }
 
-    const filtrar = (tipoFiltro) => {
+    const filtrar = async(tipoFiltro) => {
 
       // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
       filtrarOpcionesCatalogoUsuarios(tipoFiltro,
@@ -306,18 +329,6 @@ export default {
 
     }
 
-    const limpiarFiltros = () => {
-      limpiarFiltrosEmpresaSucursalDepartamento(todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
-        todasSucursalesSeleccionadas, modelSucursalesSeleccionadas, todosDepartamentosSeleccionados,
-        modelDepartamentosSeleccionados, sucursales, sucursalesFiltradas,
-        listaClavesEmpresas, departamentos, departamentosFiltrados)
-      todosEstatusActividadSeleccionados.value = true
-      modelEstatusActividadSeleccionados.value = []
-      todosTurnosLunesViernesSeleccionados.value = true
-      modelTurnosLunesViernesSeleccionados.value = []
-      todosTurnosSabadosSeleccionados.value = true
-      modelTurnosSabadosSeleccionados.value = []
-    }
 
     return {
       buscar: ref(''),

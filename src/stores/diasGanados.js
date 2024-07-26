@@ -22,11 +22,12 @@ export const useDiasGanadosStore = defineStore("diasGanados", () => {
         }
     }
 
-    const agregarDiasGanados = async (catalogoObj) => {
+    const agregarDiasGanados = async (diasGanadosObj) => {
       try {
           cargando.value= true
-          const { data } = await api.post('/catalogoVacaciones',catalogoObj)
-          diasGanados.value = [data, ...diasGanados.value]
+          const { data } = await api.post('/diasGanados',diasGanadosObj)
+          diasGanados.value = [...data, ...diasGanados.value]
+          diasGanadosFiltrados.value = [...data, ...diasGanadosFiltrados.value]
           notificacion('positive', 'Registro agregado exitosamente')
       } catch (error) {
           notificacion('negative', error.response.data.message)

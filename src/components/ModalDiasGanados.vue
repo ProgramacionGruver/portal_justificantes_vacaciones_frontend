@@ -7,8 +7,14 @@
       </q-card-section>
       <div class="div--contenedor__general">
         <div style="display: block;">
-            <label>Motivo:</label>
+          <label>Sábados 5s:</label>
+            <div class="row">
+              <q-radio v-model="diasGanadosObj.sabados5s" class="col-6" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="true" label="SI" />
+              <q-radio v-model="diasGanadosObj.sabados5s" class="col-6" checked-icon="task_alt" unchecked-icon="panorama_fish_eye" :val="false" label="NO" />
+            </div>
+            <label v-if="!diasGanadosObj.sabados5s">Motivo:</label>
             <q-input
+              v-if="!diasGanadosObj.sabados5s"
               dense
               class="q-mb-md"
               outlined
@@ -72,8 +78,7 @@
         </div>
       </div>
       <q-card-section>
-        <q-form ref="formulario">
-
+        <q-form ref="formulario" @submit.prevent="agregarDias">
           <q-card-actions class="q-pt-md" align="right">
             <q-btn
               icon-right="close"
@@ -88,10 +93,8 @@
               type="submit"
               label="Guardar"
               color="primary"
-              @click="editarCatalogo"
             />
           </q-card-actions>
-
         </q-form>
       </q-card-section>
     </q-card>
@@ -101,41 +104,80 @@
 <script>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
+import { useQuasar } from 'quasar'
 import { filtradoBusquedaObj } from "src/helpers/filtradoBusquedaObj"
 import { useColaboradoresStore } from 'src/stores/colaboradores'
+import { useDiasGanadosStore } from "src/stores/diasGanados"
+import { useAsistenciasStore } from "src/stores/asistencias"
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 
 export default {
   setup() {
     const useColaboradores = useColaboradoresStore()
     const { opcionesColaboradores } = storeToRefs(useColaboradores)
 
+    const useDiasGanados = useDiasGanadosStore()
+    const { agregarDiasGanados } = useDiasGanados
+
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
+
+    const $q = useQuasar()
     const abrirModal = ref(false)
     const formulario = ref(null)
     const usuarioSeleccionado = ref(null)
     const listaUsuarios = ref([])
     const lista = ref(null)
     const opcionesEmpleados = ref(opcionesColaboradores.value)
+    const objDiasGanados = ref(null)
 
     const diasGanadosObjInit = {
       motivo: "",
       descripcionMotivo : "",
-      diasGanados: 1
+      diasGanados: 1,
+      sabados5s: true
     }
 
     const diasGanadosObj = ref(diasGanadosObjInit)
 
     const abrir = () => {
+        objDiasGanados.value = null
         listaUsuarios.value = []
         usuarioSeleccionado.value = null
         diasGanadosObj.value = { ...diasGanadosObjInit }
         abrirModal.value = true
     }
 
-    const editarCatalogo = async () => {
+    const agregarDias = async () => {
       if (!(await formulario.value.validate())) {
         return
       }
-      await editarCatalogoUsuarios(catalagoObj.value)
+      if (!diasGanadosObj.value.descripcionMotivo) {
+        $q.notify({
+          type: 'negative',
+          message: 'La descripción del motivo es obligatoria.',
+        })
+        return
+      }
+      if (listaUsuarios.value.length === 0) {
+        $q.notify({
+          type: 'negative',
+          message: 'Debe agregar al menos un colaborador.',
+        })
+        return
+      }
+      if(diasGanadosObj.value.sabados5s){
+        diasGanadosObj.value.motivo = 'Sabados 5s'
+      }
+      objDiasGanados.value = {
+        diasArray:  listaUsuarios.value.map(usuario => ({
+                      ...usuario,
+                      motivo: diasGanadosObj.value.motivo,
+                      descripcionMotivo: diasGanadosObj.value.descripcionMotivo,
+                      editedBy: usuarioAutenticado.value.usuario
+                    }))
+      }
+      await agregarDiasGanados(objDiasGanados.value)
       abrirModal.value = false
     }
 
@@ -167,7 +209,7 @@ export default {
       listaUsuarios,
       opcionesEmpleados,
       usuarioSeleccionado,
-      editarCatalogo,
+      agregarDias,
       agregarColaboradores,
       eliminarColaboradores,
       parametrosFiltradosColaboradores
