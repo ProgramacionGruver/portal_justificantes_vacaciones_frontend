@@ -261,7 +261,7 @@
                       <q-tooltip>
                         <p class="text-h5">Activa solo en caso de ser incorrecto el correo electronico
                           de jefe inmediato.</p>
-                        <p class="text-h5">Notifica a R.H. para que se realice el canbio desde el origen</p>
+                        <p class="text-h5">Notifica a R.H. para que se realice el cambio desde el origen.</p>
                       </q-tooltip>
                     </q-checkbox>
                   </div>

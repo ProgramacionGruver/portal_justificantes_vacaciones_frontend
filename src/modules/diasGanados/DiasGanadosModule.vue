@@ -41,17 +41,6 @@
               type="checkbox" />
           </q-btn-dropdown>
           </div>
-
-          <div class="fit row q-gutter-sm">
-            <div class="col q-ma-sm">
-              <q-select outlined dense :disable="cargando" :options="anios" v-model="anioSeleccionado"
-                @update:model-value="cargarPresupuestos" map-options option-value="name" />
-            </div>
-            <div class="col q-ma-sm">
-              <q-select outlined dense map-options :disable="cargando" :options="meses" v-model="mesSeleccionado"
-                @update:model-value="cargarPresupuestos" option-value="name" />
-            </div>
-          </div>
       </template>
     </q-table>
   </div>

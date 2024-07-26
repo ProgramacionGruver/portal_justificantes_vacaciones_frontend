@@ -189,6 +189,9 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                       label: `${formatearFecha(fechaRegistro)} ${dia.charAt(0).toUpperCase() + dia.slice(1)}`,
                       align: "center",
                       field: row => {
+                        if(row.numero_empleado === 7377){
+                          console.log(row)
+                        }
                         const turnoEspecial = row.turnoEspecial
                         const diaData = row.semanas[semana] && row.semanas[semana][dia]
                         if (diaData) {
@@ -211,12 +214,12 @@ import ModalVerSolicitud from 'src/components/ModalVerSolicitud.vue'
                               estado: 'COMPLETO',
                               retardo: diaData.retardo
                             }
-                          }else if(turnoEspecial){
-                          return {
-                              value: `${turnoEspecial.turno}`,
-                              estado: `TURNO ESPECIAL`,
+                          }else if(turnoEspecial && dia ==="sabado"){
+                            return {
+                                value: `${turnoEspecial.turno}`,
+                                estado: `TURNO ESPECIAL`,
+                            }
                           }
-                        }
                         }else if(turnoEspecial){
                           return {
                               value: `${turnoEspecial.turno}`,
