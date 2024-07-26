@@ -353,52 +353,71 @@ export const mensajeOrdenesDeServicioProceso = (ordenes, ordenesZonas) => {
   //    </tr>
 
   export const mensajeCorreoAutorizacionJustificantesVacaciones = (solicitudCreada, url) => {
-    return `
-      <p>Se ha generado una solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud} </p>
+    const AUSENCIAS_Y_RETARDOS = 1
+    let diasSolicitados = ``
 
-      <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
-        <thead bgcolor='#1052A0' text='white'>
-            <tr>
-              <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>Solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud}</th>
-            </tr>
-        </thead>
-        <tbody bgcolor='white' text='black'>
-            <tr>
-              <td style='padding: 12px;'>Folio:</td>
-              <td style='padding: 12px;'>${solicitudCreada.folio}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Fecha de solicitud:</td>
-              <td style='padding: 12px;'>${formatearFechaCorreo(solicitudCreada.createdAt)}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Número de empleado:</td>
-              <td style='padding: 12px;'>${solicitudCreada.usuario.numero_empleado}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Nombre: </td>
-              <td style='padding: 12px;'>${solicitudCreada.usuario.nombre}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Empresa: </td>
-              <td style='padding: 12px;'>${solicitudCreada.empresa.nombreEmpresa}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Centro de trabajo: </td>
-              <td style='padding: 12px;'>${solicitudCreada.sucursale.nombreSucursal}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Puesto </td>
-              <td style='padding: 12px;'>${solicitudCreada.usuario.puesto}</td>
-            </tr>
-            <tr>
-              <td style='padding: 12px;'>Haz click aqui para mas informacion:</td>
-              <td style='padding: 12px;'><a
-                    href='${url}'
-                    style='color: #58ACFA; text-decoration: none;'>Autorizar o rechazar solicitud </a></td>
-            </tr>
-        </tbody>
-      </table>
+    if (solicitudCreada.catalogo_tipo_solicitude?.idTipoSolicitud === AUSENCIAS_Y_RETARDOS) {
+
+      const textoDiasSolicitados = solicitudCreada.solicitud_detalles?.length === 1? 'Dia solicitado: ' :  solicitudCreada.solicitud_detalles?.length > 1 ? 'Dias solicitados: ' : ''
+
+      const fechasTexto = solicitudCreada.solicitud_detalles?.map((detalle) => {
+        return formatearFecha(detalle.fechaDiaSolicitado)
+      }).join(', ')
+
+      diasSolicitados = `
+      <tr>
+        <td style='padding: 12px;'>${textoDiasSolicitados}</td>
+        <td style='padding: 12px;'>${fechasTexto}</td>
+      </tr>
       `
 
+    }
+
+    const cuerpoTabla = `
+        <p>Se ha generado una solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud} </p>
+
+        <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
+          <thead bgcolor='#1052A0' text='white'>
+              <tr>
+                <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>Solicitud de ${solicitudCreada.catalogo_tipo_solicitude.nombreSolicitud}</th>
+              </tr>
+          </thead>
+          <tbody bgcolor='white' text='black'>
+              <tr>
+                <td style='padding: 12px;'>Folio:</td>
+                <td style='padding: 12px;'>${solicitudCreada.folio}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Fecha de solicitud:</td>
+                <td style='padding: 12px;'>${formatearFechaCorreo(solicitudCreada.createdAt)}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Número de empleado:</td>
+                <td style='padding: 12px;'>${solicitudCreada.usuario.numero_empleado}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Nombre: </td>
+                <td style='padding: 12px;'>${solicitudCreada.usuario.nombre}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Empresa: </td>
+                <td style='padding: 12px;'>${solicitudCreada.empresa.nombreEmpresa}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Centro de trabajo: </td>
+                <td style='padding: 12px;'>${solicitudCreada.sucursale.nombreSucursal}</td>
+              </tr>
+              <tr>
+                <td style='padding: 12px;'>Puesto </td>
+                <td style='padding: 12px;'>${solicitudCreada.usuario.puesto}</td>
+              </tr>`
+    const finalTabla = `
+              <tr>
+                <td style='padding: 12px;'>Haz click aqui para mas informacion:</td>
+                <td style='padding: 12px;'><a href='${url}' style='color: #58ACFA; text-decoration: none;'>Autorizar o rechazar solicitud </a></td>
+              </tr>
+          </tbody>
+        </table>
+        `
+    return cuerpoTabla + diasSolicitados + finalTabla
   }
