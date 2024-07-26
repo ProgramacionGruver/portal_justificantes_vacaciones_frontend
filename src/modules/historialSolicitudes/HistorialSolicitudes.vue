@@ -59,17 +59,24 @@
         </div>
       </template>
       <template v-slot:body-cell-estatus="props">
-        <q-td>
-          <q-icon v-for="index in numeroAutorizaciones" :key="index" class="q-mr-md" size="sm"
-            :name="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).icon"
-            :color="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).color"><q-tooltip>{{
-              obtenerTextoAutorizacion(index - 1) }}</q-tooltip></q-icon>
-          <q-chip clickable @click="verDetalleSolicitud(props.row)"
-            :icon="obtenerPropsQChip(props.row.solicitud_detalles).icono" text-color="white"
-            :color="obtenerPropsQChip(props.row.solicitud_detalles).color"
-            :label="obtenerPropsQChip(props.row.solicitud_detalles).nombre"><q-tooltip>Ver detalles</q-tooltip></q-chip>
+        <q-td class="align-right">
+          <div class="icons-container">
+            <q-icon v-for="index in numeroAutorizaciones(props.row)" :key="index" class="q-mr-md" size="sm"
+              :name="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).icon"
+              :color="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).color">
+              <q-tooltip>{{ obtenerTextoAutorizacion(index - 1) }}</q-tooltip>
+            </q-icon>
+            <q-chip clickable @click="verDetalleSolicitud(props.row)"
+              :icon="obtenerPropsQChip(props.row.solicitud_detalles).icono" text-color="white"
+              :color="obtenerPropsQChip(props.row.solicitud_detalles).color"
+              :label="obtenerPropsQChip(props.row.solicitud_detalles).nombre">
+              <q-tooltip>Ver detalles</q-tooltip>
+            </q-chip>
+          </div>
         </q-td>
       </template>
+
+
     </q-table>
   </div>
   <ModalVerDetalleSolicitud ref="modalDetalle"></ModalVerDetalleSolicitud>
@@ -178,9 +185,10 @@ export default {
       modalDetalle.value.abrir(row)
     }
 
-    const numeroAutorizaciones = computed(() => {
-      return historialSolicitudes.value?.[0]?.solicitud_detalles?.[0]?.autorizaciones_solicitudes?.length ?? 0
-    })
+    const numeroAutorizaciones = (row) => {
+      return row.solicitud_detalles?.[0]?.autorizaciones_solicitudes?.length ?? 0
+    }
+
 
     const filtrar = async(tipoFiltro) => {
 
@@ -246,3 +254,15 @@ export default {
   }
 }
 </script>
+<style scoped>
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.icons-container {
+  display: flex;
+  align-items: center;
+}
+</style>

@@ -34,7 +34,7 @@
             <div class="col-xs-12 col-sm-3 q-pr-sm">
               <label>Dias a solicitar</label>
               <q-input type="number" v-model="solicitudProrrogaObj.numeroDiasProrroga" lazy-rules
-                :rules="validarEnterosPositivos" outlined />
+                :rules="validarMaximoDiasProrroga(usuarioObj.diasVacacionesRestantes)" outlined />
             </div>
             <div class="col-xs-12 col-sm-3 q-pl-sm q-pr-sm">
               <label>Vigencia</label>
@@ -58,7 +58,7 @@
 
 <script>
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { validarEnterosPositivos, validarTexto } from 'src/helpers/inputReglas'
+import { validarMaximoDiasProrroga, validarTexto } from 'src/helpers/inputReglas'
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
 import { storeToRefs } from 'pinia'
@@ -102,6 +102,7 @@ export default {
       await obtenerDetalleVacacionesDiasEconomicos(numero_empleado)
       usuarioObj.value = detalleVacacionesDiasEconomicos.value
       modalProrroga.value = true
+      console.log(usuarioObj.value)
     }
 
     const enviarSolicitud = async () => {
@@ -120,7 +121,7 @@ export default {
       cargandoEnvioSolicitud,
       modalProrroga,
       usuarioObj,
-      validarEnterosPositivos,
+      validarMaximoDiasProrroga,
       validarTexto,
       solicitudProrrogaObj,
       fechaAniversario,
