@@ -4,7 +4,7 @@
       <q-card class="card-banner">
         <q-card-section class="row no-wrap items-center">
           <div class="col">
-            <h3 class="text-white">Buen dia, </h3>
+            <h3 class="text-white">Buen día, </h3>
             <h4 class="text-white">{{ usuarioAutenticado?.nombre }}</h4>
           </div>
           <div class="col-4">

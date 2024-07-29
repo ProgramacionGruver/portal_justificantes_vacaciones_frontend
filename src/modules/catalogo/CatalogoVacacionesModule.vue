@@ -78,7 +78,7 @@ export default {
         },
         {
           name: "diasAsignados",
-          label: "Dias Asignados",
+          label: "Días Asignados",
           align: "left",
           field: "diasAsignados",
           sortable: true

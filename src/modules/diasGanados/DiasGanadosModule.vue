@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <h2>Dias Ganados</h2>
+    <h2>Días Ganados</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
     <q-table :columns="columns" :rows="diasGanadosFiltrados" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
     loading-label="Buscando información. . . "  row-key="numero_empleado">
@@ -103,7 +103,7 @@ export default {
         },
         {
           name: "diasGanados",
-          label: "Dias Ganados",
+          label: "Días Ganados",
           align: "left",
           field: "diasGanados",
           sortable: true

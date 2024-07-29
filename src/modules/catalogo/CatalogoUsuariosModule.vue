@@ -197,21 +197,21 @@ export default {
       },
       {
         name: "diasEconomicosLey",
-        label: "Dias Economicos",
+        label: "Días Economicos",
         align: "left",
         field: "diasEconomicosLey",
         sortable: true
       },
       {
         name: "diasEconomicosRestantes",
-        label: "Dias Economicos Restantes",
+        label: "Días Economicos Restantes",
         align: "left",
         field: "diasEconomicosRestantes",
         sortable: true
       },
       {
         name: "diasGanados",
-        label: "Dias Ganados",
+        label: "Días Ganados",
         align: "left",
         field: "diasGanados",
         sortable: true
@@ -225,7 +225,7 @@ export default {
       },
       {
         name: "vacacionesVencidas",
-        label: "Dias Vacaciones Vencidos",
+        label: "Días Vacaciones Vencidos",
         align: "left",
         field: "vacacionesVencidas",
         sortable: true

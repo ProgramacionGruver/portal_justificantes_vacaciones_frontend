@@ -26,9 +26,9 @@ export const coloresBotones = [
   {estado:'RETARDO', color: 'deep-orange-5'},
   {estado:'AUSENCIAS Y RETARDOS', color: 'pink-4'},
   {estado:'VACACIONES', color: 'light-green-5'},
-  {estado:'DIAS ECONOMICOS', color: 'cyan-6'},
+  {estado:'DÍAS ECONOMICOS', color: 'cyan-6'},
   {estado:'TURNO ESPECIAL', color: 'blue-7'},
-  {estado:'DIAS GANADOS', color: 'deep-purple-7'},
+  {estado:'DÍAS GANADOS', color: 'deep-purple-7'},
   {estado:'SABADOS 5S', color: 'purple-6'}
 ]
 

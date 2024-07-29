@@ -133,7 +133,7 @@
               </div>
               <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === DIAS_GANADOS">
                 <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
-                  <label>Dias ganados disponibles</label>
+                  <label>Días ganados disponibles</label>
                   <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasGanados"></q-input>
                 </q-card-section>
               </div>
@@ -150,11 +150,11 @@
                 </div>
                 <div class="row q-my-sm">
                   <q-card-section class="col-6 q-pt-none">
-                    <label>Dias que corresponden por años laborados </label>
+                    <label>Días que corresponden por años laborados </label>
                     <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasVacacionesLey"></q-input>
                   </q-card-section>
                   <q-card-section class="col-6 q-pt-none">
-                    <label>Dias disponibles </label>
+                    <label>Días disponibles </label>
                     <q-input readonly outlined
                       v-model="detalleVacacionesDiasEconomicos.diasVacacionesRestantes"></q-input>
                   </q-card-section>
@@ -196,11 +196,11 @@
               </div>
               <div class="row q-my-sm">
                 <q-card-section class="col-6 q-pt-none">
-                  <label>Dias que corresponden al año </label>
+                  <label>Días que corresponden al año </label>
                   <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.diasEconomicosLey"></q-input>
                 </q-card-section>
                 <q-card-section class="col-6 q-pt-none">
-                  <label>Dias disponibles </label>
+                  <label>Días disponibles </label>
                   <q-input readonly outlined
                     v-model="detalleVacacionesDiasEconomicos.diasEconomicosRestantes"></q-input>
                 </q-card-section>

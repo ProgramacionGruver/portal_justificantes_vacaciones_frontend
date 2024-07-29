@@ -55,7 +55,7 @@ const routes = [
       {
         path: 'diasGanados',
         icono: 'fact_check',
-        label: 'Dias Ganados',
+        label: 'Días Ganados',
         name: 'diasGanados',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/diasGanados/DiasGanadosModule.vue')
       },

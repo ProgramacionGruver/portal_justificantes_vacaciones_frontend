@@ -32,7 +32,7 @@
           </div>
           <div class="row q-my-md">
             <div class="col-xs-12 col-sm-3 q-pr-sm">
-              <label>Dias a solicitar</label>
+              <label>Días a solicitar</label>
               <q-input type="number" v-model="solicitudProrrogaObj.numeroDiasProrroga" lazy-rules
                 :rules="validarMaximoDiasProrroga(usuarioObj.diasVacacionesRestantes)" outlined />
             </div>

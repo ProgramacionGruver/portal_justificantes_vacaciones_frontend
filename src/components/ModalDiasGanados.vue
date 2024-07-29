@@ -2,7 +2,7 @@
   <q-dialog v-model="abrirModal">
     <q-card style="min-width: 70vw;">
       <q-card-section class="bg-primary text-white row items-center q-pb-none">
-        <h2 class="text-h4">Agregar Dias Ganados</h2>
+        <h2 class="text-h4">Agregar Días Ganados</h2>
         <q-space />
       </q-card-section>
       <div class="div--contenedor__general">
@@ -30,14 +30,14 @@
               v-model="diasGanadosObj.descripcionMotivo"
               label="Describe del motivo"
             />
-            <label>Dias Ganados:</label>
+            <label>Días Ganados:</label>
             <q-input
               ref="lista"
               dense
               outlined
               type="number"
               v-model="diasGanadosObj.diasGanados"
-              label="Agrega los dias ganados"
+              label="Agrega los días ganados"
               :rules="[val => (val > 0) || 'LLena el este campo para continuar.']"
             />
         </div>
@@ -71,7 +71,7 @@
             <q-scroll-area style="height: 25rem;" class="bg-grey-12">
               <div class="row q-pa-md" v-for="(usuarios, index) in listaUsuarios" :key="usuarios">
                 <div class="col">{{ `${index+1}.- ${usuarios.nombre}`  }}</div>
-                <q-input dense class="col q-mx-xs" label="Dias ganados" outlined type="number" v-model="usuarios.diasGanados" :rules="[val => (val > 0) || 'LLena el este campo para continuar.']"></q-input>
+                <q-input dense class="col q-mx-xs" label="Días ganados" outlined type="number" v-model="usuarios.diasGanados" :rules="[val => (val > 0) || 'LLena el este campo para continuar.']"></q-input>
                 <q-btn flat dense color="negative" icon="delete" @click="eliminarColaboradores(index)"/>
               </div>
             </q-scroll-area>

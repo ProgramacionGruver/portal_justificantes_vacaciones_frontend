@@ -32,7 +32,7 @@
 
           <div class="q-gutter-x-sm row">
             <div class="q-my-xs col">
-              <label>Dias Asignados</label>
+              <label>Días Asignados</label>
               <q-input
                 outlined
                 type="number"

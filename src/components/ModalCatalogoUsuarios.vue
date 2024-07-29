@@ -19,7 +19,7 @@
                           align="justify"
                         >
                           <q-tab name="turnos" label="Turnos" />
-                          <q-tab name="dias" label="Dias" />
+                          <q-tab name="dias" label="Días" />
                 </q-tabs>
           </div>
           <q-tab-panels v-model="tab" animated>
@@ -52,7 +52,7 @@
             <q-tab-panel name="dias">
                 <div class="q-gutter-x-sm row">
                     <div class="q-my-xs col">
-                      <label>Dias Vacaciones Restantes</label>
+                      <label>Días Vacaciones Restantes</label>
                       <q-input
                             filled
                             type="number"
@@ -60,7 +60,7 @@
                       />
                     </div>
                     <div class="q-my-xs col">
-                      <label>Dias Economicos Restantes</label>
+                      <label>Días Economicos Restantes</label>
                       <q-input
                             filled
                             type="number"
@@ -70,7 +70,7 @@
                 </div>
                 <div class="q-gutter-x-sm row">
                   <div class="q-my-xs col">
-                      <label>Dias Vacaciones Vencidas</label>
+                      <label>Días Vacaciones Vencidas</label>
                       <q-input
                             filled
                             type="number"
@@ -78,7 +78,7 @@
                       />
                     </div>
                     <div class="q-my-xs col">
-                      <label>Dias Vencidos Restantes</label>
+                      <label>Días Vencidos Restantes</label>
                       <q-input
                             filled
                             type="number"
@@ -88,7 +88,7 @@
                 </div>
                 <div class="q-gutter-x-sm row">
                   <div class="q-my-xs col">
-                      <label>Dias Ganados</label>
+                      <label>Días Ganados</label>
                       <q-input
                             filled
                             type="number"
