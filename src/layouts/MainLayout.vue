@@ -34,15 +34,19 @@
 
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
       <!-- drawer content -->
-      <div class="row justify-center contenedor-menu">
-        <q-img src="../img/banner.jpg" id="target-img-1" style="height: 100px">
-          <div class="absolute-bottom-right" style="border-top-left-radius: 5px">
-
+      <div class="contenedor-perfil">
+        <div style="background-color: rgba(0, 0, 0, 0.5);" class="q-px-md q-py-sm">
+            <div style="display: flex; justify-content: center;">
+              <q-avatar size="7rem">
+                <q-img
+                  :src="calcularURLFoto(usuarioAutenticado?.numero_empleado)"
+                  spinner-color="white"/>
+              </q-avatar>
+            </div>
+            <div style="display: flex; justify-content: center; " >
               {{ usuarioAutenticado?.nombre }}
-              <span style="font-weight: bold"></span>
-
-              </div>
-        </q-img>
+            </div>
+        </div>
       </div>
       <NavBar></NavBar>
     </q-drawer>
@@ -115,12 +119,20 @@ export default {
       router.push('/')
       cerrarSesion()
     }
+
+    const calcularURLFoto = (numeroEmpleado) => {
+      const idFormateado = String(numeroEmpleado).padStart(7, '0')
+      const url = `https://backend.gruver.com.mx/rh/api/fotos/${idFormateado}.jpg`
+      return url
+    }
+
     return {
       leftDrawerOpen,
       // inicialesUsuario,
       usuarioAutenticado,
       logout,
       cargando,
+      calcularURLFoto,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }
