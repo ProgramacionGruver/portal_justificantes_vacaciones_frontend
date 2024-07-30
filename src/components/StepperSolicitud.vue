@@ -286,18 +286,10 @@ import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacacio
 import { storeToRefs } from 'pinia'
 import { notificacion } from 'src/helpers/mensajes'
 import { validarCorreo } from 'src/helpers/inputReglas'
-import { useSucursalesStore } from 'src/stores/sucursales'
-import { useDepartamentosStore } from 'src/stores/departamentos'
 import dayjs from 'dayjs'
 
 export default {
   setup() {
-    const useSucursales = useSucursalesStore()
-    const { sucursales } = storeToRefs(useSucursales)
-
-    const useDepartamentos = useDepartamentosStore()
-    const { departamentos } = storeToRefs(useDepartamentos)
-
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
     const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s } = useJustificantesVacaciones
     const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto } = storeToRefs(useJustificantesVacaciones)
@@ -475,14 +467,11 @@ export default {
         notificacion('warning', 'Revise que la información esté completa')
         return
       }
-      const sucursal = sucursales.value.find(sucursal => sucursal.claveSucursal === detalleUsuario.value.siglasCentroTrabajo)
-      const departamento = departamentos.value.find(departamento => departamento.departamento.nombreDepartamento === detalleUsuario.value.departamento)
 
-      if (sucursal && departamento) {
         solicitudObj.value.numero_empleado = detalleUsuario.value.numero_empleado
-        solicitudObj.value.claveSucursal = sucursal.claveSucursal
-        solicitudObj.value.claveEmpresa = sucursal.claveEmpresa
-        solicitudObj.value.claveDepartamento = departamento.claveDepartamento
+        solicitudObj.value.claveSucursal = detalleVacacionesDiasEconomicos.value.claveSucursal
+        solicitudObj.value.claveEmpresa = detalleVacacionesDiasEconomicos.value.claveEmpresa
+        solicitudObj.value.claveDepartamento = detalleVacacionesDiasEconomicos.value.claveDepartamento
 
         // Ordena las fechas solicitadas
         solicitudObj.value.fechasSeleccionadas.sort((a, b) => {
@@ -518,7 +507,6 @@ export default {
         }
       }
 
-    }
 
     // observa los cambios en las fechas seleccionadas del q-date
     watch(() => solicitudObj.value.fechasSeleccionadas, (nuevoValor) => {
