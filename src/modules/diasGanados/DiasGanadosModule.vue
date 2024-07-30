@@ -16,22 +16,22 @@
             <q-btn dense color="primary" icon-right="playlist_add"
             label="Agregar" no-caps :disable="cargando" @click="agregarDias()"/>
           </div>
-          <div class="fit row q-gutter-sm">
-            <q-btn-dropdown dense outline class="col q-my-sm" color="grey" label="Empresas">
+          <div class="dias--select">
+            <q-btn-dropdown dense outline color="grey" label="Empresas">
             <q-checkbox class="q-pa-md" dense :disable="todasEmpresasSeleccionadas" v-model="todasEmpresasSeleccionadas"
               label="Todas" @update:model-value="filtrar('TODASEMPRESAS')" />
             <q-separator class="q-mx-md bg-gray"></q-separator>
             <q-option-group class="q-pa-md" dense :options="empresasFiltradas" v-model="modelEmpresasSeleccionadas"
               @update:model-value="filtrar('OPCIONESEMPRESAS')" type="checkbox" />
           </q-btn-dropdown>
-          <q-btn-dropdown dense outline class="col q-my-sm " color="grey" label="Sucursales">
+          <q-btn-dropdown dense outline color="grey" label="Sucursales">
             <q-checkbox class="q-pa-md" dense :disable="todasSucursalesSeleccionadas"
               v-model="todasSucursalesSeleccionadas" label="Todas" @update:model-value="filtrar('TODASSUCURSALES')" />
             <q-separator class="q-mx-sm bg-gray"></q-separator>
             <q-option-group class="q-pa-md" dense :options="sucursalesFiltradas" v-model="modelSucursalesSeleccionadas"
               @update:model-value="filtrar('OPCIONESSUCURSALES')" type="checkbox" />
           </q-btn-dropdown>
-          <q-btn-dropdown dense outline class="col q-my-sm " color="grey" label="Departamentos">
+          <q-btn-dropdown dense outline color="grey" label="Departamentos">
             <q-checkbox class="q-pa-md" dense :disable="todosDepartamentosSeleccionados"
               v-model="todosDepartamentosSeleccionados" label="Todos"
               @update:model-value="filtrar('TODOSDEPARTAMENTOS')" />

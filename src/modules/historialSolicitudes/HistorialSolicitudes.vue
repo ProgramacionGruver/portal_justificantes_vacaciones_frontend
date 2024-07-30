@@ -16,7 +16,7 @@
             </q-input>
           </div>
         </div>
-        <div class="fit row q-mb-sm q-gutter-sm">
+        <div class="filtros--historial">
           <q-btn-dropdown dense outline class="col q-my-sm" color="grey" label="Empresas">
             <q-checkbox class="q-pa-md" dense :disable="todasEmpresasSeleccionadas" v-model="todasEmpresasSeleccionadas"
               label="Todas" @update:model-value="filtrar('TODASEMPRESAS')" />

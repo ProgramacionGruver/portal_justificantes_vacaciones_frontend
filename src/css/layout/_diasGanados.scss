@@ -1,0 +1,20 @@
+.dias--select {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 1rem;
+  column-gap: 1rem;
+  row-gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+
+  @include adaptar(768px) {
+    margin-bottom: 0;
+    flex-wrap: nowrap;
+  }
+}
+
+.dias--select > button {
+  width: 45%;
+  height: 4rem;
+}

@@ -1,23 +1,69 @@
-.contenedor-dashboard{
-  padding: 4rem;
+.contenedor-dashboard {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 
-  .contenedor-banner-fecha{
-    display: grid;
+  @include adaptar (768px) {
+    align-items: flex-start;
+    height: auto;
+  }
 
-    @include adaptar(768px) {
-       grid-template-columns: 65% 35%;
-    }
+  .contenedor-banner-fecha {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    row-gap: 2rem;
 
     .card-banner {
       background-color: #1052A0;
+      width: 90vw;
+      padding: 1rem;
+
+      @include adaptar(768px) {
+        width: 40vw;
+        height: 40vh;
+      }
+
+      .contenedor--bienvenida {
+        @include adaptar(768px) {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          height: 100%;
+        }
+      }
     }
 
-    .contenedor-date{
-      padding-left: 3rem;
+    .contenedor-date {
       display: flex;
       justify-content: center;
     }
 
+    .contenedor--date__modificador {
+      width: 90vw;
+
+      @include adaptar(768px) {
+        width: 30vw;
+      }
+    }
+
+    @include adaptar(768px) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-evenly;
+      margin-top: 3rem;
+    }
+
+    .contenedor--imagen {
+      @include adaptar(768px) {
+        width: 50%;
+        height: 50%;
+      }
+    }
   }
 
   .contenedor-requisicones-ingresos{
@@ -47,7 +93,6 @@
       padding-left: 3rem;
     }
   }
-
 }
 
 .avatar {

@@ -10,22 +10,22 @@
           <q-input :label="`${solicitud.usuario.nombre}`" outlined readonly />
         </div>
       </div>
-      <div class="row q-my-sm">
-        <div class="col-6 q-pr-sm">
+      <div class="row q-my-sm formulario--historial">
+        <div class="col-sm-5 col-xs-12 formulario--historal__folio">
           <label>Folio</label>
           <q-input :label="`${solicitud.folio}`" outlined readonly />
         </div>
-        <div class="col-6 q-pl-sm">
+        <div class="col-sm-5 col-xs-12">
           <label>Tipo solicitud</label>
           <q-input :label="`${solicitud.catalogo_tipo_solicitude.nombreSolicitud}`" outlined readonly />
         </div>
       </div>
-      <div class="row q-my-sm">
-        <div class="col-6 q-pr-sm">
+      <div class="row q-my-sm formulario--historial">
+        <div class="col-sm-5 col-xs-12 formulario--historal__motivo">
           <label>Motivo</label>
           <q-input :label="`${solicitud.catalogo_motivo.nombreMotivo}`" outlined readonly />
         </div>
-        <div class="col-6 q-pl-sm">
+        <div class="col-sm-5 col-xs-12">
           <label>Fecha de solicitud</label>
           <q-input :label="`${formatearFecha(solicitud.createdAt)}`" outlined readonly />
         </div>

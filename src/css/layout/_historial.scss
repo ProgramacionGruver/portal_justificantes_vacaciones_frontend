@@ -1,0 +1,31 @@
+.filtros--historial {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 1rem;
+
+  @include adaptar(768px) {
+    width: 100%;
+  }
+}
+
+.formulario--historal__folio {
+  margin-bottom: 1rem;
+
+  @include adaptar(768px) {
+    margin-right: 1rem;
+  }
+}
+
+.formulario--historal__motivo {
+  margin-bottom: 1rem;
+}
+
+.formulario--historial {
+  @include adaptar(768px) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+}

@@ -12,7 +12,7 @@
         "
       >
         <q-spinner-ios size="200px" color="primary" />
-        <div class="text-h2 q-mt-xl">
+        <div class="text-h2 q-mt-xl q-mr-md q-ml-md text-center">
           Obteniendo la información del portal, espere un momento...
         </div>
       </div>
@@ -26,7 +26,9 @@
           <q-avatar class="logo-inicio">
             <img src="../img/logog.png" />
           </q-avatar>
-          Portal de Justificantes, Vacaciones y Días económicos
+          <span class="q-ml-sm">
+            Portal de Justificantes, Vacaciones y Días económicos
+          </span>
         </q-toolbar-title>
         <q-btn flat @click="logout"> Cerrar sesión </q-btn>
       </q-toolbar>
