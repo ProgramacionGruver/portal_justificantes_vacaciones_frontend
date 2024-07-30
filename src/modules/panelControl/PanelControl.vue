@@ -4,7 +4,7 @@
       <h2 class="q-ml-md">Panel de control</h2>
       <q-separator color="primary" class="q-my-md" inset />
       <div class="permisos">
-        <div class="permisos__left q-ml-md">
+        <div class="permisos__left q-mb-md">
           <div class="text-h4 q-mb-sm">Lista de modulos</div>
           <q-input
             outlined
@@ -41,28 +41,30 @@
                     v-for="(usuario, index) in usuariosModulos[modulo.name]?.slice(0, 3)"
                     :key="index"
                     size="3rem"
-                    :style="{ position: 'absolute', left: `${index * 1.5}rem` }"
+                    :style="{ '--index': index }"
+                    class="avatars"
                   >
                     <img :src="obtenerURLImage(usuario.numero_empleado)">
                   </q-avatar>
 
                   <q-avatar
                     v-if="usuariosModulos[modulo.name]?.length > 3"
-                    size="3rem"
                     color="primary"
-                    :style="{ position: 'absolute', left: '4.5rem' }"
-                    class="text-white"
+                    class="text-white avatar--numeros"
                   >
-                  <span>
-                    +{{ usuariosModulos[modulo.name]?.length - 3 }}
-                  </span>
+                    <span class="span--desktop">
+                      +{{ usuariosModulos[modulo.name]?.length - 3 }}
+                    </span>
+                    <span class="span--mobile">
+                      {{ usuariosModulos[modulo.name]?.length }}
+                    </span>
                   </q-avatar>
                 </div>
               </q-item-section>
             </q-item>
           </q-list>
         </div>
-        <div class="permisos__right q-mr-md">
+        <div class="permisos__right">
           <q-table
             grid
             flat
@@ -76,27 +78,28 @@
             :rows-per-page-options="[15]"
           >
             <template v-slot:top-right>
-              <q-input
-                outlined
-                dense
-                v-model="buscarUsuario"
-                label="Buscar usuario"
-              >
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-              <q-btn
-                color="primary"
-                label="Gestionar permisos de usuarios"
-                class="q-ml-md"
-                @click="gestionarPermisos(moduloSeleccionado)"
-              />
+              <div class="top--tabla">
+                <q-input
+                  outlined
+                  dense
+                  v-model="buscarUsuario"
+                  label="Buscar usuario"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+                <q-btn
+                  color="primary"
+                  label="Gestionar permisos"
+                  @click="gestionarPermisos(moduloSeleccionado)"
+                />
+              </div>
             </template>
 
             <template v-slot:item="props">
-              <div class="q-pa-sm col-md-4">
-                <q-card style="height: 16rem; margin: 0.5rem">
+              <div class="items--tabla">
+                <q-card class="card--items">
                   <q-card-section class="text-center">
                     <q-avatar size="6rem" class="q-mt-md">
                       <img :src="obtenerURLImage(props.row.numero_empleado)">
@@ -216,11 +219,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.permisos
-  display: grid
-  gap: 1rem
-  grid-template-columns: 0.8fr 1.2fr
-
 .q-card__section--vert
   padding: 0.5rem 0 0.5rem 0
 </style>

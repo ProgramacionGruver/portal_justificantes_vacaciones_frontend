@@ -2,22 +2,20 @@
   <div class="contenedor-dashboard">
     <div class="contenedor-banner-fecha">
       <q-card class="card-banner">
-        <q-card-section class="row no-wrap items-center">
+        <q-card-section class="row no-wrap items-center contenedor--bienvenida">
           <div class="col">
             <h3 class="text-white">Buen día, </h3>
             <h4 class="text-white">{{ usuarioAutenticado?.nombre }}</h4>
           </div>
-          <div class="col-4">
-            <q-img src="../../img/sensible.png" spinner-color="white" style="height: 150px; max-width: 150px" />
+          <div class="col" style="display: flex; justify-content: center; align-items: center;">
+            <q-img src="../../img/sensible.png" spinner-color="white" class="contenedor--imagen" />
           </div>
         </q-card-section>
       </q-card>
       <div class="contenedor-date">
-        <q-date style="height: 25rem;" v-model="date" :locale="myLocale" minimal />
+        <q-date v-model="date" :locale="myLocale" class="contenedor--date__modificador" />
       </div>
-
     </div>
-
   </div>
 </template>
 

@@ -1,0 +1,65 @@
+.q-stepper__tab {
+  width: 33% !important;
+  text-align: center !important;
+
+  @include adaptar (768px) {
+    width: auto !important;
+  }
+}
+
+.q-stepper__dot {
+  display: none !important;
+
+  @include adaptar (768px) {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+
+.radios {
+  display: flex;
+  flex-direction: column;
+
+  @include adaptar (768px) {
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+}
+
+.contenedor--fecha {
+  width: 100%;
+
+  @include adaptar (768px) {
+    width: 40%;
+  }
+}
+
+.q-date__view {
+  width: 75%;
+
+  @include adaptar (768px) {
+    width: 100%;
+  }
+}
+
+.q-date__navigation > div:first-child {
+  min-width: 20px !important;
+}
+
+.formulario--correos {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.formulario--correos__input {
+  width: 100% !important;
+}
+
+.advertencia {
+  color: red;
+  text-align: center;
+}
