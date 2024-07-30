@@ -8,12 +8,12 @@
       <q-card-section class="q-pt-none padings-form">
         <q-stepper v-model="step" ref="stepper" color="primary" animated>
           <q-step :name="1" title="Selecciona el tipo de solicitud" icon="settings">
-            <div class="text-h5 q-pa-sm text-center bg-primary text-white">
+            <div class="text-h5 text-center bg-primary text-white q-pt-sm q-pb-sm">
               Tipo de solicitud
             </div>
-            <div class="row q-my-sm">
-              <q-card-section class="col-12 q-pt-none">
-                <div class="row">
+            <div class="row">
+              <q-card-section class="col-12">
+                <div class="radios">
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
                     unchecked-icon="panorama_fish_eye" :val="1" label="Ausencias y retardos" />
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
@@ -166,7 +166,7 @@
                     numeroDiasRestantes }}</b></span>
                     días <span style="color: red;">*</span></label>
                 </q-card-section>
-                <div class="q-my-sm flex flex-center">
+                <div class="q-my-sm flex flex-center contenedor--fecha">
                   <q-date v-model="solicitudObj.fechasSeleccionadas" landscape multiple mask="YYYY-MM-DD"
                     label="Selecciona fechas de vacaciones" :locale="myLocale" />
                 </div>
@@ -245,27 +245,24 @@
               Envío por correo
             </div>
             <q-form ref="formularioCorreos" @submit.prevent="validarPasoTres">
-              <div class="row q-my-sm">
-                <q-card-section class="col-6 q-pt-none">
+              <div class="row q-my-sm formulario--correos">
+                <q-card-section class="col-6 q-pt-none formulario--correos__input">
                   <label>Email del solicitante <span style="color: red;">*</span></label>
                   <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
                 </q-card-section>
-                <q-card-section class="col-5 q-pt-none">
+                <q-card-section class="col-5 q-pt-none formulario--correos__input">
                   <label>Email del jefe inmediato <span style="color: red;">*</span></label>
                   <q-input outlined :readonly="!emailJefeIncorrecto" v-model="emailJefeDirecto" lazy-rules
                     :rules="validarCorreo"></q-input>
                 </q-card-section>
-                <q-card-section class="col-1 q-pt-none">
+                <q-card-section class="col-1 q-pt-none formulario--correos__input">
                   <div class="checkbox-container">
-                    <q-checkbox v-model="emailJefeIncorrecto">
-                      <q-tooltip>
-                        <p class="text-h5">Activa solo en caso de ser incorrecto el correo electronico
-                          de jefe inmediato.</p>
-                        <p class="text-h5">Notifica a R.H. para que se realice el cambio desde el origen.</p>
-                      </q-tooltip>
-                    </q-checkbox>
+                    <q-checkbox v-model="emailJefeIncorrecto" label="Activar para cambiar el correo del jefe inmediato." />
                   </div>
                 </q-card-section>
+                <div v-if="emailJefeIncorrecto">
+                  <span class="advertencia" >**Nota: Deberas notificar a R.H. para que se realice el cambio desde el origen.</span>
+                </div>
               </div>
               <q-stepper-navigation>
                 <q-btn :loading="cargandoEnvioSolicitud" color="primary" type="submit" label="Enviar solicitud"
@@ -628,10 +625,10 @@ export default {
 </script>
 
 <style scoped>
-.checkbox-container {
+/* .checkbox-container {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-}
+} */
 </style>
