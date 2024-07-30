@@ -90,6 +90,8 @@ export const useCatalogosStore = defineStore("catalogos", () => {
         const { data } = await api.put(`/catalogoUsuarios/${catalogoObj.idUsuario}`,catalogoObj)
         const index = catalogoUsuarios.value.findIndex((catalogo) => catalogo.idUsuario === catalogoObj.idUsuario)
         catalogoUsuarios.value.splice(index, 1, catalogoObj)
+        const indexFiltrado = catalogoUsuariosFiltrados.value.findIndex((catalogo) => catalogo.idUsuario === catalogoObj.idUsuario)
+        catalogoUsuariosFiltrados.value.splice(indexFiltrado, 1, catalogoObj)
         notificacion("positive", " Usuario Actualizado Correctamente")
       } catch (error) {
         notificacion("negative", error.response.data.message)

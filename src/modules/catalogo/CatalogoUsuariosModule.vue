@@ -161,6 +161,13 @@ export default {
         sortable: true
       },
       {
+        name: "puesto",
+        label: "Puesto",
+        align: "left",
+        field: "puesto",
+        sortable: true
+      },
+      {
         name: "fechaAlta",
         label: "Fecha Ingreso",
         align: "left",

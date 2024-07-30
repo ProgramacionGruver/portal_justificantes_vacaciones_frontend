@@ -34,7 +34,7 @@
             <div class="col-xs-12 col-sm-3 q-pr-sm">
               <label>Días a solicitar</label>
               <q-input type="number" v-model="solicitudProrrogaObj.numeroDiasProrroga" lazy-rules
-                :rules="validarMaximoDiasProrroga(usuarioObj.diasVacacionesRestantes)" outlined />
+                :rules="validarMaximoDiasProrroga(usuarioObj.diasVacacionesRestantes)" outlined readonly/>
             </div>
             <div class="col-xs-12 col-sm-3 q-pl-sm q-pr-sm">
               <label>Vigencia</label>
@@ -101,8 +101,8 @@ export default {
       solicitudProrrogaObj.value = { ...solicitudProrrogaInit }
       await obtenerDetalleVacacionesDiasEconomicos(numero_empleado)
       usuarioObj.value = detalleVacacionesDiasEconomicos.value
+      solicitudProrrogaObj.value.numeroDiasProrroga = usuarioObj.value.diasVacacionesRestantes
       modalProrroga.value = true
-      console.log(usuarioObj.value)
     }
 
     const enviarSolicitud = async () => {

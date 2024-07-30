@@ -19,10 +19,9 @@
       <div class="portada-form">
         <q-tabs
           v-model="tab"
-          class="text-white bg-primary text-h6"
-          indicator-color="yellow"
-          active-bg-color="white"
-          active-color="primary"
+          class="text-h6"
+          active-bg-color="primary"
+          active-color="white"
           dense
         >
           <q-tab
