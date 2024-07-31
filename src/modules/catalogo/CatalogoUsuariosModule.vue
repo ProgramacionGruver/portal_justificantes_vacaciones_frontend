@@ -199,7 +199,7 @@ export default {
         name: "diasVacacionesRestantes",
         label: "Vacaciones Restantes",
         align: "left",
-        field: "diasVacacionesLey",
+        field: "diasVacacionesRestantes",
         sortable: true
       },
       {
