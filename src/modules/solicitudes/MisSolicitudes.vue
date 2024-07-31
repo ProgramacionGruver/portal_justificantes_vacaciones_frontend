@@ -10,9 +10,6 @@
       </template>
       <template v-slot:body-cell-estatus="props">
         <q-td>
-          <q-icon v-for="index in numeroAutorizaciones" :key="index" class="q-mr-md" size="sm"
-            :name="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).icon"
-            :color="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).color"><q-tooltip>{{ obtenerTextoAutorizacion(index-1) }}</q-tooltip></q-icon>
           <q-chip clickable @click="verDetalleSolicitud(props.row)" :icon="obtenerPropsQChip(props.row.solicitud_detalles).icono" text-color="white"
             :color="obtenerPropsQChip(props.row.solicitud_detalles).color" :label="obtenerPropsQChip(props.row.solicitud_detalles).nombre"><q-tooltip>Ver detalles</q-tooltip></q-chip>
         </q-td>
@@ -24,13 +21,13 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref} from 'vue'
 import StepperSolicitud from '../../components/StepperSolicitud.vue'
 import { useAutenticacionStore } from 'src/stores/autenticaciones'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { obtenerIconoYColorAutorizacion, obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
+import { obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
 import ModalVerDetalleSolicitud from '../../components/ModalVerDetalleSolicitud.vue'
 
 export default {
@@ -93,10 +90,6 @@ export default {
       modalDetalle.value.abrir(row)
     }
 
-    const numeroAutorizaciones = computed(() => {
-      return todasSolicitudesEmpleado.value?.[0]?.solicitud_detalles?.[0]?.autorizaciones_solicitudes?.length ?? 0
-    })
-
     return {
       columns,
       modalSolicitud,
@@ -104,8 +97,6 @@ export default {
       cargandoMisSolicitudes,
       abrirModalSolicitud,
       formatearFecha,
-      numeroAutorizaciones,
-      obtenerIconoYColorAutorizacion,
       obtenerPropsQChip,
       verDetalleSolicitud,
       modalDetalle,

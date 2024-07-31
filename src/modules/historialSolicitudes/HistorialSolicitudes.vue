@@ -61,11 +61,6 @@
       <template v-slot:body-cell-estatus="props">
         <q-td class="align-right">
           <div class="icons-container">
-            <q-icon v-for="index in numeroAutorizaciones(props.row)" :key="index" class="q-mr-md" size="sm"
-              :name="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).icon"
-              :color="obtenerIconoYColorAutorizacion(props.row.solicitud_detalles, index).color">
-              <q-tooltip>{{ obtenerTextoAutorizacion(index - 1) }}</q-tooltip>
-            </q-icon>
             <q-chip clickable @click="verDetalleSolicitud(props.row)"
               :icon="obtenerPropsQChip(props.row.solicitud_detalles).icono" text-color="white"
               :color="obtenerPropsQChip(props.row.solicitud_detalles).color"
@@ -83,14 +78,14 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { obtenerIconoYColorAutorizacion, obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
+import { obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
 import { filtrarElementos, filtrarElementosPorEmpresaSucursalDepartamento, filtrarOpcionesHistorialSolicitudes } from 'src/helpers/filtros'
 import ModalVerDetalleSolicitud from '../../components/ModalVerDetalleSolicitud.vue'
 
@@ -164,9 +159,9 @@ export default {
     ]
 
     onMounted(async () => {
-      try{
+      try {
         cargandoHistorialSolicitudes.value = true
-        if(primeraCarga.value){
+        if (primeraCarga.value) {
           primeraCarga.value = false
           await obtenerEmpresas()
           await obtenerSucursales()
@@ -174,9 +169,9 @@ export default {
         }
         await obtenerTodasSolicitudes()
         await filtrar('TODASEMPRESAS')
-      }catch{
+      } catch {
 
-      }finally{
+      } finally {
         cargandoHistorialSolicitudes.value = false
       }
     })
@@ -185,12 +180,7 @@ export default {
       modalDetalle.value.abrir(row)
     }
 
-    const numeroAutorizaciones = (row) => {
-      return row.solicitud_detalles?.[0]?.autorizaciones_solicitudes?.length ?? 0
-    }
-
-
-    const filtrar = async(tipoFiltro) => {
+    const filtrar = async (tipoFiltro) => {
 
       // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
       filtrarOpcionesHistorialSolicitudes(tipoFiltro,
@@ -227,8 +217,6 @@ export default {
       historialSolicitudesFiltradas,
       cargandoHistorialSolicitudes,
       formatearFecha,
-      numeroAutorizaciones,
-      obtenerIconoYColorAutorizacion,
       obtenerPropsQChip,
       verDetalleSolicitud,
       modalDetalle,
