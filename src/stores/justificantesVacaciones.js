@@ -140,10 +140,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarAusenciasYRetardos = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
         primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
 
@@ -171,10 +169,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarVacaciones = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
-        primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
+        primeraAutorizacion: detalleJefeDirecto.value
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
       const { data } = await api.post('/solicitarVacaciones', solicitudObj)
@@ -200,10 +196,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarDiasEconomicos = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
         primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
       const { data } = await api.post('/solicitarDiasEconomicos', solicitudObj)
@@ -229,10 +223,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarDiasGanados = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
         primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
       const { data } = await api.post('/solicitarDiasGanados', solicitudObj)
@@ -258,10 +250,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarVacacionesVencidas = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
         primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
       const { data } = await api.post('/solicitarVacacionesVencidas', solicitudObj)
@@ -287,10 +277,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarSabados5s = async (solicitudObj, destinatario) => {
     try {
       cargandoEnvioSolicitud.value = true
-      const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       const usuariosAutorizanObj = {
         primeraAutorizacion: detalleJefeDirecto.value,
-        segundaAutorizacion: solicitudObj.claveEmpresa === 'MB' ? usuariosAutorizan.obtenerGerenteAdministrativo : usuariosAutorizan.obtenerRevisaRH
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
       const { data } = await api.post('/solicitarSabados5s', solicitudObj)
@@ -326,9 +314,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
         formulario: ID_FORM_JUSTIFICANTES_VACACIONES
       }
 
-      // const destinatario = solicitudObj.usuarioAutoriza.correo
-      const destinatario = 'ggalvan@gruver.mx'
-      console.log(solicitudObj.usuarioAutoriza.correo)
+      const destinatario = solicitudObj.usuarioAutoriza.correo
 
       await crearEventoForm(eventoObj)
 
