@@ -79,7 +79,7 @@
             :label="nombreEstatus(props.row.estatus)" />
         </div>
       </template>
-      <template v-slot:body-cell-acciones="props">
+      <!-- <template v-slot:body-cell-acciones="props">
         <q-td>
           <q-btn flat color="primary" icon="edit" @click="editarCatalogo(props.row)">
             <q-tooltip>
@@ -87,7 +87,7 @@
             </q-tooltip>
           </q-btn>
         </q-td>
-      </template>
+      </template> -->
     </q-table>
     <modal-catalogo-usuarios ref="modalCatalogo"></modal-catalogo-usuarios>
   </div>
