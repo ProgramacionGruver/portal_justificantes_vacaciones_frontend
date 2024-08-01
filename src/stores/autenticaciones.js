@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { notificacion } from 'src/helpers/mensajes'
 import { ca } from 'date-fns/locale'
 import { useRouter } from 'vue-router'
+import { ID_SERVIDOR } from 'src/constant/servidor'
 
 export const useAutenticacionStore = defineStore('autenticaciones', () => {
   const empleado = ref(null)
@@ -66,7 +67,8 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     const configuracion = {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        idPort: ID_SERVIDOR
       }
     }
 
