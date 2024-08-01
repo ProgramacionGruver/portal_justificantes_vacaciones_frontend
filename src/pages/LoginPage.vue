@@ -172,16 +172,12 @@ import { storeToRefs } from "pinia";
 export default {
   setup() {
     const useAutenticacion = useAutenticacionStore();
-    const { iniciarSesion, autenticarUsuario, obtenerInfoColaborador, iniciarSesionNumEmpleado } =
+    const { iniciarSesion, obtenerInfoColaborador, iniciarSesionNumEmpleado } =
       useAutenticacion;
     const { isLogin, objUsuario } = storeToRefs(useAutenticacion);
     const router = useRouter();
     const isPassword = ref(true);
     const formulario = ref(null);
-
-    onMounted(async () => {
-      await autenticarUsuario();
-    });
 
     const usuarioObj = reactive({
       usuario: "",
