@@ -181,9 +181,6 @@ export default {
 
     onMounted(async () => {
       await autenticarUsuario();
-      if (isLogin.value) {
-        router.push("/principal");
-      }
     });
 
     const usuarioObj = reactive({
