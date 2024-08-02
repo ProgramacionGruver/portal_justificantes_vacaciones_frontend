@@ -246,7 +246,7 @@
             </div>
             <q-form ref="formularioCorreos" @submit.prevent="validarPasoTres">
               <div class="row q-my-sm formulario--correos">
-                <q-card-section v-if="!detalleJefeDirecto.correo" class="col-6 q-pt-none formulario--correos__input">
+                <q-card-section v-if="!detalleJefeDirecto?.correo" class="col-6 q-pt-none formulario--correos__input">
                   <label>Email del solicitante <span style="color: red;">*</span></label>
                   <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
                 </q-card-section>
@@ -375,11 +375,27 @@ export default {
     const solicitudObj = ref({ ...solicitudInit })
 
     const abrir = async (numero_empleado) => {
+      if (numero_empleado == null || !Number.isInteger(numero_empleado)) {
+        notificacion('negative', 'No se encontró el número de empleado o el número de empleado no es válido')
+        console.log(numero_empleado)
+        return
+      }
+
       await obtenerDetalleVacacionesDiasEconomicos(numero_empleado)
+
+      if (detalleVacacionesDiasEconomicos.value == null) {
+        notificacion('negative', 'No se pudo obtener el detalle de vacaciones y días económicos')
+        console.log(detalleVacacionesDiasEconomicos)
+        return
+      }
+
       solicitudObj.value = { ...solicitudInit }
       step.value = 1
       emailJefeIncorrecto.value = false
-      emailJefeDirecto.value = detalleJefeDirecto.value.correo
+
+      const correo = detalleJefeDirecto.value?.correo
+      emailJefeDirecto.value = correo != null ? correo : ''
+
       stepperSolicitud.value = true
     }
 
