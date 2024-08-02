@@ -139,32 +139,6 @@
              />
            </q-card-section>
          </div>
-         <div class="row q-my-sm">
-           <q-card-section class="col-3 q-pt-xs">
-               <q-chip
-                        class="text-white"
-                        size="1.3rem"
-                        unelevated
-                        rounded
-                        :color="colorAutorizacion(solicitudObj.nombreEstatus2)"
-                        :label="solicitudObj.nombreEstatus2"
-                />
-           </q-card-section>
-           <q-card-section class="col-4 q-pt-none">
-             <q-input
-               v-model="solicitudObj.fechaAutorizacion2"
-               outlined
-               readonly
-               />
-           </q-card-section>
-           <q-card-section class="col-5 q-pt-none">
-             <q-input
-                 v-model="solicitudObj.nombreEmpleadoAutoriza2"
-                 outlined
-                 readonly
-             />
-           </q-card-section>
-         </div>
        </q-card>
      </q-dialog>
  </template>
@@ -183,7 +157,6 @@ export default {
       solicitudObj.value.createdAt = formatearFecha(solicitudObj.value.createdAt)
       solicitudObj.value.fechaDiaSolicitado = formatearFecha(solicitudObj.value.fechaDiaSolicitado)
       solicitudObj.value.fechaAutorizacion1 = formatearHora(solicitudObj.value.fechaAutorizacion1)
-      solicitudObj.value.fechaAutorizacion2 = formatearHora(solicitudObj.value.fechaAutorizacion2)
       modalVerSolicitud.value = true
     }
 

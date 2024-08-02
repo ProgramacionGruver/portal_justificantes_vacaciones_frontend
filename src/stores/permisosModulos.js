@@ -36,7 +36,7 @@ export const useModulosStore = defineStore('modulos', () => {
 
   const obtenerPermisosSucursalesByUser = async (idUsuario) => {
     try {
-      const { data } = await apiUsuarios.post('/permisos/sucursales', { idUsuario })
+      const { data } = await apiUsuarios.post('/permisos/sucursales/justificantes', { idUsuario })
       permisosSucursales.value = [...data]
       clavesPermisosSucursales.value = permisosSucursales.value.map( permiso => { return permiso.claveSucursal} )
     } catch (error) {
@@ -46,7 +46,7 @@ export const useModulosStore = defineStore('modulos', () => {
 
   const actualizarPermisosSucursales = async (permisosObj) => {
     try {
-      const { data } = await apiUsuarios.put('/permisos/sucursales', permisosObj)
+      const { data } = await apiUsuarios.put('/permisos/sucursales/justificantes', permisosObj)
       permisosSucursales.value = data
       notificacion('positive', data.message)
     } catch (error) {
