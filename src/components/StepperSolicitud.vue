@@ -246,7 +246,7 @@
             </div>
             <q-form ref="formularioCorreos" @submit.prevent="validarPasoTres">
               <div class="row q-my-sm formulario--correos">
-                <q-card-section class="col-6 q-pt-none formulario--correos__input">
+                <q-card-section v-if="!detalleJefeDirecto.correo" class="col-6 q-pt-none formulario--correos__input">
                   <label>Email del solicitante <span style="color: red;">*</span></label>
                   <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
                 </q-card-section>
@@ -480,7 +480,7 @@ export default {
           return 0
         })
 
-        if (detalleUsuario.value?.correo !== '' && detalleJefeDirecto.value?.correo !== '') {
+        if (detalleJefeDirecto.value?.correo !== '') {
           switch (solicitudObj.value.idTipoSolicitud) {
             case AUSENCIAS_Y_RETARDOS:
               await solicitarAusenciasYRetardos(solicitudObj.value, emailJefeDirecto.value)
