@@ -317,10 +317,6 @@ export default {
       {
         label: 'Enfermedad del empleado',
         value: 5
-      },
-      {
-        label: 'Nacimiento de hijo(a)',
-        value: 6
       }
     ]
 

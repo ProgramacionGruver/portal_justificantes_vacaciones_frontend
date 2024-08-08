@@ -95,6 +95,42 @@
   }
 }
 
+.contenedor-asistenciaUsuario{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  @include adaptar (768px) {
+    align-items: flex-start;
+    height: auto;
+  }
+
+  .contenedor-banner-fecha-usuario {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    row-gap: 2rem;
+
+    @include adaptar (768px) {
+      align-items: flex-start;
+      height: auto;
+    }
+
+    .card-banner-usuario {
+      width: 90vw;
+      padding: 1rem;
+
+      @include adaptar(768px) {
+        width: 75vw;
+        height: 40vh;
+      }
+    }
+  }
+
+}
+
 .avatar {
   background-color: $primary;
   font-size: 4rem;

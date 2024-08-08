@@ -1,10 +1,10 @@
 <template>
   <div class="q-pa-md">
-    <h2>Reporte de Asistencias</h2>
+    <h2>Reporte de Faltas</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
     <q-table
       :columns="columns"
-      :rows="asistenciasFiltradas"
+      :rows="faltasFiltradas"
       :loading="cargando"
       :filter="buscar"
       no-data-label="No se encontró informacion disponible."
@@ -119,45 +119,7 @@
           </q-btn-dropdown>
         </div>
       </template>
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="!col.name.startsWith('semana_')">
-              {{ col.value }}
-            </template>
-            <template v-if="col.name.startsWith('semana_')">
-              <div v-if="col.value.estado === 'COMPLETO'">
-                {{ col.value.value }}
-              </div>
-              <q-btn
-                v-else-if="
-                  col.value.estado === 'RETARDO' ||
-                  col.value.estado === 'FALTA' ||
-                  col.value.estado === 'TURNO ESPECIAL'
-                "
-                class="q-mx-sm text-white"
-                size="1.2rem"
-                unelevated
-                rounded
-                :color="colorBoton(col.value)"
-                :label="col.value.value"
-              />
-              <q-btn
-                v-else
-                class="q-mx-sm text-white"
-                size="1.2rem"
-                unelevated
-                rounded
-                :color="colorBoton(col.value)"
-                :label="col.value.value"
-                @click="verSolicitud(col.value.solicitud)"
-              />
-            </template>
-          </q-td>
-        </q-tr>
-      </template>
     </q-table>
-    <ModalVerSolicitud ref="modalVerSolicitud"></ModalVerSolicitud>
   </div>
 </template>
 <script>
@@ -168,16 +130,10 @@ import { useSucursalesStore } from "src/stores/sucursales";
 import { useDepartamentosStore } from "src/stores/departamentos";
 import { useAsistenciasStore } from "src/stores/asistencias";
 import { formatearFecha } from "src/helpers/formatearFecha";
-import { coloresBotones } from "src/constant/constantes";
-import {
-  filtrarOpciones,
-  filtrarElementosPorEmpresaSucursalDepartamento,
-} from "src/helpers/filtros";
-import ModalVerSolicitud from "src/components/ModalVerSolicitud.vue";
+import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento } from "src/helpers/filtros";
 
 export default {
   components: {
-    ModalVerSolicitud,
   },
   setup() {
     const useEmpresas = useEmpresasStore();
@@ -211,19 +167,16 @@ export default {
     const { obtenerDepartamentos } = useDepartamentos;
 
     const useAsistencias = useAsistenciasStore();
-    const { obtenerAsistencias } = useAsistencias;
-    const { asistencias, asistenciasFiltradas } = storeToRefs(useAsistencias);
+    const { obtenerFaltas } = useAsistencias;
+    const { faltas, faltasFiltradas } = storeToRefs(useAsistencias);
 
     const cargando = ref(false);
-    const dynamicColumns = ref([]);
-    const columns = ref([]);
-    const modalVerSolicitud = ref(null);
     const hoy = new Date();
     hoy.setDate(hoy.getDate() - 1);
     const unaSemanaAntes = new Date();
     unaSemanaAntes.setDate(hoy.getDate() - 7);
 
-    const basecolumns = [
+    const columns = [
       {
         name: "numero_empleado",
         label: "No Empleado",
@@ -245,6 +198,20 @@ export default {
         field: "puesto",
         sortable: true
       },
+      {
+        name: "faltas",
+        label: "Faltas",
+        align: "left",
+        field: "faltas",
+        sortable: true
+      },
+      {
+        name: "fechaDeFaltas",
+        label: "Fechas",
+        align: "left",
+        field: "fechaDeFaltas",
+        sortable: true
+      },
     ];
 
     const objBusqueda = ref({
@@ -261,116 +228,14 @@ export default {
           await obtenerSucursales();
           await obtenerDepartamentos();
         }
-        await obtenerAsistencias(objBusqueda.value);
-        await columnasDinamicas();
+        faltasFiltradas.value = [];
+        await obtenerFaltas(objBusqueda.value);
         await filtrar("TODASEMPRESAS");
       } catch {
       } finally {
         cargando.value = false;
       }
     });
-
-    const columnasDinamicas = async () => {
-      // Crear un mapa para almacenar la fecha de registro para cada combinación de semana y día
-      const fechasPorSemanaYDia = {};
-
-      //Recorrer cada empleado en asistencias
-      asistencias.value.forEach((empleado) => {
-        Object.keys(empleado.semanas).forEach((semana) => {
-          if (!fechasPorSemanaYDia[semana]) {
-            fechasPorSemanaYDia[semana] = {};
-          }
-          Object.keys(empleado.semanas[semana]).forEach((dia) => {
-            const registroDia = empleado.semanas[semana][dia];
-            if (registroDia && registroDia.fechaRegistro) {
-              if (!fechasPorSemanaYDia[semana][dia]) {
-                fechasPorSemanaYDia[semana][dia] = registroDia.fechaRegistro;
-              }
-            }
-          });
-        });
-      });
-
-      // Crear columnas basadas en las fechas
-      Object.keys(fechasPorSemanaYDia).forEach((semana) => {
-        Object.keys(fechasPorSemanaYDia[semana]).forEach((dia) => {
-          const columnName = `semana_${semana}_${dia}`;
-          if (!dynamicColumns.value.find((col) => col.name === columnName)) {
-            const fechaRegistro = fechasPorSemanaYDia[semana][dia];
-            dynamicColumns.value.push({
-              name: columnName,
-              label: `${formatearFecha(fechaRegistro)} ${
-                dia.charAt(0).toUpperCase() + dia.slice(1)
-              }`,
-              align: "center",
-              field: (row) => {
-                const diaData = row.semanas[semana] && row.semanas[semana][dia];
-                if (
-                  diaData &&
-                  typeof diaData === "object" &&
-                  Object.keys(diaData).length > 0
-                ) {
-                  if (diaData.solicitud) {
-                    return {
-                      value: diaData.solicitud.nombreSolicitud,
-                      estado: diaData.solicitud.nombreSolicitud,
-                      retardo: diaData.retardo,
-                      solicitud: diaData.solicitud,
-                    };
-                  } else if (diaData.retardo) {
-                    return {
-                      value: diaData.horaRegistro,
-                      estado: "RETARDO",
-                      retardo: diaData.retardo,
-                    };
-                  } else if (diaData.sinTurno) {
-                    return {
-                      value: `${diaData.horaRegistro}/SIN TURNO`,
-                      estado: "COMPLETO",
-                      retardo: diaData.retardo,
-                    };
-                  } else if (diaData.horaRegistro) {
-                    return {
-                      value: diaData.horaRegistro,
-                      estado: "COMPLETO",
-                      retardo: diaData.retardo,
-                    };
-                  }else if (row.turnoEspecialSabado && dia === "sabado") {
-                    return {
-                      value: `${row.turnoEspecialSabado.turno}`,
-                      estado: `TURNO ESPECIAL`,
-                    };
-                  }else if (row.turnoEspecialSemana) {
-                    return {
-                      value: `${row.turnoEspecialSemana.turno}`,
-                      estado: `TURNO ESPECIAL`,
-                    };
-                  }
-                }
-                return {
-                  value: "FALTA",
-                  estado: "FALTA",
-                  retardo: false,
-                }
-              },
-            });
-          }
-        });
-      });
-
-      //Juntar las columnas dinamicas y las base
-      columns.value = [...basecolumns, ...dynamicColumns.value];
-    };
-
-    const colorBoton = (entrada) => {
-      const { estado } = entrada;
-      const colores = coloresBotones.find((e) => e.estado === estado);
-      return colores?.color;
-    };
-
-    const verSolicitud = (solicitud) => {
-      modalVerSolicitud.value.abrir(solicitud);
-    };
 
     const filtrar = async (tipoFiltro) => {
       // Filtra las opciones según (empresa, sucursal, departamento) (NO FILTRA INFORMACION)
@@ -398,8 +263,8 @@ export default {
     // Filtrar los datos segun las opciones seleccionadas
     const filtrarDatos = () => {
       filtrarElementosPorEmpresaSucursalDepartamento(
-        asistencias,
-        asistenciasFiltradas,
+        faltas,
+        faltasFiltradas,
         todasEmpresasSeleccionadas,
         listaClavesEmpresas,
         modelEmpresasSeleccionadas,
@@ -418,13 +283,10 @@ export default {
 
     const busquedaFechas = async () => {
       if (objBusqueda.value.fechaInicio && objBusqueda.value.fechaFin) {
-        asistenciasFiltradas.value = [];
-        columns.value = [];
-        dynamicColumns.value = [];
+        faltasFiltradas.value = [];
         try {
           cargando.value = true;
-          await obtenerAsistencias(objBusqueda.value);
-          await columnasDinamicas();
+          await obtenerFaltas(objBusqueda.value);
           await filtrar("TODASEMPRESAS");
         } catch {
         } finally {
@@ -436,12 +298,9 @@ export default {
     return {
       columns,
       buscar: ref(""),
-      asistenciasFiltradas,
+      faltasFiltradas,
       objBusqueda,
-      colorBoton,
       cargando,
-      modalVerSolicitud,
-      verSolicitud,
       empresasFiltradas,
       modelEmpresasSeleccionadas,
       todasEmpresasSeleccionadas,

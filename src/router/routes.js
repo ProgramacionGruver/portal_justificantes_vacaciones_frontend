@@ -53,6 +53,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/AsistenciasModule.vue')
       },
       {
+        path: 'faltas',
+        icono: 'insert_invitation',
+        label: 'Faltas',
+        name: 'faltas',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/FaltasModule.vue')
+      },
+      {
         path: 'diasGanados',
         icono: 'fact_check',
         label: 'Días Ganados',
