@@ -115,10 +115,10 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const obtenerTodasSolicitudes = async () => {
+  const obtenerTodasSolicitudes = async (objBusqueda) => {
     try {
       cargandoHistorialSolicitudes.value = true
-      const { data } = await api.get('/obtenerTodasSolicitudes')
+      const { data } = await api.post('/obtenerTodasSolicitudes', objBusqueda)
       historialSolicitudes.value = data
       historialSolicitudesFiltradas.value = data
     } catch (error) {

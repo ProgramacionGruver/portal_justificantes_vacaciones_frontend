@@ -15,6 +15,26 @@
               </template>
             </q-input>
           </div>
+          <div class="fechas--asistencias">
+            <div>
+              <q-input
+                dense
+                filled
+                v-model="objBusqueda.fechaInicio"
+                type="date"
+                @update:model-value="limpiarFechaFin()"
+              />
+            </div>
+            <div>
+              <q-input
+                dense
+                filled
+                v-model="objBusqueda.fechaFin"
+                type="date"
+                @update:model-value="busquedaFechas()"
+              />
+            </div>
+          </div>
         </div>
         <div class="filtros--historial">
           <q-btn-dropdown dense outline class="col q-my-sm" color="grey" label="Empresas">
@@ -113,6 +133,15 @@ export default {
 
     const modalDetalle = ref(null)
     const cargandoHistorialSolicitudes = ref(false)
+    const hoy = new Date()
+    hoy.setDate(hoy.getDate() - 1)
+    const unaSemanaAntes = new Date()
+    unaSemanaAntes.setDate(hoy.getDate() - 7)
+
+    const objBusqueda = ref({
+      fechaInicio: unaSemanaAntes.toISOString().split("T")[0],
+      fechaFin: hoy.toISOString().split("T")[0],
+    })
 
     const columns = [
       {
@@ -167,7 +196,7 @@ export default {
           await obtenerSucursales()
           await obtenerDepartamentos()
         }
-        await obtenerTodasSolicitudes()
+        await obtenerTodasSolicitudes(objBusqueda.value)
         await filtrar('TODASEMPRESAS')
       } catch {
 
@@ -212,7 +241,27 @@ export default {
         : filtrarElementos(motivosSeleccionados.value, historialSolicitudesFiltradas.value, 'idMotivo')
     }
 
+    const limpiarFechaFin = () => {
+      objBusqueda.value.fechaFin = null;
+    };
+
+    const busquedaFechas = async () => {
+      if (objBusqueda.value.fechaInicio && objBusqueda.value.fechaFin) {
+        historialSolicitudesFiltradas.value = [];
+        columns.value = [];
+        try {
+          cargandoHistorialSolicitudes.value = true;
+          await obtenerTodasSolicitudes(objBusqueda.value);
+          await filtrar("TODASEMPRESAS");
+        } catch {
+        } finally {
+          cargandoHistorialSolicitudes.value = false;
+        }
+      }
+    };
+
     return {
+      objBusqueda,
       columns,
       historialSolicitudesFiltradas,
       cargandoHistorialSolicitudes,
@@ -221,6 +270,8 @@ export default {
       verDetalleSolicitud,
       modalDetalle,
       obtenerTextoAutorizacion,
+      limpiarFechaFin,
+      busquedaFechas,
       buscar: ref(''),
       empresasFiltradas,
       modelEmpresasSeleccionadas,
