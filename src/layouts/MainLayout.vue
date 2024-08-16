@@ -71,6 +71,7 @@ import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useModulosStore } from 'src/stores/permisosModulos'
+import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { ID_SERVIDOR } from 'src/constant/servidor'
 
 export default {
@@ -99,12 +100,16 @@ export default {
     const useModulos = useModulosStore()
     const { obtenerUsuariosModulo, obtenerPermisosSucursalesByUser } = useModulos
 
+    const useColaboradores = useColaboradoresStore()
+    const { obtenerColaboradoresPortalSistemas } = useColaboradores
+
     const router = useRouter()
     const cargando = ref(false)
 
     onMounted(async () => {
       cargando.value = true
       // autenticarUsuario()
+      await obtenerColaboradoresPortalSistemas()
       await obtenerEstatus()
       await obtenerTipoSolicitudes()
       await obtenerMotivos()

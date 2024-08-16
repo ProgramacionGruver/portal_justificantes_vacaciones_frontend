@@ -128,7 +128,8 @@
               <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === VACACIONES_VENCIDAS">
                 <q-card-section class="col-xs-12 col-sm-6 q-pt-none">
                   <label>Vacaciones vencidas</label>
-                  <q-input readonly outlined v-model="detalleVacacionesDiasEconomicos.vacacionesVencidasRestantes"></q-input>
+                  <q-input readonly outlined
+                    v-model="detalleVacacionesDiasEconomicos.vacacionesVencidasRestantes"></q-input>
                 </q-card-section>
               </div>
               <div class="row q-my-sm" v-if="solicitudObj.idTipoSolicitud === DIAS_GANADOS">
@@ -250,6 +251,14 @@
                   <label>Email del solicitante <span style="color: red;">*</span></label>
                   <q-input outlined readonly v-model="detalleUsuario.correo"></q-input>
                 </q-card-section>
+                <q-card-section v-if="emailJefeIncorrecto" class="q-pb-none col-xs-12 col-sm-6 col-md-3">
+                  <label>Seleccione el jefe inmediato <span style="color: red;">*</span></label>
+                  <q-select class="q-mb-md" v-model="usuarioSeleccionado" label="Selecciona un usuario"
+                    option-label="nombre" option-disable="inactive" emit-value outlined map-options clearable use-input
+                    input-debounce="0" :options="opcionesUsuarios" behavior="menu"
+                    :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
+                    @filter="parametrosFiltradosEmpleados" @update:model-value="seleccionarUsuario" />
+                </q-card-section>
                 <q-card-section class="col-5 q-pt-none formulario--correos__input">
                   <label>Email del jefe inmediato <span style="color: red;">*</span></label>
                   <q-input outlined :readonly="!emailJefeIncorrecto" v-model="emailJefeDirecto" lazy-rules
@@ -257,11 +266,13 @@
                 </q-card-section>
                 <q-card-section class="col-1 q-pt-none formulario--correos__input">
                   <div class="checkbox-container">
-                    <q-checkbox v-model="emailJefeIncorrecto" label="Activar para cambiar el correo del jefe inmediato." />
+                    <q-checkbox v-model="emailJefeIncorrecto" @update:model-value="checkCorreoIncorrectoSeleccionado"
+                      label="Activar para cambiar el correo del jefe inmediato." />
                   </div>
                 </q-card-section>
                 <div v-if="emailJefeIncorrecto">
-                  <span class="advertencia" >**Nota: Deberas notificar a R.H. para que se realice el cambio desde el origen.</span>
+                  <span class="advertencia">**Nota: Deberas notificar a R.H. para que se realice el cambio desde el
+                    origen.</span>
                 </div>
               </div>
               <q-stepper-navigation>
@@ -276,23 +287,27 @@
       <q-card-actions align="right">
         <q-btn flat label="cerrar" color="primary" v-close-popup />
       </q-card-actions>
-    </q-card>
-  </q-dialog>
+    </q-card></q-dialog>
 </template>
 
 <script>
 import { ref, computed, watch } from 'vue'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
+import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { storeToRefs } from 'pinia'
 import { notificacion } from 'src/helpers/mensajes'
 import { validarCorreo } from 'src/helpers/inputReglas'
 import dayjs from 'dayjs'
+import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj'
 
 export default {
   setup() {
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
     const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s } = useJustificantesVacaciones
-    const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto } = storeToRefs(useJustificantesVacaciones)
+    const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto, usuarioSeleccionado, emailJefeDirecto, emailJefeIncorrecto } = storeToRefs(useJustificantesVacaciones)
+
+    const useColaboradores = useColaboradoresStore()
+    const { colaboradoresPortalSistemas } = storeToRefs(useColaboradores)
 
     const opcionesTipoPase = [
       {
@@ -324,6 +339,7 @@ export default {
     const step = ref(1)
     const previousStep = ref(1)
     const errorSeleccion = ref(false)
+    const opcionesUsuarios = ref(colaboradoresPortalSistemas.value)
 
     const AUSENCIAS_Y_RETARDOS = 1
     const VACACIONES = 2
@@ -340,9 +356,6 @@ export default {
     const MOTIVO_DIAS_GANADOS = 8
     const MOTIVO_VACACIONES_VENCIDAS = 9
     const MOTIVO_SABADOS_5S = 10
-
-    const emailJefeDirecto = ref('')
-    const emailJefeIncorrecto = ref(false)
 
     const numeroDiasRestantes = computed(() => {
       return solicitudObj.value?.idTipoSolicitud === VACACIONES ? detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes :
@@ -480,45 +493,70 @@ export default {
         return
       }
 
-        solicitudObj.value.numero_empleado = detalleUsuario.value.numero_empleado
-        solicitudObj.value.claveSucursal = detalleVacacionesDiasEconomicos.value.claveSucursal
-        solicitudObj.value.claveEmpresa = detalleVacacionesDiasEconomicos.value.claveEmpresa
-        solicitudObj.value.claveDepartamento = detalleVacacionesDiasEconomicos.value.claveDepartamento
+      solicitudObj.value.numero_empleado = detalleUsuario.value.numero_empleado
+      solicitudObj.value.claveSucursal = detalleVacacionesDiasEconomicos.value.claveSucursal
+      solicitudObj.value.claveEmpresa = detalleVacacionesDiasEconomicos.value.claveEmpresa
+      solicitudObj.value.claveDepartamento = detalleVacacionesDiasEconomicos.value.claveDepartamento
 
-        // Ordena las fechas solicitadas
-        solicitudObj.value.fechasSeleccionadas.sort((a, b) => {
-          if (a < b) return -1
-          if (a > b) return 1
-          return 0
-        })
+      // Ordena las fechas solicitadas
+      solicitudObj.value.fechasSeleccionadas.sort((a, b) => {
+        if (a < b) return -1
+        if (a > b) return 1
+        return 0
+      })
 
-        if (detalleJefeDirecto.value?.correo !== '') {
-          switch (solicitudObj.value.idTipoSolicitud) {
-            case AUSENCIAS_Y_RETARDOS:
-              await solicitarAusenciasYRetardos(solicitudObj.value, emailJefeDirecto.value)
-              break
-            case VACACIONES:
-              await solicitarVacaciones(solicitudObj.value, emailJefeDirecto.value)
-              break
-            case DIAS_ECONOMICOS:
-              await solicitarDiasEconomicos(solicitudObj.value, emailJefeDirecto.value)
-              break
-            case DIAS_GANADOS:
-              await solicitarDiasGanados(solicitudObj.value, emailJefeDirecto.value)
-              break
-            case VACACIONES_VENCIDAS:
-              await solicitarVacacionesVencidas(solicitudObj.value, emailJefeDirecto.value)
-              break
-            case SABADOS_5S:
-              await solicitarSabados5s(solicitudObj.value, emailJefeDirecto.value)
-              break
-          }
-          stepperSolicitud.value = false
-        } else {
-          notificacion('warning', 'Revise que la información esté completa')
+      if (detalleJefeDirecto.value?.correo !== '') {
+        switch (solicitudObj.value.idTipoSolicitud) {
+          case AUSENCIAS_Y_RETARDOS:
+            await solicitarAusenciasYRetardos(solicitudObj.value)
+            break
+          case VACACIONES:
+            await solicitarVacaciones(solicitudObj.value)
+            break
+          case DIAS_ECONOMICOS:
+            await solicitarDiasEconomicos(solicitudObj.value)
+            break
+          case DIAS_GANADOS:
+            await solicitarDiasGanados(solicitudObj.value)
+            break
+          case VACACIONES_VENCIDAS:
+            await solicitarVacacionesVencidas(solicitudObj.value)
+            break
+          case SABADOS_5S:
+            await solicitarSabados5s(solicitudObj.value)
+            break
         }
+        stepperSolicitud.value = false
+      } else {
+        notificacion('warning', 'Revise que la información esté completa')
+      }
+    }
+
+    const checkCorreoIncorrectoSeleccionado = () => {
+      if (emailJefeIncorrecto.value === true) {
+        emailJefeDirecto.value = ''
+        usuarioSeleccionado.value = null
       }
 
+      if (emailJefeIncorrecto.value === false) {
+        emailJefeDirecto.value = detalleJefeDirecto.value?.correo
+      }
+    }
+
+    const seleccionarUsuario = async () => {
+      if (usuarioSeleccionado.value !== null) {
+        emailJefeDirecto.value = usuarioSeleccionado.value?.correo
+      }
+    }
+
+    const parametrosFiltradosEmpleados = (val, update) => {
+      filtradoBusquedauUsuariosAcceso(
+        val,
+        update,
+        colaboradoresPortalSistemas.value,
+        opcionesUsuarios
+      )
+    }
 
     // observa los cambios en las fechas seleccionadas del q-date
     watch(() => solicitudObj.value.fechasSeleccionadas, (nuevoValor) => {
@@ -618,7 +656,12 @@ export default {
       emailJefeIncorrecto,
       emailJefeDirecto,
       validarCorreo,
-      formularioCorreos
+      formularioCorreos,
+      checkCorreoIncorrectoSeleccionado,
+      usuarioSeleccionado,
+      seleccionarUsuario,
+      parametrosFiltradosEmpleados,
+      opcionesUsuarios
     }
   }
 }
