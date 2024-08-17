@@ -56,7 +56,7 @@ export default {
       {
         name: 'estatus',
         label: 'Estatus',
-        align: 'center',
+        align: 'left',
         sortable: true
       },
       {

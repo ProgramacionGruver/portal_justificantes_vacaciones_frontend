@@ -32,6 +32,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/solicitudes/MisSolicitudes.vue')
       },
       {
+        path: 'misAutorizaciones',
+        icono: 'rule',
+        label: 'Mis autorizaciones',
+        name: 'misAutorizaciones',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/solicitudes/MisAutorizaciones.vue')
+      },
+      {
         path: 'prorrogas',
         icono: 'pending_actions',
         label: 'Solicitud de prórroga',
@@ -65,6 +72,13 @@ const routes = [
         label: 'Días Ganados',
         name: 'diasGanados',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/diasGanados/DiasGanadosModule.vue')
+      },
+      {
+        path: 'incapacidades',
+        icono: 'local_hospital',
+        label: 'Incapacidades',
+        name: 'incapacidades',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/incapacidades/IncapacidadesModule.vue')
       },
       {
         path: 'catalogoUsuarios',

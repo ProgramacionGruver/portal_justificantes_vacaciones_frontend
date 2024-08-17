@@ -79,15 +79,15 @@
             :label="nombreEstatus(props.row.estatus)" />
         </div>
       </template>
-      <!-- <template v-slot:body-cell-acciones="props">
+      <template v-slot:body-cell-acciones="props">
         <q-td>
-          <q-btn flat color="primary" icon="edit" @click="editarCatalogo(props.row)">
+          <q-btn v-if="permisoEditar" flat color="primary" icon="edit" @click="editarCatalogo(props.row)">
             <q-tooltip>
               Editar
             </q-tooltip>
           </q-btn>
         </q-td>
-      </template> -->
+      </template>
     </q-table>
     <modal-catalogo-usuarios ref="modalCatalogo"></modal-catalogo-usuarios>
   </div>
@@ -100,6 +100,7 @@ import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useCatalogosStore } from 'src/stores/catalogos.js'
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 import ModalCatalogoUsuarios from 'src/components/ModalCatalogoUsuarios.vue'
 import { filtrarOpcionesCatalogoUsuarios, filtrarElementosPorEmpresaSucursalDepartamento, filtrarElementos } from 'src/helpers/filtros'
 
@@ -142,8 +143,12 @@ export default {
       opcionesTurnos
     } = storeToRefs(useCatalogos)
 
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado }= storeToRefs(useAutenticacion)
+
     const cargando = ref(false)
     const modalCatalogo = ref(null)
+    const permisoEditar = ref(false)
 
     const columns = [
       {
@@ -270,6 +275,7 @@ export default {
         await obtenerCatalogoUsuarios()
         await obtenerCatalogoTurnos()
         await filtrar('TODASEMPRESAS')
+        permisoEditar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.actualizar === true)
       }catch{
 
       }finally{
@@ -372,7 +378,8 @@ export default {
       modelTurnosSabadosSeleccionados,
       listaTurnosSabados,
       todosTurnosSabadosSeleccionados,
-      opcionesTurnos
+      opcionesTurnos,
+      permisoEditar
     }
   }
 }

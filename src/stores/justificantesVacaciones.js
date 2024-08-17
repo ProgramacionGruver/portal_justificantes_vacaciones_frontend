@@ -23,6 +23,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const detalleUsuario = ref([])
   const detalleJefeDirecto = ref([])
   const todasSolicitudesEmpleado = ref([])
+  const todasAutorizacionesEmpleado = ref([])
   const todasProrrogasEmpleado = ref([])
   const historialSolicitudes = ref([])
   const historialSolicitudesFiltradas = ref([])
@@ -100,6 +101,15 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       notificacion('negative', error.response.data.message)
     } finally {
       cargandoMisSolicitudes.value = false
+    }
+  }
+
+  const obtenerAutorizacionesPorEmpleado = async (objBusqueda) => {
+    try {
+      const { data } = await api.post(`/obtenerAutorizacionesPorEmpleado`, objBusqueda)
+      todasAutorizacionesEmpleado.value = data
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
     }
   }
 
@@ -365,6 +375,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     detalleUsuario,
     detalleJefeDirecto,
     todasSolicitudesEmpleado,
+    todasAutorizacionesEmpleado,
     todasProrrogasEmpleado,
     historialSolicitudes,
     historialSolicitudesFiltradas,
@@ -387,6 +398,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     solicitarDiasGanados,
     solicitarVacacionesVencidas,
     solicitarSabados5s,
-    solicitarProrroga
+    solicitarProrroga,
+    obtenerAutorizacionesPorEmpleado
   }
 })

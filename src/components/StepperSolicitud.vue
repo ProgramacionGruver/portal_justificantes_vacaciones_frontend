@@ -320,6 +320,9 @@ export default {
       }
     ]
 
+    const hoy = dayjs()
+    const diaHoy = hoy.date()
+    const inicioQuincenaActual = diaHoy <= 15 ? hoy.startOf('month').date(1) : hoy.date(16)
     const stepperSolicitud = ref(false)
     const step = ref(1)
     const previousStep = ref(1)
@@ -523,13 +526,21 @@ export default {
     // observa los cambios en las fechas seleccionadas del q-date
     watch(() => solicitudObj.value.fechasSeleccionadas, (nuevoValor) => {
       if ([VACACIONES, DIAS_ECONOMICOS, DIAS_GANADOS, VACACIONES_VENCIDAS].includes(solicitudObj.value.idTipoSolicitud)) {
+        const fechaInvalida = nuevoValor?.some(fecha => dayjs(fecha).isBefore(inicioQuincenaActual, 'day'));
+
+        if (fechaInvalida) {
+          errorSeleccion.value = true
+          solicitudObj.value.fechasSeleccionadas = []
+          notificacion('warning', `No puedes seleccionar días de la quincena anterior, periodo cerrado.`)
+          return
+        }
 
         if (nuevoValor && nuevoValor.length > numeroDiasRestantes.value) {
           errorSeleccion.value = true
           // corta el arreglo de fechas según el límite de días
           solicitudObj.value.fechasSeleccionadas = nuevoValor.slice(0, numeroDiasRestantes.value)
           notificacion('warning', `Alcanzaste el límite de días disponibles restantes`)
-        } else {
+        }else {
           errorSeleccion.value = false
         }
       }
@@ -577,7 +588,36 @@ export default {
           errorSeleccion.value = false;
         }
       }
+
+      if (solicitudObj.value.idTipoSolicitud === AUSENCIAS_Y_RETARDOS) {
+        const fechaInvalida = nuevoValor?.some(fecha => dayjs(fecha).isBefore(inicioQuincenaActual, 'day'));
+
+        if (fechaInvalida) {
+          errorSeleccion.value = true
+          solicitudObj.value.fechasSeleccionadas = []
+          notificacion('warning', `No puedes seleccionar días de la quincena anterior, periodo cerrado.`)
+          return
+        }
+      }
     }, { deep: true })
+
+    watch(() => solicitudObj.value.fechaDiaSolicitado, (nuevoValor) => {
+      const hoy = dayjs(); // Fecha de hoy
+      const diaHoy = hoy.date(); // Día actual
+      const inicioQuincenaActual = diaHoy <= 15 ? hoy.startOf('month').date(1) : hoy.date(16); // Inicio de la quincena actual
+
+      if (solicitudObj.value.idTipoSolicitud === AUSENCIAS_Y_RETARDOS) {
+        const fechaSeleccionada = dayjs(nuevoValor);
+
+        // Verificar si la fecha seleccionada es anterior al inicio de la quincena actual
+        if (fechaSeleccionada.isBefore(inicioQuincenaActual, 'day')) {
+          errorSeleccion.value = true;
+          solicitudObj.value.fechaDiaSolicitado = null; // Limpiar la fecha seleccionada
+          notificacion('warning', `No puedes seleccionar un día de la quincena anterior, periodo cerrado.`);
+          return;
+        }
+      }
+    }, { deep: true });
 
     return {
       stepperSolicitud,

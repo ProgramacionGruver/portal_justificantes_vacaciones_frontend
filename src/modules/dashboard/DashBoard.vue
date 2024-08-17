@@ -6,6 +6,7 @@
           <div class="col">
             <h3 class="text-white">Buen día, </h3>
             <h4 class="text-white">{{ usuarioAutenticado?.nombre }}</h4>
+            <h5 class="text-white"><strong>Jefe Directo:</strong> <br> {{ detalleJefeDirecto.nombre }}</h5>
           </div>
           <div class="col" style="display: flex; justify-content: center; align-items: center;">
             <q-img src="../../img/sensible.png" spinner-color="white" class="contenedor--imagen" />
@@ -113,6 +114,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { formatearFecha } from "src/helpers/formatearFecha";
 import { coloresBotones } from "src/constant/constantes"
+import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones';
 import ModalVerSolicitud from "src/components/ModalVerSolicitud.vue";
 
 export default {
@@ -127,6 +129,9 @@ export default {
     const useAsistencias = useAsistenciasStore()
     const { obtenerAsistencias } = useAsistencias
     const { asistencias } = storeToRefs(useAsistencias)
+
+    const useJustificantesVacaciones = useJustificantesVacacionesStore()
+    const { detalleJefeDirecto } = storeToRefs(useJustificantesVacaciones)
 
     const today = new Date()
     const year = today.getFullYear()
@@ -313,6 +318,7 @@ export default {
       objBusqueda,
       asistencias,
       modalVerSolicitud,
+      detalleJefeDirecto,
       verSolicitud,
       colorBoton,
       limpiarFechaFin,
