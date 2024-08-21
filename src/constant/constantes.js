@@ -29,7 +29,8 @@ export const coloresBotones = [
   {estado:'DIAS ECONOMICOS', color: 'cyan-6'},
   {estado:'TURNO ESPECIAL', color: 'blue-7'},
   {estado:'DIAS GANADOS', color: 'deep-purple-7'},
-  {estado:'SABADOS 5S', color: 'purple-6'}
+  {estado:'SABADOS 5S', color: 'purple-6'},
+  {estado:'INCAPACIDAD', color: 'amber-14'},
 ]
 
 export const coloresAutorizaciones= [

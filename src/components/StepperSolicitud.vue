@@ -20,6 +20,8 @@
                     unchecked-icon="panorama_fish_eye" :val="2" label="Vacaciones" />
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
                     unchecked-icon="panorama_fish_eye" :val="3" label="Días económicos" />
+                  <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
+                    unchecked-icon="panorama_fish_eye" :val="4" label="Capacitaciones" />
                   <!-- mostrar si detecta que tiene días vencidos etc...  -->
                   <q-radio
                     v-if="detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes && detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes > 0"

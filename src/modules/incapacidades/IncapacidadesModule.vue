@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <h2>Incapacidades</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table :columns="columns" :rows="diasGanadosFiltrados" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
+    <q-table :columns="columns" :rows="incapacidadesFiltrados" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
     loading-label="Buscando información. . . "  row-key="numero_empleado">
     <template v-slot:top>
           <div class="fit row q-gutter-sm q-mb-sm justify-end">
@@ -44,23 +44,23 @@
       </template>
     </q-table>
   </div>
-  <modal-dias-ganados ref="modalDias"></modal-dias-ganados>
+  <modal-incapacidades ref="modalIncapacidades"></modal-incapacidades>>
 </template>
 <script>
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
-import { useDiasGanadosStore } from 'src/stores/diasGanados'
+import { useIncapacidadesStore } from 'src/stores/incapacidades'
 import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { filtrarOpciones, filtrarElementosPorEmpresaSucursalDepartamento} from 'src/helpers/filtros'
-import ModalDiasGanados from 'src/components/ModalDiasGanados.vue'
+import ModalIncapacidades from 'src/components/ModalIncapacidades.vue'
 
 export default {
     components: {
-      ModalDiasGanados
+      ModalIncapacidades
     },
     setup () {
 
@@ -76,15 +76,15 @@ export default {
       const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
       const { obtenerDepartamentos } = useDepartamentos
 
-      const useDiasGanados = useDiasGanadosStore()
-      const { obtenerDiasGanados } = useDiasGanados
-      const { diasGanados, diasGanadosFiltrados } = storeToRefs(useDiasGanados)
+      const useIncapacidades = useIncapacidadesStore()
+      const { obtenerIncapacidades } = useIncapacidades
+      const { incapacidades, incapacidadesFiltrados } = storeToRefs(useIncapacidades)
 
       const useColaboradores = useColaboradoresStore()
       const { obtenerColaboradores } = useColaboradores
 
       const cargando = ref(false)
-      const modalDias = ref(null)
+      const modalIncapacidades = ref(null)
 
       const columns = [
         {
@@ -102,10 +102,17 @@ export default {
           sortable: true
         },
         {
+          name: "folio",
+          label: "Folio",
+          align: "left",
+          field: "folio",
+          sortable: true
+        },
+        {
           name: "fechaIncapacidad",
           label: "Fecha Incapacidad",
           align: "left",
-          field: "fechaIncapacidad",
+          field: (row) => formatearFecha(row.fechaIncapacidad),
           sortable: true
         },
         {
@@ -148,7 +155,7 @@ export default {
             await obtenerDepartamentos()
           }
           await obtenerColaboradores()
-          await obtenerDiasGanados()
+          await obtenerIncapacidades()
           await filtrar('TODASEMPRESAS')
         }catch{
 
@@ -158,7 +165,7 @@ export default {
       })
 
       const agregarDias = () => {
-        modalDias.value.abrir()
+        modalIncapacidades.value.abrir()
       }
 
       const filtrar = async(tipoFiltro) => {
@@ -175,7 +182,7 @@ export default {
 
       // Filtrar los datos segun las opciones seleccionadas
       const filtrarDatos = () => {
-        filtrarElementosPorEmpresaSucursalDepartamento(diasGanados, diasGanadosFiltrados,
+        filtrarElementosPorEmpresaSucursalDepartamento(incapacidades, incapacidadesFiltrados,
           todasEmpresasSeleccionadas, listaClavesEmpresas, modelEmpresasSeleccionadas,
           todasSucursalesSeleccionadas, listaClavesSucursales, modelSucursalesSeleccionadas,
           todosDepartamentosSeleccionados, listaClavesDepartamentos, modelDepartamentosSeleccionados)
@@ -186,9 +193,9 @@ export default {
         buscar: ref(''),
         columns,
         cargando,
-        diasGanadosFiltrados,
+        incapacidadesFiltrados,
         agregarDias,
-        modalDias,
+        modalIncapacidades,
         empresasFiltradas,
         modelEmpresasSeleccionadas,
         todasEmpresasSeleccionadas,

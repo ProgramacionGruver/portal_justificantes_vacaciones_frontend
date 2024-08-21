@@ -335,6 +335,12 @@ export default {
                       estado: "COMPLETO",
                       retardo: diaData.retardo,
                     };
+                  }else if (diaData.incapacidad) {
+                    return {
+                      value: "INCAPACIDAD",
+                      estado: "INCAPACIDAD",
+                      solicitud: diaData.incapacidad,
+                    };
                   }else if (row.turnoEspecialSabado && dia === "sabado") {
                     return {
                       value: `${row.turnoEspecialSabado.turno}`,

@@ -253,11 +253,17 @@ export default {
                         estado: "COMPLETO",
                         retardo: diaData.retardo,
                       };
-                    }else if (row.turnoEspecialSabado && dia === "sabado") {
+                    }else if (diaData.incapacidad) {
                       return {
-                        value: `${row.turnoEspecialSabado.turno}`,
-                        estado: `TURNO ESPECIAL`,
+                        value: "INCAPACIDAD",
+                        estado: "INCAPACIDAD",
+                        solicitud: diaData.incapacidad,
                       };
+                    }else if (row.turnoEspecialSabado && dia === "sabado") {
+                        return {
+                          value: `${row.turnoEspecialSabado.turno}`,
+                          estado: `TURNO ESPECIAL`,
+                        };
                     }else if (row.turnoEspecialSemana) {
                       return {
                         value: `${row.turnoEspecialSemana.turno}`,
