@@ -22,6 +22,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const listaIdsTipoSolicitudes = ref([])
   const detalleUsuario = ref([])
   const detalleJefeDirecto = ref([])
+  const detalleGerenteSucursal = ref([])
   const todasSolicitudesEmpleado = ref([])
   const todasAutorizacionesEmpleado = ref([])
   const todasProrrogasEmpleado = ref([])
@@ -88,9 +89,10 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
   const obtenerDetalleEmpleadoYJefeDirecto = async (numero_empleado) => {
     try {
-      const { data: { detalleEmpleado, detalleJefe } } = await api.get(`/obtenerDetalleEmpleadoYJefeDirecto/${numero_empleado}`)
+      const { data: { detalleEmpleado, detalleJefe, detalleGerente } } = await api.get(`/obtenerDetalleEmpleadoYJefeDirecto/${numero_empleado}`)
       detalleUsuario.value = detalleEmpleado
       detalleJefeDirecto.value = detalleJefe
+      detalleGerenteSucursal.value = detalleGerente
     } catch (error) {
       notificacion('negative', error.response.data.message)
     }
@@ -154,6 +156,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarAusenciasYRetardos = async (solicitudObj) => {
     try {
       cargandoEnvioSolicitud.value = true
+
+      if(detalleJefeDirecto.value.numero_empleado === 1028){
+        detalleJefeDirecto.value = detalleGerenteSucursal.value
+        emailJefeDirecto.value = detalleJefeDirecto.value.correo
+      }
+
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
@@ -210,6 +218,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarDiasEconomicos = async (solicitudObj) => {
     try {
       cargandoEnvioSolicitud.value = true
+
+      if(detalleJefeDirecto.value.numero_empleado === 1028){
+        detalleJefeDirecto.value = detalleGerenteSucursal.value
+        emailJefeDirecto.value = detalleJefeDirecto.value.correo
+      }
+
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
@@ -237,6 +251,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarDiasGanados = async (solicitudObj) => {
     try {
       cargandoEnvioSolicitud.value = true
+
+      if(detalleJefeDirecto.value.numero_empleado === 1028){
+        detalleJefeDirecto.value = detalleGerenteSucursal.value
+        emailJefeDirecto.value = detalleJefeDirecto.value.correo
+      }
+
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
@@ -291,6 +311,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarSabados5s = async (solicitudObj) => {
     try {
       cargandoEnvioSolicitud.value = true
+
+      if(detalleJefeDirecto.value.numero_empleado === 1028){
+        detalleJefeDirecto.value = detalleGerenteSucursal.value
+        emailJefeDirecto.value = detalleJefeDirecto.value.correo
+      }
+
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
@@ -345,6 +371,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const solicitarCapacitaciones = async (solicitudObj) => {
     try {
       cargandoEnvioSolicitud.value = true
+
+      if(detalleJefeDirecto.value.numero_empleado === 1028){
+        detalleJefeDirecto.value = detalleGerenteSucursal.value
+        emailJefeDirecto.value = detalleJefeDirecto.value.correo
+      }
+
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
