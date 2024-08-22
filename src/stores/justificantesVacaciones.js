@@ -342,6 +342,35 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
+  const solicitarCapacitaciones = async (solicitudObj) => {
+    try {
+      cargandoEnvioSolicitud.value = true
+      const usuariosAutorizanObj = {
+        primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
+      }
+      solicitudObj.usuariosAutorizan = usuariosAutorizanObj
+
+      const { data } = await api.post('/solicitarCapacitaciones', solicitudObj)
+      todasSolicitudesEmpleado.value.unshift(data)
+
+      const eventoObj = {
+        nombreEvento: `-${data.folio}_1`,
+        formulario: ID_FORM_JUSTIFICANTES_VACACIONES
+      }
+
+      await crearEventoForm(eventoObj)
+
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+
+      notificacion('positive', 'Solicitud generada exitosamente')
+    } catch (error) {
+      notificacion('negative', error.response?.data.message)
+    } finally {
+      cargandoEnvioSolicitud.value = false
+      urlForm.value = ''
+    }
+  }
+
   const crearEventoForm = async (eventoObj) => {
     try {
       const { data } = await apiForm.post('/generarEventoAutorizacion', eventoObj)
@@ -406,6 +435,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     solicitarVacacionesVencidas,
     solicitarSabados5s,
     solicitarProrroga,
+    solicitarCapacitaciones,
     obtenerAutorizacionesPorEmpleado
   }
 })

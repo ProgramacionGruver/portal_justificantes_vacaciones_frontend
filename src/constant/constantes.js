@@ -31,6 +31,7 @@ export const coloresBotones = [
   {estado:'DIAS GANADOS', color: 'deep-purple-7'},
   {estado:'SABADOS 5S', color: 'purple-6'},
   {estado:'INCAPACIDAD', color: 'amber-14'},
+  {estado:'CAPACITACIONES', color: 'blue-grey-3'},
 ]
 
 export const coloresAutorizaciones= [

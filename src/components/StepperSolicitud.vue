@@ -21,7 +21,7 @@
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
                     unchecked-icon="panorama_fish_eye" :val="3" label="Días económicos" />
                   <q-radio v-model="solicitudObj.idTipoSolicitud" class="col-6" checked-icon="task_alt"
-                    unchecked-icon="panorama_fish_eye" :val="4" label="Capacitaciones" />
+                    unchecked-icon="panorama_fish_eye" :val="8" label="Capacitaciones" />
                   <!-- mostrar si detecta que tiene días vencidos etc...  -->
                   <q-radio
                     v-if="detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes && detalleVacacionesDiasEconomicos?.vacacionesVencidasRestantes > 0"
@@ -238,6 +238,28 @@
               </div>
             </q-form>
 
+            <q-form v-if="solicitudObj.idTipoSolicitud === CAPACITACIONES" ref="formulario">
+              <div class=" q-my-sm q-mb-lg">
+                <q-card-section>
+                  <label>Seleccione los días a justificar <span style="color: red;">*</span></label>
+                </q-card-section>
+                <div class="q-my-sm flex flex-center">
+                  <q-date landscape multiple mask="YYYY-MM-DD" v-model="solicitudObj.fechasSeleccionadas"
+                    :locale="myLocale"></q-date>
+                </div>
+              </div>
+              <div class="row q-my-sm">
+                <q-card-section class="col">
+                  <label>Describe los motivos <span style="color: red;">*</span></label>
+                </q-card-section>
+              </div>
+              <div class="row q-my-sm">
+                <q-card-section class="col q-pt-none">
+                  <q-input maxlength="255" counter autogrow outlined v-model="solicitudObj.descripcionMotivo"></q-input>
+                </q-card-section>
+              </div>
+            </q-form>
+
             <q-stepper-navigation>
               <q-btn color="primary" @click="validarPasoDos" label="continuar" class="q-ml-sm" />
               <q-btn color="primary" flat @click="step = 1" label="atras" class="q-ml-sm" />
@@ -305,7 +327,7 @@ import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj
 export default {
   setup() {
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s } = useJustificantesVacaciones
+    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s, solicitarCapacitaciones} = useJustificantesVacaciones
     const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto, usuarioSeleccionado, emailJefeDirecto, emailJefeIncorrecto } = storeToRefs(useJustificantesVacaciones)
 
     const useColaboradores = useColaboradoresStore()
@@ -352,6 +374,7 @@ export default {
     const DIAS_GANADOS = 4
     const VACACIONES_VENCIDAS = 5
     const SABADOS_5S = 6
+    const CAPACITACIONES = 8
 
     const PASE_DE_ENTRADA = 1
     const PASE_DE_SALIDA = 2
@@ -361,6 +384,7 @@ export default {
     const MOTIVO_DIAS_GANADOS = 8
     const MOTIVO_VACACIONES_VENCIDAS = 9
     const MOTIVO_SABADOS_5S = 10
+    const MOTIVO_CAPACITACIONES = 12
 
     const numeroDiasRestantes = computed(() => {
       return solicitudObj.value?.idTipoSolicitud === VACACIONES ? detalleVacacionesDiasEconomicos.value.diasVacacionesRestantes :
@@ -459,7 +483,6 @@ export default {
             }
           }
           break
-
         case VACACIONES:
         case DIAS_GANADOS:
         case VACACIONES_VENCIDAS:
@@ -470,14 +493,14 @@ export default {
               [VACACIONES]: MOTIVO_VACACIONES,
               [DIAS_GANADOS]: MOTIVO_DIAS_GANADOS,
               [VACACIONES_VENCIDAS]: MOTIVO_VACACIONES_VENCIDAS,
-              [SABADOS_5S]: MOTIVO_SABADOS_5S
+              [SABADOS_5S]: MOTIVO_SABADOS_5S,
+              [CAPACITACIONES]: MOTIVO_CAPACITACIONES
             }[idTipoSolicitud]
             step.value++
           } else {
             notificarError()
           }
           break
-
         case DIAS_ECONOMICOS:
           if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0 && typeof idMotivo === 'number') {
             step.value++
@@ -485,7 +508,21 @@ export default {
             notificarError()
           }
           break
-
+        case CAPACITACIONES:
+          if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0) {
+              //  "computed property names"
+              solicitudObj.value.idMotivo = {
+                [VACACIONES]: MOTIVO_VACACIONES,
+                [DIAS_GANADOS]: MOTIVO_DIAS_GANADOS,
+                [VACACIONES_VENCIDAS]: MOTIVO_VACACIONES_VENCIDAS,
+                [SABADOS_5S]: MOTIVO_SABADOS_5S,
+                [CAPACITACIONES]: MOTIVO_CAPACITACIONES
+              }[idTipoSolicitud]
+              step.value++
+            } else {
+              notificarError()
+            }
+            break
         default:
           notificacion('warning', 'Tipo de solicitud no válido')
           break
@@ -529,6 +566,9 @@ export default {
             break
           case SABADOS_5S:
             await solicitarSabados5s(solicitudObj.value)
+            break
+          case CAPACITACIONES:
+            await solicitarCapacitaciones(solicitudObj.value)
             break
         }
         stepperSolicitud.value = false
@@ -629,7 +669,7 @@ export default {
         }
       }
 
-      if (solicitudObj.value.idTipoSolicitud === AUSENCIAS_Y_RETARDOS) {
+      if (solicitudObj.value.idTipoSolicitud === AUSENCIAS_Y_RETARDOS || solicitudObj.value.idTipoSolicitud === CAPACITACIONES) {
         const fechaInvalida = nuevoValor?.some(fecha => dayjs(fecha).isBefore(inicioQuincenaActual, 'day'));
 
         if (fechaInvalida) {
@@ -673,6 +713,7 @@ export default {
       PASE_DE_ENTRADA,
       PASE_DE_SALIDA,
       FALTA,
+      CAPACITACIONES,
       numeroDiasRestantes,
       opcionesTipoPase,
       detalleVacacionesDiasEconomicos,
