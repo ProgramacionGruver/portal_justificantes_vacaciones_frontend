@@ -30,6 +30,17 @@
             Portal de Justificantes, Vacaciones y Días económicos
           </span>
         </q-toolbar-title>
+        <q-btn
+          flat
+          round
+          dense
+          icon="info"
+          @click="abrirUrl"
+        >
+          <q-tooltip class="text-h5">
+            Manual de Usuario
+          </q-tooltip>
+        </q-btn>
         <q-btn flat @click="logout"> Cerrar sesión </q-btn>
       </q-toolbar>
     </q-header>
@@ -81,7 +92,7 @@ export default {
   setup () {
     const leftDrawerOpen = ref(false)
     const useUsuario = useAutenticacionStore()
-    const { usuarioAutenticado } = storeToRefs(useUsuario)
+    const { usuarioAutenticado, usuarioJefe } = storeToRefs(useUsuario)
     const { cerrarSesion } = useUsuario
     // const { autenticarUsuario } = useUsuario
 
@@ -133,6 +144,14 @@ export default {
       return url
     }
 
+    const abrirUrl = async () => {
+      if(usuarioJefe.value){
+        window.open('https://gruvermx.sharepoint.com/:b:/s/GruverProgramacin/EUNFHuQ8Dc5HiYF1xH42Oi4BJ3curXA6-aIiq9m29ZkRiA?e=dLO00J', '_blank')
+      }else{
+        window.open('https://gruvermx.sharepoint.com/:b:/s/GruverProgramacin/ETrVe0NpxvtOmlTwtCnZ-qIB4H95aOWd5Xpewvaao0z5cQ?e=ECH4lS', '_blank')
+      }
+    }
+
     return {
       leftDrawerOpen,
       // inicialesUsuario,
@@ -140,6 +159,7 @@ export default {
       logout,
       cargando,
       calcularURLFoto,
+      abrirUrl,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

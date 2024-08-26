@@ -41,10 +41,13 @@ const menulist = ref([])
 const router = useRouter()
 
 const useUsuario = useAutenticacionStore()
-const { usuarioAutenticado } = storeToRefs(useUsuario)
+const { usuarioAutenticado, usuarioJefe } = storeToRefs(useUsuario)
 
 onMounted(() => {
   const modulosPermiso = usuarioAutenticado.value.modulos.map(e => e.moduloPortale.nombreModulo)
+  if(modulosPermiso.length > 3){
+    usuarioJefe.value = true
+  }
   menulist.value = router.options.routes.find((r) => {
     return r.name === 'principal'
   }).children.filter(route => modulosPermiso.includes(route.name))

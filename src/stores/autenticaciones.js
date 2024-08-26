@@ -17,6 +17,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
   const objUsuario = ref(null)
   const infoUsuario = ref(null)
   const router = useRouter();
+  const usuarioJefe = ref(false)
 
   const obtenerEmpleado = async (empleado) => {
     try {
@@ -134,6 +135,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     obtenerInfoColaborador,
     registrarContrasenia,
     iniciarSesionNumEmpleado,
-    infoUsuario
+    infoUsuario,
+    usuarioJefe
   }
 })
