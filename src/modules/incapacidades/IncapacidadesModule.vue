@@ -79,12 +79,22 @@
                 <q-option-group class="q-pa-md" dense :options="opcionesRiesgoTrabajo" v-model="tiposRiesgoSeleccionados"
                   @update:model-value="filtrar('OPCIONESRIESGO')" type="checkbox" />
               </q-btn-dropdown>
-              <q-btn color="primary" icon-right="picture_as_pdf" label="Descargar" no-caps :disable="cargando" @click="agregarDias()"/>
-              <q-btn color="green" icon-right="description" label="Descargar" no-caps :disable="cargando" @click="agregarDias()"/>
+              <q-btn color="primary" icon-right="picture_as_pdf" label="Descargar" no-caps :disable="cargando" @click="descargarDocumentos"/>
+              <q-btn color="green" icon-right="description" label="Descargar" no-caps :disable="cargando" @click="descargaExcel"/>
             </div>
       </template>
       <template v-slot:body-cell-acciones="props">
           <q-td>
+            <q-btn dense flat color="primary" icon="visibility" @click="verIncapacidad(props.row)">
+              <q-tooltip>
+                Ver Incapacidad
+              </q-tooltip>
+            </q-btn>
+            <q-btn dense flat color="primary" icon="file_upload" @click="editarIncapacidad(props.row, true)">
+              <q-tooltip>
+                Subir archivos
+              </q-tooltip>
+            </q-btn>
             <q-btn dense flat color="primary" icon="edit" @click="editarIncapacidad(props.row)">
               <q-tooltip>
                 Editar
@@ -138,6 +148,10 @@ import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
+import * as XLSX from 'xlsx'
+import { descargarPDF } from 'src/helpers/descargarPDF'
 import { filtrarElementos, filtrarOpcionesIncapacidades, filtrarElementosPorEmpresaSucursalDepartamento} from 'src/helpers/filtros'
 import { opcionesFiltroRamoSeguro, opcionesFiltroRiesgoTrabajo, opcionesRamoSeguro, opcionesRiesgoTrabajo } from 'src/constant/opcionesSeleccionables'
 import ModalIncapacidades from 'src/components/ModalIncapacidades.vue'
@@ -358,8 +372,12 @@ export default {
       }
       }
 
-      const editarIncapacidad = (incapacidadObj) => {
-        modalIncapacidades.value.abrir(incapacidadObj)
+      const editarIncapacidad = (incapacidadObj, editarDocumentos) => {
+        modalIncapacidades.value.abrir(incapacidadObj, false, editarDocumentos)
+      }
+
+      const verIncapacidad = (incapacidadObj) => {
+        modalIncapacidades.value.abrir(incapacidadObj, true)
       }
 
       const abrirUrl = async (url) => {
@@ -395,6 +413,98 @@ export default {
           })
       }
 
+      const descargarDocumentos = async () => {
+        try {
+          cargando.value = true
+          const zip = new JSZip()
+          const batchSize = 3
+
+          const loteFunciones = []
+
+          incapacidadesFiltrados.value.forEach(objeto => {
+            const carpetaFolio = zip.folder(`Incapacidades/${objeto.folio}`)
+
+            loteFunciones.push(async () => {
+              const url = objeto.urlDocumento
+              const blob = await descargarPDF(url)
+              carpetaFolio.file(`${objeto.folio}.pdf`, blob)
+            })
+
+            // Descargar ST7 si existe
+            if (objeto.urlDocumentoSt7) {
+              loteFunciones.push(async () => {
+                const url = objeto.urlDocumentoSt7
+                const blob = await descargarPDF(url)
+                carpetaFolio.file(`${objeto.folio}-ST7.pdf`, blob)
+              })
+            }
+
+            // Descargar ST2 si existe
+            if (objeto.urlDocumentoSt2) {
+              loteFunciones.push(async () => {
+                const url = objeto.urlDocumentoSt2
+                const blob = await descargarPDF(url)
+                carpetaFolio.file(`${objeto.folio}-ST2.pdf`, blob)
+              })
+            }
+
+            // Descargar SIAAT si existe
+            if (objeto.urlDocumentoSiaat) {
+              loteFunciones.push(async () => {
+                const url = objeto.urlDocumentoSiaat
+                const blob = await descargarPDF(url)
+                carpetaFolio.file(`${objeto.folio}-SIAAT.pdf`, blob)
+              })
+            }
+          })
+
+          await descargarEnLotes(loteFunciones, batchSize)
+
+          const contenidoZip = await zip.generateAsync({ type: 'blob' })
+          saveAs(contenidoZip, `Incapacidades-${objBusqueda.value.fechaInicio}-${objBusqueda.value.fechaFin}.zip`)
+        } catch (error) {
+          console.error("Error descargando los documentos:", error)
+        } finally {
+          cargando.value = false
+        }
+      }
+
+      const descargarEnLotes = async (loteFunciones, batchSize) => {
+        const resultados = []
+
+        for (let i = 0; i < loteFunciones.length; i += batchSize) {
+          const lote = loteFunciones.slice(i, i + batchSize)
+          const resultadosLote = await Promise.all(lote.map(fn => fn()))
+          resultados.push(...resultadosLote)
+        }
+
+        return resultados
+      }
+
+      const descargaExcel = () => {
+          cargando.value = true
+          const ws = XLSX.utils.json_to_sheet(incapacidadesFiltrados.value)
+          const wb = XLSX.utils.book_new()
+          XLSX.utils.book_append_sheet(wb, ws, 'Datos')
+          const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' })
+          const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' })
+          const url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `Incapacidades-${objBusqueda.value.fechaInicio}-${objBusqueda.value.fechaFin}.xlsx`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          cargando.value = false
+      }
+
+      const s2ab = (s) => {
+        const buf = new ArrayBuffer(s.length)
+        const view = new Uint8Array(buf)
+        for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF
+        return buf
+      }
+
       return {
         buscar: ref(''),
         columns,
@@ -424,9 +534,12 @@ export default {
         busquedaFechas,
         objBusqueda,
         editarIncapacidad,
+        verIncapacidad,
         abrirUrl,
         obtenerButton,
-        actualizarEstatus
+        actualizarEstatus,
+        descargarDocumentos,
+        descargaExcel
       }
     }
   }

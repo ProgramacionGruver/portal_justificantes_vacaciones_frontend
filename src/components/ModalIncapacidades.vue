@@ -2,15 +2,17 @@
   <q-dialog v-model="abrirModal">
     <q-card style="min-width: 50vw;">
       <q-card-section class="bg-primary text-white row items-center q-pb-none">
-        <h2 class="text-h4">Agregar Incapacidades</h2>
+        <h2 class="text-h4">Incapacidades</h2>
         <q-space />
       </q-card-section>
       <q-form ref="formulario" @submit.prevent="agregarDias">
         <div class="div--contenedor__general">
           <div style="display: block;">
             <div class="q-ma-md ">
-              <label>Agregar Colaborador: <span style="color: red;">*</span></label>
+              <label v-if="!actualizacion">Agregar Colaborador: <span style="color: red;">*</span></label>
               <q-select
+                v-if="!actualizacion"
+                :readonly="lectura"
                 dense
                 outlined
                 clearable
@@ -26,7 +28,7 @@
                 @update:model-value="datosAutomaticos"
                 :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
               />
-              <div class="row items-start q-col-gutter-sm">
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm">
                 <div class="col-6">
                   <label>Sucursal:</label>
                   <q-input
@@ -39,6 +41,7 @@
                 <div class="col-6">
                   <label>No. Seguro Social: <span style="color: red;">*</span></label>
                   <q-input
+                    :readonly="lectura"
                     dense
                     outlined
                     v-model="incapacidadesObj.numeroSeguroSocial"
@@ -46,10 +49,11 @@
                   />
                 </div>
               </div>
-              <div class="row items-start q-col-gutter-sm">
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm">
                 <div class="col-6">
                   <label>Folio Incapacidad: <span style="color: red;">*</span></label>
                   <q-input
+                    :readonly="lectura"
                     dense
                     outlined
                     v-model="incapacidadesObj.folio"
@@ -60,6 +64,7 @@
                 <div class="col-6">
                   <label>Motivo: <span style="color: red;">*</span></label>
                   <q-input
+                    :readonly="lectura"
                     dense
                     outlined
                     v-model="incapacidadesObj.motivo"
@@ -68,10 +73,11 @@
                   />
                 </div>
               </div>
-              <div class="row items-start q-col-gutter-sm">
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm">
                 <div class="col-6">
                   <label>Ramo Seguro: <span style="color: red;">*</span></label>
                   <q-select
+                    :readonly="lectura"
                     dense
                     outlined
                     clearable
@@ -85,6 +91,7 @@
                 <div class="col-6">
                   <label>Tipo Incapacidad: <span style="color: red;">*</span></label>
                   <q-select
+                    :readonly="lectura"
                     dense
                     outlined
                     clearable
@@ -96,10 +103,11 @@
                   />
                 </div>
               </div>
-              <div class="row items-start q-col-gutter-sm">
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm">
                 <div class="col-6">
                   <label>Probable Riesgo de Trabajo: <span style="color: red;">*</span></label>
                   <q-select
+                    :readonly="lectura"
                     dense
                     outlined
                     clearable
@@ -115,6 +123,7 @@
                 <div class="col-6">
                   <label>Días de Incapacidad: <span style="color: red;">*</span></label>
                   <q-input
+                    :readonly="lectura"
                     ref="lista"
                     dense
                     outlined
@@ -125,22 +134,24 @@
                   />
                 </div>
               </div>
-              <div class="row items-start q-col-gutter-sm q-mb-xs">
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm q-mb-xs">
                 <div class="col-4">
                   <label>A partir de: <span style="color: red;">*</span></label>
-                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaApartir" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]"></q-input>
+                  <q-input :readonly="lectura" dense type="date" outlined v-model="incapacidadesObj.fechaApartir" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]"></q-input>
                 </div>
                 <div class="col-4">
                   <label>Fecha de termino: <span style="color: red;">*</span></label>
-                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaTermino" :rules="[verificarFechas]"></q-input>
+                  <q-input :readonly="lectura" dense type="date" outlined v-model="incapacidadesObj.fechaTermino" :rules="[verificarFechas]"></q-input>
                 </div>
                 <div class="col-4">
                   <label>Expedido: <span style="color: red;">*</span></label>
-                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaExpedido" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]" ></q-input>
+                  <q-input :readonly="lectura" dense type="date" outlined v-model="incapacidadesObj.fechaExpedido" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]" ></q-input>
                 </div>
               </div>
-              <label>Tipo de riesgo:</label>
+              <label v-if="!actualizacion">Tipo de riesgo:</label>
               <q-input
+                v-if="!actualizacion"
+                :readonly="lectura"
                 class="q-pb-md"
                 dense
                 outlined
@@ -148,8 +159,10 @@
                 v-model="incapacidadesObj.tipoRiesgo"
                 label="Describe el Tipo de Riesgo"
               />
-              <label>Observaciones:</label>
+              <label v-if="!actualizacion">Observaciones:</label>
               <q-input
+                v-if="!actualizacion"
+                :readonly="lectura"
                 class="q-pb-md"
                 dense
                 outlined
@@ -157,9 +170,16 @@
                 v-model="incapacidadesObj.observaciones"
                 label="Escribe las observaciones"
               />
-              <label>Archivo: <span style="color: red;">*</span></label>
+              <label v-if="!lectura && !actualizacion">Archivo: <span style="color: red;">*</span></label>
+              <label v-if="lectura || actualizacion">Archivos: <span style="color: red;">*</span></label>
+              <div v-if="lectura && !actualizacion" class="q-gutter-sm items-center" :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-2'" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <q-btn v-if="incapacidadesObj.urlDocumento" color="primary" icon="attach_file" label="Incapacidad" @click="abrirUrl(incapacidadesObj.urlDocumento)"/>
+                <q-btn v-if="incapacidadesObj.urlDocumentoSt7" color="primary" icon="attach_file" label="Archivo ST7" @click="abrirUrl(incapacidadesObj.urlDocumentoSt7)"/>
+                <q-btn v-if="incapacidadesObj.urlDocumentoSt2" color="primary" icon="attach_file" label="Archivo ST2" @click="abrirUrl(incapacidadesObj.urlDocumentoSt2)"/>
+                <q-btn v-if="incapacidadesObj.urlDocumentoSiaat" color="primary" icon="attach_file" label="Archivo SIAAT" @click="abrirUrl(incapacidadesObj.urlDocumentoSiaat)"/>
+              </div>
               <q-file
-                  v-if="!incapacidadesObj.urlDocumento"
+                  v-if="!incapacidadesObj.urlDocumento && !lectura && !actualizacion"
                   outlined
                   use-chips
                   v-model="documento"
@@ -170,7 +190,7 @@
               <div class="row items-start q-col-gutter-sm q-mb-xs">
                 <div class="col-11">
                   <q-file
-                    v-if="incapacidadesObj.urlDocumento"
+                    v-if="incapacidadesObj.urlDocumento && !lectura && !actualizacion"
                     outlined
                     use-chips
                     v-model="documento"
@@ -181,12 +201,12 @@
                   </q-file>
                 </div>
                 <div class="col-1 q-pt-md">
-                  <q-btn v-if="incapacidadesObj.urlDocumento" round dense flat :icon="documento?'edit_off':'edit'" @click="documento = !documento"/>
+                  <q-btn v-if="incapacidadesObj.urlDocumento && !lectura && !actualizacion" round dense flat :icon="documento?'edit_off':'edit'" @click="documento = !documento"/>
                 </div>
               </div>
-              <div class="q-mt-md q-mb-md rounded-borders" :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-2'" style="display: flex; flex-direction: column; align-items: center;">
+              <div v-if="!lectura" class="q-mt-md q-mb-md rounded-borders" :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-2'" style="display: flex; flex-direction: column; align-items: center;">
                 <div>
-                  Documentos extras:
+                  Documentos seguimiento:
                 </div>
                 <q-option-group
                   name="accepted_genres"
@@ -198,9 +218,9 @@
                   inline
                 />
               </div>
-              <label v-if="incapacidadesObj.st7">ST-7:</label>
+              <label v-if="incapacidadesObj.st7 && !lectura">ST-7:</label>
               <q-file
-                  v-if="!incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7"
+                  v-if="!incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7 && !lectura"
                   class="q-pb-md"
                   outlined
                   use-chips
@@ -212,7 +232,7 @@
               <div class="row items-start q-col-gutter-sm q-mb-md">
                 <div class="col-11">
                   <q-file
-                    v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7"
+                    v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7 && !lectura"
                     outlined
                     use-chips
                     v-model="documentoSt7"
@@ -223,12 +243,12 @@
                   </q-file>
                 </div>
                 <div class="col-1 q-pt-md">
-                  <q-btn v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7" round dense flat :icon="documentoSt7?'edit_off':'edit'" @click="documentoSt7 = !documentoSt7"/>
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7 && !lectura" round dense flat :icon="documentoSt7?'edit_off':'edit'" @click="documentoSt7 = !documentoSt7"/>
                 </div>
               </div>
-              <label v-if="incapacidadesObj.st2">ST-2:</label>
+              <label v-if="incapacidadesObj.st2 && !lectura">ST-2:</label>
               <q-file
-                  v-if="!incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2"
+                  v-if="!incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2 && !lectura"
                   class="q-pb-md"
                   outlined
                   use-chips
@@ -240,7 +260,7 @@
               <div class="row items-start q-col-gutter-sm q-mb-md">
                 <div class="col-11">
                   <q-file
-                    v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2"
+                    v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2 && !lectura"
                     outlined
                     use-chips
                     v-model="documentoSt2"
@@ -251,12 +271,12 @@
                   </q-file>
                 </div>
                 <div class="col-1 q-pt-md">
-                  <q-btn v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2" round dense flat :icon="documentoSt2?'edit_off':'edit'" @click="documentoSt2 = !documentoSt2"/>
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2 && !lectura" round dense flat :icon="documentoSt2?'edit_off':'edit'" @click="documentoSt2 = !documentoSt2"/>
                 </div>
               </div>
-              <label v-if="incapacidadesObj.siaat">SIAAT:</label>
+              <label v-if="incapacidadesObj.siaat && !lectura">SIAAT:</label>
               <q-file
-                  v-if="!incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat"
+                  v-if="!incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat && !lectura"
                   outlined
                   use-chips
                   v-model="documentoSiaat"
@@ -267,7 +287,7 @@
               <div class="row items-start q-col-gutter-sm q-mb-xs">
                 <div class="col-11">
                   <q-file
-                    v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat"
+                    v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat && !lectura"
                     outlined
                     use-chips
                     v-model="documentoSiaat"
@@ -278,7 +298,7 @@
                   </q-file>
                 </div>
                 <div class="col-1 q-pt-md">
-                  <q-btn v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat" round dense flat :icon="documentoSiaat?'edit_off':'edit'" @click="documentoSiaat = !documentoSiaat"/>
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat && !lectura" round dense flat :icon="documentoSiaat?'edit_off':'edit'" @click="documentoSiaat = !documentoSiaat"/>
                 </div>
               </div>
             </div>
@@ -289,20 +309,20 @@
             <q-btn
               icon-right="close"
               flat
-              label="Cancelar"
+              label="Cerrar"
               text-color="dark"
               color="gris"
               v-close-popup
             />
             <q-btn
-              v-if="!edicion"
+              v-if="!edicion && !lectura && !actualizacion"
               icon-right="save"
               type="submit"
               label="Guardar"
               color="primary"
             />
             <q-btn
-              v-else
+              v-if="edicion || actualizacion"
               icon-right="save"
               label="Actualizar"
               color="primary"
@@ -326,6 +346,7 @@ import { useIncapacidadesStore } from "src/stores/incapacidades"
 import { useAutenticacionStore } from "src/stores/autenticaciones"
 import { opcionesRamoSeguro, opcionesTipoIncapacidad, opcionesRiesgoTrabajo, opcionesArchivosExtras } from "src/constant/opcionesSeleccionables"
 import { urlArchivosIncapacidades } from "src/constant/constantes"
+import { abrirUrl } from "src/helpers/abrirURL"
 
 export default {
   setup() {
@@ -350,6 +371,8 @@ export default {
     const documentoSiaat = ref(null)
     const todosDocumentos = [documento, documentoSt7, documentoSt2, documentoSiaat]
     const edicion = ref(false)
+    const lectura = ref(false)
+    const actualizacion = ref(false)
     const nuevoArchivo = ref(false)
     const checkArchivos = ref([])
 
@@ -384,7 +407,10 @@ export default {
 
     const incapacidadesObj = ref(incapacidadesObjInit)
 
-    const abrir = (incapacidad) => {
+    const abrir = (incapacidad, leer, editarDocumentos) => {
+        edicion.value = false
+        lectura.value = false
+        actualizacion.value = false
         objIncapacidad.value = null
         usuarioSeleccionado.value = null
         fechasEnRango.value = []
@@ -396,7 +422,7 @@ export default {
         })
         checkArchivos.value =[]
         abrirModal.value = true
-        if(incapacidad){
+        if(incapacidad && !leer && !editarDocumentos){
           edicion.value = true
           documento.value = true
           if(incapacidad.urlDocumentoSt7){
@@ -416,8 +442,47 @@ export default {
           }
           usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
           incapacidadesObj.value = { ...incapacidad }
+        }else if(incapacidad && leer){
+          lectura.value = true
+          documento.value = true
+          if(incapacidad.urlDocumentoSt7){
+            checkArchivos.value=[...checkArchivos.value, 'st7']
+            opcionesArchivosExtras[0].disable = true
+            documentoSt7.value = true
+          }
+          if(incapacidad.urlDocumentoSt2){
+            checkArchivos.value=[...checkArchivos.value, 'st2']
+            opcionesArchivosExtras[1].disable = true
+            documentoSt2.value = true
+          }
+          if(incapacidad.urlDocumentoSiaat){
+            checkArchivos.value=[...checkArchivos.value, 'siaat']
+            opcionesArchivosExtras[2].disable = true
+            documentoSiaat.value = true
+          }
+          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          incapacidadesObj.value = { ...incapacidad }
+        }else if(incapacidad && editarDocumentos){
+          actualizacion.value = true
+          documento.value = true
+          if(incapacidad.urlDocumentoSt7){
+            checkArchivos.value=[...checkArchivos.value, 'st7']
+            opcionesArchivosExtras[0].disable = true
+            documentoSt7.value = true
+          }
+          if(incapacidad.urlDocumentoSt2){
+            checkArchivos.value=[...checkArchivos.value, 'st2']
+            opcionesArchivosExtras[1].disable = true
+            documentoSt2.value = true
+          }
+          if(incapacidad.urlDocumentoSiaat){
+            checkArchivos.value=[...checkArchivos.value, 'siaat']
+            opcionesArchivosExtras[2].disable = true
+            documentoSiaat.value = true
+          }
+          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          incapacidadesObj.value = { ...incapacidad }
         }else{
-          edicion.value = false
           incapacidadesObj.value = { ...incapacidadesObjInit }
         }
     }
@@ -434,13 +499,13 @@ export default {
       incapacidadesObj.value.mes = dayjs(incapacidadesObj.value.fechaExpedido).month() + 1
       incapacidadesObj.value.editedBy = usuarioAutenticado.value.nombre
       if(documentoSt7.value){
-        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st7.pdf`
+        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-St7.pdf`
       }
       if(documentoSt2.value){
-        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st2.pdf`
+        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-St2.pdf`
       }
       if(documentoSiaat.value){
-        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-siaat.pdf`
+        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-Siaat.pdf`
       }
       incapacidadesObj.value.urlDocumento = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
 
@@ -482,13 +547,13 @@ export default {
       incapacidadesObj.value.editedBy = usuarioAutenticado.value.nombre
       incapacidadesObj.value.urlDocumento = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
       if(documentoSt7.value){
-        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st7.pdf`
+        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-St7.pdf`
       }
       if(documentoSt2.value){
-        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st2.pdf`
+        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-St2.pdf`
       }
       if(documentoSiaat.value){
-        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-siaat.pdf`
+        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-Siaat.pdf`
       }
       objIncapacidad.value = {
         diasIncapacidades:  fechasEnRango.value.map(fecha => ({
@@ -573,6 +638,7 @@ export default {
 
     return {
       abrir,
+      abrirUrl,
       abrirModal,
       formulario,
       incapacidadesObj,
@@ -586,6 +652,8 @@ export default {
       opcionesTipoIncapacidad,
       opcionesRiesgoTrabajo,
       edicion,
+      lectura,
+      actualizacion,
       nuevoArchivo,
       checkArchivos,
       opcionesArchivosExtras,
