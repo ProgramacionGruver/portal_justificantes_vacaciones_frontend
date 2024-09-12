@@ -39,3 +39,5 @@ export const coloresAutorizaciones= [
   {estado:'PENDIENTE', color: 'grey'},
   {estado:'RECHAZADO', color: 'red'},
 ]
+
+export const urlArchivosIncapacidades = 'https://backend.gruver.com.mx/portalJustificantes/incapacidades'

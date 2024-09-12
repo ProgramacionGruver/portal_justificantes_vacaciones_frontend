@@ -274,3 +274,56 @@ export const limpiarFiltrosEmpresaSucursalDepartamento = (todasEmpresasSeleccion
   sucursalesFiltradas.value = filtrarElementos(listaClavesEmpresas.value, sucursales.value, 'claveEmpresa')
   departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
 }
+
+export const filtrarOpcionesIncapacidades = (tipoFiltro,
+  listaClavesEmpresas, todasEmpresasSeleccionadas, modelEmpresasSeleccionadas,
+  sucursales, sucursalesFiltradas, listaClavesSucursales, todasSucursalesSeleccionadas, modelSucursalesSeleccionadas,
+  departamentos, departamentosFiltrados, listaClavesDepartamentos, todosDepartamentosSeleccionados, modelDepartamentosSeleccionados,
+  todosTipoRamoSeleccionados, tiposRamoSeleccionados, todosTipoRiesgoSeleccionados, tiposRiesgoSeleccionados) => {
+  switch (tipoFiltro) {
+    case 'TODASEMPRESAS':
+      todasEmpresasSeleccionadas.value = true
+      modelEmpresasSeleccionadas.value = []
+      sucursalesFiltradas.value = filtrarElementos(listaClavesEmpresas.value, sucursales.value, 'claveEmpresa')
+      departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+      break
+    case 'OPCIONESEMPRESAS':
+      todasEmpresasSeleccionadas.value = false
+      sucursalesFiltradas.value = filtrarElementos(modelEmpresasSeleccionadas.value, sucursales.value, 'claveEmpresa')
+      departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+      break
+    case 'TODASSUCURSALES':
+      todasSucursalesSeleccionadas.value = true
+      modelSucursalesSeleccionadas.value = []
+      departamentosFiltrados.value == todasEmpresasSeleccionadas.value ?
+        filtrarElementosDuplicados(filtrarElementos(listaClavesEmpresas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+        : filtrarElementosDuplicados(filtrarElementos(modelEmpresasSeleccionadas.value, departamentos.value, 'claveEmpresa'), 'claveDepartamento')
+      break
+    case 'OPCIONESSUCURSALES':
+      todasSucursalesSeleccionadas.value = false
+      departamentosFiltrados.value = filtrarElementosDuplicados(filtrarElementos(modelSucursalesSeleccionadas.value, departamentos.value, 'claveSucursal'), 'claveDepartamento')
+      break
+    case 'TODOSDEPARTAMENTOS':
+      todosDepartamentosSeleccionados.value = true
+      modelDepartamentosSeleccionados.value = []
+      break
+    case 'OPCIONESDEPARTAMENTOS':
+      todosDepartamentosSeleccionados.value = false
+      break
+    case 'TODOSTIPORAMO':
+      todosTipoRamoSeleccionados.value = true
+      tiposRamoSeleccionados.value = []
+      break
+    case 'OPCIONESTIPORAMO':
+      todosTipoRamoSeleccionados.value = false
+      break
+    case 'TODOSTIPORIESGO':
+      todosTipoRiesgoSeleccionados.value = true
+      tiposRiesgoSeleccionados.value = []
+      break
+    case 'OPCIONESRIESGO':
+      todosTipoRiesgoSeleccionados.value = false
+      break
+  }
+
+}

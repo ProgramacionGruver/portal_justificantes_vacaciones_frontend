@@ -9,7 +9,7 @@
         <div class="div--contenedor__general">
           <div style="display: block;">
             <div class="q-ma-md ">
-              <label>Agregar Colaborador:</label>
+              <label>Agregar Colaborador: <span style="color: red;">*</span></label>
               <q-select
                 dense
                 outlined
@@ -22,12 +22,33 @@
                 @filter="parametrosFiltradosColaboradores"
                 :options="opcionesEmpleados"
                 v-model="usuarioSeleccionado"
-                label="Buscar colaboradores"
+                label="Buscar colaborador"
+                @update:model-value="datosAutomaticos"
                 :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
               />
               <div class="row items-start q-col-gutter-sm">
                 <div class="col-6">
-                  <label>Folio:</label>
+                  <label>Sucursal:</label>
+                  <q-input
+                    dense
+                    outlined
+                    v-model="incapacidadesObj.nombreSucursal"
+                    readonly
+                  />
+                </div>
+                <div class="col-6">
+                  <label>No. Seguro Social: <span style="color: red;">*</span></label>
+                  <q-input
+                    dense
+                    outlined
+                    v-model="incapacidadesObj.numeroSeguroSocial"
+                    :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Escribe un No. Seguro Social' }]"
+                  />
+                </div>
+              </div>
+              <div class="row items-start q-col-gutter-sm">
+                <div class="col-6">
+                  <label>Folio Incapacidad: <span style="color: red;">*</span></label>
                   <q-input
                     dense
                     outlined
@@ -37,7 +58,7 @@
                   />
                 </div>
                 <div class="col-6">
-                  <label>Motivo:</label>
+                  <label>Motivo: <span style="color: red;">*</span></label>
                   <q-input
                     dense
                     outlined
@@ -47,26 +68,223 @@
                   />
                 </div>
               </div>
-              <label>Descripción:</label>
+              <div class="row items-start q-col-gutter-sm">
+                <div class="col-6">
+                  <label>Ramo Seguro: <span style="color: red;">*</span></label>
+                  <q-select
+                    dense
+                    outlined
+                    clearable
+                    map-options
+                    :options="opcionesRamoSeguro"
+                    v-model="incapacidadesObj.ramoSeguro"
+                    label="Seleccionar Ramo Seguro"
+                    :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
+                  />
+                </div>
+                <div class="col-6">
+                  <label>Tipo Incapacidad: <span style="color: red;">*</span></label>
+                  <q-select
+                    dense
+                    outlined
+                    clearable
+                    map-options
+                    :options="opcionesTipoIncapacidad"
+                    v-model="incapacidadesObj.tipoIncapacidad"
+                    label="Seleccionar Tipo Incapacidad"
+                    :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
+                  />
+                </div>
+              </div>
+              <div class="row items-start q-col-gutter-sm">
+                <div class="col-6">
+                  <label>Probable Riesgo de Trabajo: <span style="color: red;">*</span></label>
+                  <q-select
+                    dense
+                    outlined
+                    clearable
+                    emit-value
+                    map-options
+                    option-value="value"
+                    :options="opcionesRiesgoTrabajo"
+                    v-model="incapacidadesObj.riesgoTrabajo"
+                    label="Seleccionar Riesgo Trabajo"
+                    :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione un usuario' }]"
+                  />
+                </div>
+                <div class="col-6">
+                  <label>Días de Incapacidad: <span style="color: red;">*</span></label>
+                  <q-input
+                    ref="lista"
+                    dense
+                    outlined
+                    type="number"
+                    v-model="incapacidadesObj.diasIncapacidad"
+                    label="Agrega los días de Incapacidad"
+                    :rules="[val => (val > 0) || 'LLena el este campo para continuar.']"
+                  />
+                </div>
+              </div>
+              <div class="row items-start q-col-gutter-sm q-mb-xs">
+                <div class="col-4">
+                  <label>A partir de: <span style="color: red;">*</span></label>
+                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaApartir" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]"></q-input>
+                </div>
+                <div class="col-4">
+                  <label>Fecha de termino: <span style="color: red;">*</span></label>
+                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaTermino" :rules="[verificarFechas]"></q-input>
+                </div>
+                <div class="col-4">
+                  <label>Expedido: <span style="color: red;">*</span></label>
+                  <q-input dense type="date" outlined v-model="incapacidadesObj.fechaExpedido" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]" ></q-input>
+                </div>
+              </div>
+              <label>Tipo de riesgo:</label>
               <q-input
+                class="q-pb-md"
                 dense
                 outlined
                 autogrow
-                v-model="incapacidadesObj.descripcionMotivo"
-                label="Describe del motivo"
-                :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Escribe una descripcion del motivo' }]"
+                v-model="incapacidadesObj.tipoRiesgo"
+                label="Describe el Tipo de Riesgo"
               />
-              <label>Días Incapacidad:</label>
-              <div class="flex flex-center">
-                    <q-date landscape multiple mask="YYYY-MM-DD" v-model="fechasSeleccionadas"
-                      :locale="myLocale"></q-date>
+              <label>Observaciones:</label>
+              <q-input
+                class="q-pb-md"
+                dense
+                outlined
+                autogrow
+                v-model="incapacidadesObj.observaciones"
+                label="Escribe las observaciones"
+              />
+              <label>Archivo: <span style="color: red;">*</span></label>
+              <q-file
+                  v-if="!incapacidadesObj.urlDocumento"
+                  outlined
+                  use-chips
+                  v-model="documento"
+                  :label="'Click aquí para subir archivo'"
+                  accept=".pdf, .PDF pdf/*"
+                >
+              </q-file>
+              <div class="row items-start q-col-gutter-sm q-mb-xs">
+                <div class="col-11">
+                  <q-file
+                    v-if="incapacidadesObj.urlDocumento"
+                    outlined
+                    use-chips
+                    v-model="documento"
+                    :disable="documento"
+                    :label="documento?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
+                    accept=".pdf, .PDF pdf/*"
+                  >
+                  </q-file>
+                </div>
+                <div class="col-1 q-pt-md">
+                  <q-btn v-if="incapacidadesObj.urlDocumento" round dense flat :icon="documento?'edit_off':'edit'" @click="documento = !documento"/>
+                </div>
+              </div>
+              <div class="q-mt-md q-mb-md rounded-borders" :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-2'" style="display: flex; flex-direction: column; align-items: center;">
+                <div>
+                  Documentos extras:
+                </div>
+                <q-option-group
+                  name="accepted_genres"
+                  v-model="checkArchivos"
+                  :options="opcionesArchivosExtras"
+                  @update:model-value="checkArchivosExtra"
+                  type="checkbox"
+                  color="primary"
+                  inline
+                />
+              </div>
+              <label v-if="incapacidadesObj.st7">ST-7:</label>
+              <q-file
+                  v-if="!incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7"
+                  class="q-pb-md"
+                  outlined
+                  use-chips
+                  v-model="documentoSt7"
+                  :label="'Click aquí para subir archivo'"
+                  accept=".pdf, .PDF pdf/*"
+                >
+              </q-file>
+              <div class="row items-start q-col-gutter-sm q-mb-md">
+                <div class="col-11">
+                  <q-file
+                    v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7"
+                    outlined
+                    use-chips
+                    v-model="documentoSt7"
+                    :disable="documentoSt7"
+                    :label="documentoSt7?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
+                    accept=".pdf, .PDF pdf/*"
+                  >
+                  </q-file>
+                </div>
+                <div class="col-1 q-pt-md">
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSt7 && incapacidadesObj.st7" round dense flat :icon="documentoSt7?'edit_off':'edit'" @click="documentoSt7 = !documentoSt7"/>
+                </div>
+              </div>
+              <label v-if="incapacidadesObj.st2">ST-2:</label>
+              <q-file
+                  v-if="!incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2"
+                  class="q-pb-md"
+                  outlined
+                  use-chips
+                  v-model="documentoSt2"
+                  :label="'Click aquí para subir archivo'"
+                  accept=".pdf, .PDF pdf/*"
+                >
+              </q-file>
+              <div class="row items-start q-col-gutter-sm q-mb-md">
+                <div class="col-11">
+                  <q-file
+                    v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2"
+                    outlined
+                    use-chips
+                    v-model="documentoSt2"
+                    :disable="documentoSt2"
+                    :label="documentoSt2?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
+                    accept=".pdf, .PDF pdf/*"
+                  >
+                  </q-file>
+                </div>
+                <div class="col-1 q-pt-md">
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSt2 && incapacidadesObj.st2" round dense flat :icon="documentoSt2?'edit_off':'edit'" @click="documentoSt2 = !documentoSt2"/>
+                </div>
+              </div>
+              <label v-if="incapacidadesObj.siaat">SIAAT:</label>
+              <q-file
+                  v-if="!incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat"
+                  outlined
+                  use-chips
+                  v-model="documentoSiaat"
+                  :label="'Click aquí para subir archivo'"
+                  accept=".pdf, .PDF pdf/*"
+                >
+              </q-file>
+              <div class="row items-start q-col-gutter-sm q-mb-xs">
+                <div class="col-11">
+                  <q-file
+                    v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat"
+                    outlined
+                    use-chips
+                    v-model="documentoSiaat"
+                    :disable="documentoSiaat"
+                    :label="documentoSiaat?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
+                    accept=".pdf, .PDF pdf/*"
+                  >
+                  </q-file>
+                </div>
+                <div class="col-1 q-pt-md">
+                  <q-btn v-if="incapacidadesObj.urlDocumentoSiaat && incapacidadesObj.siaat" round dense flat :icon="documentoSiaat?'edit_off':'edit'" @click="documentoSiaat = !documentoSiaat"/>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
       <q-card-section>
-
           <q-card-actions align="right">
             <q-btn
               icon-right="close"
@@ -77,10 +295,18 @@
               v-close-popup
             />
             <q-btn
+              v-if="!edicion"
               icon-right="save"
               type="submit"
               label="Guardar"
               color="primary"
+            />
+            <q-btn
+              v-else
+              icon-right="save"
+              label="Actualizar"
+              color="primary"
+              @click="editarDias"
             />
           </q-card-actions>
       </q-card-section>
@@ -92,11 +318,14 @@
 <script>
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
-import { useQuasar } from 'quasar'
+import dayjs from "dayjs"
+import { notificacion } from 'src/helpers/mensajes'
 import { filtradoBusquedaObj } from "src/helpers/filtradoBusquedaObj"
 import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { useIncapacidadesStore } from "src/stores/incapacidades"
 import { useAutenticacionStore } from "src/stores/autenticaciones"
+import { opcionesRamoSeguro, opcionesTipoIncapacidad, opcionesRiesgoTrabajo, opcionesArchivosExtras } from "src/constant/opcionesSeleccionables"
+import { urlArchivosIncapacidades } from "src/constant/constantes"
 
 export default {
   setup() {
@@ -104,69 +333,243 @@ export default {
     const { opcionesColaboradores } = storeToRefs(useColaboradores)
 
     const useIncapacidades = useIncapacidadesStore()
-    const { agregarIncapacidades } = useIncapacidades
+    const { agregarIncapacidades, actualizarIncapacidades } = useIncapacidades
 
     const useAutenticacion = useAutenticacionStore()
     const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
-    const $q = useQuasar()
     const abrirModal = ref(false)
     const formulario = ref(null)
     const usuarioSeleccionado = ref(null)
-    const fechasSeleccionadas = ref(null)
+    const fechasEnRango = ref([])
     const opcionesEmpleados = ref(opcionesColaboradores.value)
     const objIncapacidad = ref(null)
+    const documento = ref(null)
+    const documentoSt7 = ref(null)
+    const documentoSt2 = ref(null)
+    const documentoSiaat = ref(null)
+    const todosDocumentos = [documento, documentoSt7, documentoSt2, documentoSiaat]
+    const edicion = ref(false)
+    const nuevoArchivo = ref(false)
+    const checkArchivos = ref([])
 
     const incapacidadesObjInit = {
+      mes: 0,
+      anio: 0,
+      numero_empleado: 0,
+      claveEmpresa: "",
+      claveSucursal: "",
+      claveDepartamento: "",
+      nombreSucursal: "",
+      nombre: "",
+      numeroSeguroSocial: "",
       folio: "",
       motivo: "",
-      descripcionMotivo : "",
-      fechasIncapacidad: ""
+      ramoSeguro: opcionesRamoSeguro[0],
+      tipoIncapacidad: opcionesTipoIncapacidad[0],
+      riesgoTrabajo: false,
+      diasIncapacidad: 1,
+      fechaApartir: '',
+      fechaTermino: '',
+      fechaExpedido: '',
+      tipoRiesgo : "",
+      observaciones : "",
+      estatusSua: false,
+      estatusContpaq: false,
+      st7: false,
+      st2: false,
+      siaat: false,
+      editedBy: ""
     }
 
     const incapacidadesObj = ref(incapacidadesObjInit)
 
-    const abrir = () => {
+    const abrir = (incapacidad) => {
         objIncapacidad.value = null
-        fechasSeleccionadas.value = null
         usuarioSeleccionado.value = null
-        incapacidadesObj.value = { ...incapacidadesObjInit }
+        fechasEnRango.value = []
+        todosDocumentos.forEach(doc => {
+            doc.value = null
+        })
+        opcionesArchivosExtras.forEach(opciones => {
+            opciones.disable = false
+        })
+        checkArchivos.value =[]
         abrirModal.value = true
+        if(incapacidad){
+          edicion.value = true
+          documento.value = true
+          if(incapacidad.urlDocumentoSt7){
+            checkArchivos.value=[...checkArchivos.value, 'st7']
+            opcionesArchivosExtras[0].disable = true
+            documentoSt7.value = true
+          }
+          if(incapacidad.urlDocumentoSt2){
+            checkArchivos.value=[...checkArchivos.value, 'st2']
+            opcionesArchivosExtras[1].disable = true
+            documentoSt2.value = true
+          }
+          if(incapacidad.urlDocumentoSiaat){
+            checkArchivos.value=[...checkArchivos.value, 'siaat']
+            opcionesArchivosExtras[2].disable = true
+            documentoSiaat.value = true
+          }
+          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          incapacidadesObj.value = { ...incapacidad }
+        }else{
+          edicion.value = false
+          incapacidadesObj.value = { ...incapacidadesObjInit }
+        }
     }
 
     const agregarDias = async () => {
       if (!(await formulario.value.validate())) {
         return
       }
-      if (!fechasSeleccionadas.value) {
-        $q.notify({
-          type: 'negative',
-          message: 'Seleccione al menos un dia.',
-        })
+      if (!documento.value) {
+        notificacion('negative', 'Debes seleccionar un archivo')
         return
       }
+      incapacidadesObj.value.anio = dayjs(incapacidadesObj.value.fechaExpedido).year()
+      incapacidadesObj.value.mes = dayjs(incapacidadesObj.value.fechaExpedido).month() + 1
+      incapacidadesObj.value.editedBy = usuarioAutenticado.value.nombre
+      if(documentoSt7.value){
+        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st7.pdf`
+      }
+      if(documentoSt2.value){
+        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st2.pdf`
+      }
+      if(documentoSiaat.value){
+        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-siaat.pdf`
+      }
+      incapacidadesObj.value.urlDocumento = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
+
       objIncapacidad.value = {
-        diasArray:  fechasSeleccionadas.value.map(fecha => ({
+        diasIncapacidades:  fechasEnRango.value.map(fecha => ({
                       fechaIncapacidad: fecha,
                       folio: incapacidadesObj.value.folio,
                       motivo: incapacidadesObj.value.motivo,
-                      descripcionMotivo: incapacidadesObj.value.descripcionMotivo,
+                      descripcionMotivo: incapacidadesObj.value.observaciones,
                       editedBy: usuarioAutenticado.value.nombre,
                       numero_empleado: usuarioSeleccionado.value.numero_empleado,
                       nombre: usuarioSeleccionado.value.nombre,
                       claveEmpresa: usuarioSeleccionado.value.claveEmpresa,
                       claveSucursal: usuarioSeleccionado.value.claveSucursal,
-                      claveDepartamento: usuarioSeleccionado.value.claveDepartamento
-                    }))
+                      claveDepartamento: usuarioSeleccionado.value.claveDepartamento,
+                      urlDocumento: `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
+                    })),
+        diasIncapacidadesNomina: incapacidadesObj.value,
+        archivo: documento.value,
+        archivoSt7: documentoSt7.value,
+        archivoSt2: documentoSt2.value,
+        archivoSiaat: documentoSiaat.value
       }
       await agregarIncapacidades(objIncapacidad.value)
       abrirModal.value = false
+    }
+
+    const editarDias = async () => {
+      if (!(await formulario.value.validate())) {
+        return
+      }
+      todosDocumentos.forEach(doc => {
+        if (doc.value === true) {
+          doc.value = []
+        }
+      })
+      incapacidadesObj.value.anio = dayjs(incapacidadesObj.value.fechaExpedido).year()
+      incapacidadesObj.value.mes = dayjs(incapacidadesObj.value.fechaExpedido).month() + 1
+      incapacidadesObj.value.editedBy = usuarioAutenticado.value.nombre
+      incapacidadesObj.value.urlDocumento = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
+      if(documentoSt7.value){
+        incapacidadesObj.value.urlDocumentoSt7 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st7.pdf`
+      }
+      if(documentoSt2.value){
+        incapacidadesObj.value.urlDocumentoSt2 = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-st2.pdf`
+      }
+      if(documentoSiaat.value){
+        incapacidadesObj.value.urlDocumentoSiaat = `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}-siaat.pdf`
+      }
+      objIncapacidad.value = {
+        diasIncapacidades:  fechasEnRango.value.map(fecha => ({
+                      fechaIncapacidad: fecha,
+                      folio: incapacidadesObj.value.folio,
+                      motivo: incapacidadesObj.value.motivo,
+                      descripcionMotivo: incapacidadesObj.value.observaciones,
+                      editedBy: usuarioAutenticado.value.nombre,
+                      numero_empleado: usuarioSeleccionado.value.numero_empleado,
+                      nombre: usuarioSeleccionado.value.nombre,
+                      claveEmpresa: usuarioSeleccionado.value.claveEmpresa,
+                      claveSucursal: usuarioSeleccionado.value.claveSucursal,
+                      claveDepartamento: usuarioSeleccionado.value.claveDepartamento,
+                      urlDocumento: `${urlArchivosIncapacidades}/${incapacidadesObj.value.folio}.pdf`
+                    })),
+        diasIncapacidadesNomina: incapacidadesObj.value,
+        archivo: documento.value,
+        archivoSt7: documentoSt7.value,
+        archivoSt2: documentoSt2.value,
+        archivoSiaat: documentoSiaat.value
+      }
+      await actualizarIncapacidades(objIncapacidad.value)
+      abrirModal.value = false
+    }
+
+    const datosAutomaticos = async () => {
+      incapacidadesObj.value.numero_empleado = usuarioSeleccionado.value?.numero_empleado
+      incapacidadesObj.value.nombre = usuarioSeleccionado.value?.nombre
+      incapacidadesObj.value.nombreSucursal = usuarioSeleccionado.value?.centroTrabajo
+      incapacidadesObj.value.claveEmpresa = usuarioSeleccionado.value?.claveEmpresa
+      incapacidadesObj.value.claveSucursal = usuarioSeleccionado.value?.claveSucursal
+      incapacidadesObj.value.claveDepartamento = usuarioSeleccionado.value?.claveDepartamento
+      incapacidadesObj.value.numeroSeguroSocial = usuarioSeleccionado.value?.numeroSeguroSocial
+    }
+
+    const verificarFechas = (val) => {
+      fechasEnRango.value = []
+      const fechaApartir = dayjs(incapacidadesObj.value.fechaApartir)
+      const fechaTermino = dayjs(val)
+      const diasIncapacidad = incapacidadesObj.value.diasIncapacidad
+
+      if (!fechaApartir.isValid() || !fechaTermino.isValid()) {
+        return 'Ambas fechas deben ser válidas'
+      }
+
+      if (fechaTermino.isBefore(fechaApartir)) {
+        return 'La fecha de término debe ser mayor que la fecha de inicio'
+      }
+
+      const diferenciaDias = fechaTermino.diff(fechaApartir, 'day') + 1
+      if (diferenciaDias !== parseInt(diasIncapacidad)) {
+        return `La diferencia de días (${diferenciaDias}) debe ser igual a los días de incapacidad (${diasIncapacidad})`
+      }
+
+      for (let i = 0; i < diferenciaDias; i++) {
+        fechasEnRango.value.push(fechaApartir.add(i, 'day').format('YYYY-MM-DD'))
+      }
+      return true
     }
 
     const parametrosFiltradosColaboradores = (val, update) => {
       filtradoBusquedaObj(val, update, opcionesColaboradores.value, opcionesEmpleados)
     }
 
+    const checkArchivosExtra = (nuevosValores) => {
+      incapacidadesObj.value.st7 = nuevosValores.includes('st7')
+      if (!incapacidadesObj.value.st7) {
+        documentoSt7.value = null
+      }
+
+      incapacidadesObj.value.st2 = nuevosValores.includes('st2');
+      if (!incapacidadesObj.value.st2) {
+        documentoSt2.value = null
+      }
+
+      incapacidadesObj.value.siaat = nuevosValores.includes('siaat');
+      if (!incapacidadesObj.value.siaat) {
+        documentoSiaat.value = null
+      }
+      checkArchivos.value = nuevosValores
+    }
 
     return {
       abrir,
@@ -175,9 +578,23 @@ export default {
       incapacidadesObj,
       opcionesEmpleados,
       usuarioSeleccionado,
-      fechasSeleccionadas,
+      documento,
+      documentoSt7,
+      documentoSt2,
+      documentoSiaat,
+      opcionesRamoSeguro,
+      opcionesTipoIncapacidad,
+      opcionesRiesgoTrabajo,
+      edicion,
+      nuevoArchivo,
+      checkArchivos,
+      opcionesArchivosExtras,
       agregarDias,
+      editarDias,
       parametrosFiltradosColaboradores,
+      datosAutomaticos,
+      verificarFechas,
+      checkArchivosExtra,
       myLocale: {
         /* starting with Sunday */
         days: 'Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado'.split('_'),
