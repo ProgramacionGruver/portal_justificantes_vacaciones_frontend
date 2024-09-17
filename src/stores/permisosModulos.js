@@ -54,6 +54,16 @@ export const useModulosStore = defineStore('modulos', () => {
     }
   }
 
+  const actualizarPermisosCRUD = async (permisosObj) => {
+    try {
+      await apiUsuarios.put('/permisos/modulos/crud', permisosObj)
+
+      notificacion('positive', 'Permisos adicionales actualizados correctamente')
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    }
+  }
+
   return {
     // state
     usuariosModulos,
@@ -66,6 +76,7 @@ export const useModulosStore = defineStore('modulos', () => {
     obtenerUsuariosModulo,
     actualizarPermisosModulos,
     obtenerPermisosSucursalesByUser,
-    actualizarPermisosSucursales
+    actualizarPermisosSucursales,
+    actualizarPermisosCRUD
   }
 })
