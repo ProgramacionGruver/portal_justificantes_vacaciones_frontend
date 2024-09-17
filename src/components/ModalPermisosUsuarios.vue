@@ -26,8 +26,14 @@
       <div v-else>
         <q-card-section>
           <div class="text-h4">Permisos de módulos</div>
-          <q-tree class="col-12 col-sm-6" :nodes="checksPermisos" node-key="label" tick-strategy="leaf"
-            v-model:ticked="tickedSeleccionados" default-expand-all />
+          <q-tree
+            class="col-12 col-sm-6"
+            :nodes="checksPermisos"
+            node-key="name"
+            tick-strategy="leaf"
+            v-model:ticked="tickedSeleccionados"
+            default-expand-all
+          />
         </q-card-section>
         <q-card-section>
           <div class="text-h4">Permisos de sucursales</div>
@@ -68,7 +74,7 @@ export default {
     const modalPermisos = ref(false)
     const usuarioSeleccionado = ref(null)
     const checksPermisos = ref([])
-    const tickedSeleccionados = ref(null)
+    const tickedSeleccionados = ref([])
     const checksSucursales = ref([])
     const tickedSucursales = ref(null)
     const expanded = ref([])
@@ -81,7 +87,16 @@ export default {
 
       checksPermisos.value = [{
         label: 'Módulos del portal',
-        children: listaModulos.value.map((modulo) => ({ label: modulo.label, name: modulo.name }))
+        children: listaModulos.value.map((modulo) => ({
+          label: modulo.label,
+          name: modulo.name, // Este es el identificador único del módulo
+          children: [
+            { label: 'Leer', name: `${modulo.name}_leer` },         // Identificadores únicos para cada permiso
+            { label: 'Actualizar', name: `${modulo.name}_actualizar` },
+            { label: 'Agregar', name: `${modulo.name}_agregar` },
+            { label: 'Eliminar', name: `${modulo.name}_eliminar` },
+          ]
+        }))
       }]
 
       checksSucursales.value = sucursalesAgrupadas.value.map((sucursal) => ({ label: sucursal.razonSocial, children: sucursal.sucursales.map((sucursal) => ({ label: sucursal.claveSucursal, name: sucursal.claveSucursal })) }))
@@ -89,9 +104,26 @@ export default {
 
     const seleccionarUsuario = async () => {
       if (usuarioSeleccionado.value !== null) {
-        tickedSeleccionados.value = listaModulos.value
-          .filter(modulo => usuarioSeleccionado.value.permisos.some(permiso => permiso.moduloPortale.nombreModulo === modulo.name))
-          .map(modulo => modulo.label)
+        // Itera sobre cada módulo
+      listaModulos.value.forEach(modulo => {
+      // Busca el permiso correspondiente al módulo actual
+      const permiso = usuarioSeleccionado.value.permisos.find(permiso => permiso.moduloPortale.nombreModulo === modulo.name)
+          if (permiso) {
+            // Si el permiso existe, verifica los valores true/false
+            if (permiso.leer) {
+              tickedSeleccionados.value.push(`${modulo.name}_leer`)
+            }
+            if (permiso.actualizar) {
+              tickedSeleccionados.value.push(`${modulo.name}_actualizar`)
+            }
+            if (permiso.agregar) {
+              tickedSeleccionados.value.push(`${modulo.name}_agregar`)
+            }
+            if (permiso.eliminar) {
+              tickedSeleccionados.value.push(`${modulo.name}_eliminar`)
+            }
+          }
+        })
 
         await obtenerPermisosSucursalesByUser(usuarioSeleccionado.value.idUsuario)
         tickedSucursales.value = permisosSucursales.value.filter(sucursal => sucursalesAgrupadas.value.some(empresa => empresa.sucursales.some(s => s.claveSucursal === sucursal.claveSucursal))).map(sucursal => sucursal.claveSucursal)
