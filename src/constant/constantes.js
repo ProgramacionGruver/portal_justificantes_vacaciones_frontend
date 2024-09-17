@@ -32,6 +32,7 @@ export const coloresBotones = [
   {estado:'SABADOS 5S', color: 'purple-6'},
   {estado:'INCAPACIDAD', color: 'amber-14'},
   {estado:'CAPACITACIONES', color: 'blue-grey-3'},
+  {estado:'DIA FERIADO', color: 'lime-9'},
 ]
 
 export const coloresAutorizaciones= [

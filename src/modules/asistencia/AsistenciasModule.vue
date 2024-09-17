@@ -133,7 +133,8 @@
                 v-else-if="
                   col.value.estado === 'RETARDO' ||
                   col.value.estado === 'FALTA' ||
-                  col.value.estado === 'TURNO ESPECIAL'
+                  col.value.estado === 'TURNO ESPECIAL' ||
+                  col.value.estado === 'DIA FERIADO'
                 "
                 class="q-mx-sm text-white"
                 size="1.2rem"
@@ -340,6 +341,11 @@ export default {
                       value: "INCAPACIDAD",
                       estado: "INCAPACIDAD",
                       solicitud: diaData.incapacidad,
+                    };
+                  }else if (diaData.diaFeriado) {
+                    return {
+                      value: "DIA FERIADO",
+                      estado: "DIA FERIADO"
                     };
                   }else if (row.turnoEspecialSabado && dia === "sabado") {
                     return {
