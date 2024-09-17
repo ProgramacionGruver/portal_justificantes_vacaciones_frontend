@@ -32,7 +32,6 @@
             node-key="name"
             tick-strategy="leaf"
             v-model:ticked="tickedSeleccionados"
-            default-expand-all
           />
         </q-card-section>
         <q-card-section>
@@ -60,12 +59,16 @@ import { useSucursalesStore } from 'src/stores/sucursales.js'
 import { storeToRefs } from 'pinia'
 import { ID_SERVIDOR } from 'src/constant/servidor.js'
 import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj.js'
+import { useAutenticacionStore } from 'src/stores/autenticaciones'
 
 export default {
   setup() {
     const useModulos = useModulosStore()
-    const { actualizarPermisosModulos, obtenerPermisosSucursalesByUser, actualizarPermisosSucursales } = useModulos
+    const { actualizarPermisosModulos, obtenerPermisosSucursalesByUser, actualizarPermisosSucursales, actualizarPermisosCRUD } = useModulos
     const { filtroUsuariosAcceso, listaModulos, permisosSucursales } = storeToRefs(useModulos)
+
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
     const useSucursales = useSucursalesStore()
 
@@ -85,19 +88,16 @@ export default {
       modalPermisos.value = true
       usuarioSeleccionado.value = null
 
-      checksPermisos.value = [{
-        label: 'Módulos del portal',
-        children: listaModulos.value.map((modulo) => ({
-          label: modulo.label,
-          name: modulo.name, // Este es el identificador único del módulo
-          children: [
-            { label: 'Leer', name: `${modulo.name}_leer` },         // Identificadores únicos para cada permiso
-            { label: 'Actualizar', name: `${modulo.name}_actualizar` },
-            { label: 'Agregar', name: `${modulo.name}_agregar` },
-            { label: 'Eliminar', name: `${modulo.name}_eliminar` },
-          ]
-        }))
-      }]
+      checksPermisos.value = listaModulos.value.map((modulo) => ({
+        label: modulo.label,
+        name: modulo.name,
+        children: [
+          { label: 'Leer', name: `${modulo.name}_leer` },
+          { label: 'Actualizar', name: `${modulo.name}_actualizar` },
+          { label: 'Agregar', name: `${modulo.name}_agregar` },
+          { label: 'Eliminar', name: `${modulo.name}_eliminar` }
+        ]
+      }))
 
       checksSucursales.value = sucursalesAgrupadas.value.map((sucursal) => ({ label: sucursal.razonSocial, children: sucursal.sucursales.map((sucursal) => ({ label: sucursal.claveSucursal, name: sucursal.claveSucursal })) }))
     }
@@ -105,9 +105,9 @@ export default {
     const seleccionarUsuario = async () => {
       if (usuarioSeleccionado.value !== null) {
         // Itera sobre cada módulo
-      listaModulos.value.forEach(modulo => {
+      listaModulos.value.forEach((modulo) => {
       // Busca el permiso correspondiente al módulo actual
-      const permiso = usuarioSeleccionado.value.permisos.find(permiso => permiso.moduloPortale.nombreModulo === modulo.name)
+      const permiso = usuarioSeleccionado.value.permisos.find((permiso) => permiso.moduloPortale.nombreModulo === modulo.name)
           if (permiso) {
             // Si el permiso existe, verifica los valores true/false
             if (permiso.leer) {
@@ -133,9 +133,27 @@ export default {
     const actualizarPermisos = async () => {
       loading.value = true
 
+      let modulosSeleccionados = []
+      let modulosSeleccionadosCRUD = []
+      for (const modulo of tickedSeleccionados.value) {
+        const moduloSeleccionado = modulo.split('_')[0]
+
+        if (!modulosSeleccionados.includes(moduloSeleccionado)) {
+          modulosSeleccionados.push({name: moduloSeleccionado})
+
+          modulosSeleccionadosCRUD.push({
+            modulo: moduloSeleccionado,
+            leer: tickedSeleccionados.value.includes(`${moduloSeleccionado}_leer`),
+            actualizar: tickedSeleccionados.value.includes(`${moduloSeleccionado}_actualizar`),
+            agregar: tickedSeleccionados.value.includes(`${moduloSeleccionado}_agregar`),
+            eliminar: tickedSeleccionados.value.includes(`${moduloSeleccionado}_eliminar`)
+          })
+        }
+      }
+
       const permisosActualizar = {
         usuarioSeleccionado: usuarioSeleccionado.value,
-        permisosSeleccionados: tickedSeleccionados.value.map(e => (listaModulos.value.find(a => a.label === e))),
+        permisosSeleccionados: modulosSeleccionados,
         idPortal: ID_SERVIDOR
       }
 
@@ -147,6 +165,15 @@ export default {
       }
 
       await actualizarPermisosSucursales(permisosSucursalesActualizar)
+
+      const permisosCRUD = {
+        usuarioSeleccionado: usuarioSeleccionado.value,
+        permisosSeleccionados: modulosSeleccionadosCRUD,
+        idPortal: ID_SERVIDOR,
+        editedBy: usuarioAutenticado.value.usuario
+      }
+
+      await actualizarPermisosCRUD(permisosCRUD)
 
       loading.value = false
       modalPermisos.value = false
