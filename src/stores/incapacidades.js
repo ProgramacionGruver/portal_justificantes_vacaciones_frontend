@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
+import { apiForm } from 'src/boot/axiosForm'
 import { ref } from 'vue'
 import { notificacion } from 'src/helpers/mensajes'
+import { mensajeCorreoIncapacidades } from 'src/helpers/correos'
 
 export const useIncapacidadesStore = defineStore("incapacidades", () => {
     const incapacidades = ref([])
@@ -42,6 +44,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
               'Content-Type': 'multipart/form-data'
             }
           })
+          await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nueva Incapacidad`, [])
           incapacidades.value = [data, ...incapacidades.value]
           incapacidadesFiltrados.value = [data, ...incapacidadesFiltrados.value]
           notificacion('positive', 'Registro agregado exitosamente')
@@ -61,7 +64,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
           formData.append('archivoSt2', incapacidadesObj.archivoSt2)
           formData.append('archivoSiaat', incapacidadesObj.archivoSiaat)
           formData.append('diasIncapacidades', JSON.stringify(incapacidadesObj.diasIncapacidades))
-          formData.append('diasIncapacidadesNomina', JSON.stringify(incapacidadesObj.diasIncapacidadesNomina))
+          formData.append('diasIncapacidadesNomina', JSON.stringify(incapacidadesObj.incapacidadesObj))
           const { data } = await api.post('/actualizar/incapacidades', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -92,6 +95,14 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
           notificacion('negative', error.response.data.message)
       }finally{
           cargando.value = false
+      }
+    }
+
+    const enviarCorreoForm = async (incapacidadObj, url, titulo, destinatarios) => {
+      try {
+        await apiForm.post('/eventoCorreo', { correo: ['amagdaleno@gruver.mx'], titulo: titulo, mensaje: mensajeCorreoIncapacidades(incapacidadObj, url) })
+      } catch (error) {
+        notificacion('negative', 'Error al enviar el correo')
       }
     }
 
