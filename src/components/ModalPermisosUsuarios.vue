@@ -59,12 +59,16 @@ import { useSucursalesStore } from 'src/stores/sucursales.js'
 import { storeToRefs } from 'pinia'
 import { ID_SERVIDOR } from 'src/constant/servidor.js'
 import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj.js'
+import { useAutenticacionStore } from 'src/stores/autenticaciones'
 
 export default {
   setup() {
     const useModulos = useModulosStore()
     const { actualizarPermisosModulos, obtenerPermisosSucursalesByUser, actualizarPermisosSucursales, actualizarPermisosCRUD } = useModulos
     const { filtroUsuariosAcceso, listaModulos, permisosSucursales } = storeToRefs(useModulos)
+
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
     const useSucursales = useSucursalesStore()
 
@@ -166,6 +170,7 @@ export default {
         usuarioSeleccionado: usuarioSeleccionado.value,
         permisosSeleccionados: modulosSeleccionadosCRUD,
         idPortal: ID_SERVIDOR,
+        editedBy: usuarioAutenticado.value.usuario
       }
 
       await actualizarPermisosCRUD(permisosCRUD)
