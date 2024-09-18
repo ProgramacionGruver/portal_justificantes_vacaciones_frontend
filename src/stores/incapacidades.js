@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
 import { apiForm } from 'src/boot/axiosForm'
+import { apiUsuarios } from 'src/boot/axiosUsuarios'
 import { ref } from 'vue'
 import { notificacion } from 'src/helpers/mensajes'
 import { mensajeCorreoIncapacidades } from 'src/helpers/correos'
@@ -31,6 +32,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
 
     const agregarIncapacidades = async (incapacidadesObj) => {
       try {
+          const usuarioNomina = await apiUsuarios.post('/obtener/cargos', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuesto: 'CONOM' })
           cargando.value= true
           const formData = new FormData()
           formData.append('archivo', incapacidadesObj.archivo)
@@ -44,7 +46,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
               'Content-Type': 'multipart/form-data'
             }
           })
-          await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nueva Incapacidad`, [])
+          await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nueva Incapacidad`, usuarioNomina.data[0]?.usuario?.correo?usuarioNomina.data[0]?.usuario?.correo:['amagdaleno@gruver.mx'])
           incapacidades.value = [data, ...incapacidades.value]
           incapacidadesFiltrados.value = [data, ...incapacidadesFiltrados.value]
           notificacion('positive', 'Registro agregado exitosamente')
@@ -100,7 +102,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
 
     const enviarCorreoForm = async (incapacidadObj, url, titulo, destinatarios) => {
       try {
-        await apiForm.post('/eventoCorreo', { correo: ['amagdaleno@gruver.mx'], titulo: titulo, mensaje: mensajeCorreoIncapacidades(incapacidadObj, url) })
+        await apiForm.post('/eventoCorreo', { correo: destinatarios, titulo: titulo, mensaje: mensajeCorreoIncapacidades(incapacidadObj, url) })
       } catch (error) {
         notificacion('negative', 'Error al enviar el correo')
       }

@@ -95,7 +95,7 @@
                 Subir archivos
               </q-tooltip>
             </q-btn>
-            <q-btn dense flat color="primary" icon="edit" @click="editarIncapacidad(props.row)">
+            <q-btn v-if="actualizar" dense flat color="primary" icon="edit" @click="editarIncapacidad(props.row)">
               <q-tooltip>
                 Editar
               </q-tooltip>
@@ -110,6 +110,7 @@
       <template v-slot:body-cell-sua="props">
           <td>
             <q-btn
+              :disable="!agregar"
               rounded
               flat
               :color="obtenerButton(props.row.estatusSua).color"
@@ -123,6 +124,7 @@
       <template v-slot:body-cell-contpaq="props">
           <td>
             <q-btn
+              :disable="!agregar"
               rounded
               flat
               :color="obtenerButton(props.row.estatusContpaq).color"
@@ -148,6 +150,7 @@ import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import * as XLSX from 'xlsx'
@@ -181,12 +184,21 @@ export default {
       const useColaboradores = useColaboradoresStore()
       const { obtenerColaboradores } = useColaboradores
 
+      const useAutenticacion = useAutenticacionStore()
+      const { usuarioAutenticado } = storeToRefs(useAutenticacion)
+
       const cargando = ref(false)
       const modalIncapacidades = ref(null)
       const hoy = new Date()
       const unaSemanaAntes = new Date()
       unaSemanaAntes.setDate(hoy.getDate() - 15)
       const notificacion = useQuasar()
+
+      const modulo = ref({})
+      const agregar = ref(false)
+      const actualizar = ref(false)
+      const eliminar = ref(false)
+      const leer = ref(false)
 
       const columns = [
         {
@@ -315,6 +327,11 @@ export default {
           await obtenerColaboradores()
           await obtenerIncapacidades(objBusqueda.value)
           await filtrar('TODASEMPRESAS')
+          modulo.value = usuarioAutenticado.value.modulos.find(modulo => modulo.idModulo === 68)
+          agregar.value = modulo.value.agregar
+          actualizar.value = modulo.value.actualizar
+          eliminar.value = modulo.value.eliminar
+          leer.value = modulo.value.leer
         }catch{
 
         }finally{
@@ -539,7 +556,11 @@ export default {
         obtenerButton,
         actualizarEstatus,
         descargarDocumentos,
-        descargaExcel
+        descargaExcel,
+        agregar,
+        actualizar,
+        eliminar,
+        leer
       }
     }
   }

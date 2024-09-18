@@ -49,7 +49,7 @@
                     </div>
                   </div>
             </q-tab-panel>
-            <q-tab-panel name="dias">
+            <q-tab-panel v-if="actualizar" name="dias">
                 <div class="q-gutter-x-sm row">
                     <div class="q-my-xs col">
                       <label>Días Vacaciones Restantes</label>
@@ -137,6 +137,7 @@
 import { ref } from "vue"
 import { storeToRefs } from "pinia"
 import { useCatalogosStore } from "src/stores/catalogos"
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 
 export default {
   setup() {
@@ -147,13 +148,27 @@ export default {
     const { editarCatalogoUsuarios } = useCatalogos
     const { opcionesTurnos } = storeToRefs(useCatalogos)
 
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
+
     const catalagoObj = ref([])
     const tab = ref('turnos')
+
+    const modulo = ref({})
+    const agregar = ref(false)
+    const actualizar = ref(false)
+    const eliminar = ref(false)
+    const leer = ref(false)
 
     const abrir = (catalago) => {
         tab.value = 'turnos'
         catalagoObj.value = { ...catalago }
         abrirModal.value = true
+        modulo.value = usuarioAutenticado.value.modulos.find(modulo => modulo.idModulo === 68)
+        agregar.value = modulo.value.agregar
+        actualizar.value = modulo.value.actualizar
+        eliminar.value = modulo.value.eliminar
+        leer.value = modulo.value.leer
     }
 
     const editarCatalogo = async () => {
@@ -172,6 +187,10 @@ export default {
       opcionesTurnos,
       tab,
       editarCatalogo,
+      agregar,
+      actualizar,
+      eliminar,
+      leer
     }
   },
 }
