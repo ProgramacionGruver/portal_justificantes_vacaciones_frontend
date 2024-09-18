@@ -135,10 +135,13 @@ export default {
 
       let modulosSeleccionados = []
       let modulosSeleccionadosCRUD = []
+      let modulosSeleccionadosAuxiliar = []
       for (const modulo of tickedSeleccionados.value) {
         const moduloSeleccionado = modulo.split('_')[0]
 
-        if (!modulosSeleccionados.includes(moduloSeleccionado)) {
+        if (!modulosSeleccionadosAuxiliar.includes(moduloSeleccionado)) {
+          modulosSeleccionadosAuxiliar.push(moduloSeleccionado)
+
           modulosSeleccionados.push({name: moduloSeleccionado})
 
           modulosSeleccionadosCRUD.push({
