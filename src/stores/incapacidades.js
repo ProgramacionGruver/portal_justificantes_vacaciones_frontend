@@ -59,6 +59,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
 
     const actualizarIncapacidades = async (incapacidadesObj) => {
       try {
+          const usuarioNomina = await apiUsuarios.post('/obtener/cargos', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuesto: 'CONOM' })
           cargando.value= true
           const formData = new FormData()
           formData.append('archivo', incapacidadesObj.archivo)
@@ -66,12 +67,15 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
           formData.append('archivoSt2', incapacidadesObj.archivoSt2)
           formData.append('archivoSiaat', incapacidadesObj.archivoSiaat)
           formData.append('diasIncapacidades', JSON.stringify(incapacidadesObj.diasIncapacidades))
-          formData.append('diasIncapacidadesNomina', JSON.stringify(incapacidadesObj.incapacidadesObj))
+          formData.append('diasIncapacidadesNomina', JSON.stringify(incapacidadesObj.diasIncapacidadesNomina))
           const { data } = await api.post('/actualizar/incapacidades', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
           })
+          if(incapacidadesObj.archivoSt7.name || incapacidadesObj.archivoSt2.name || incapacidadesObj.archivoSiaat.name){
+            await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nuevo archivo seguimiento de Incapacidad`, usuarioNomina.data[0]?.usuario?.correo?usuarioNomina.data[0]?.usuario?.correo:['amagdaleno@gruver.mx'], true, incapacidadesObj.archivoSt7?.name, incapacidadesObj.archivoSt2?.name, incapacidadesObj.archivoSiaat?.name)
+          }
           const index = incapacidades.value.findIndex(incapacidad => incapacidad.idIncapacidadNomina === incapacidadesObj.diasIncapacidadesNomina.idIncapacidadNomina)
           const indexFiltro = incapacidadesFiltrados.value.findIndex(incapacidad => incapacidad.idIncapacidadNomina === incapacidadesObj.diasIncapacidadesNomina.idIncapacidadNomina)
           incapacidades.value[index] = data
@@ -100,9 +104,9 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
       }
     }
 
-    const enviarCorreoForm = async (incapacidadObj, url, titulo, destinatarios) => {
+    const enviarCorreoForm = async (incapacidadObj, url, titulo, destinatarios, actualizar, archivoSt7, archivoSt2, archivoSiaat) => {
       try {
-        await apiForm.post('/eventoCorreo', { correo: destinatarios, titulo: titulo, mensaje: mensajeCorreoIncapacidades(incapacidadObj, url) })
+        await apiForm.post('/eventoCorreo', { correo: destinatarios, titulo: titulo, mensaje: mensajeCorreoIncapacidades(incapacidadObj, url, actualizar, archivoSt7, archivoSt2, archivoSiaat) })
       } catch (error) {
         notificacion('negative', 'Error al enviar el correo')
       }

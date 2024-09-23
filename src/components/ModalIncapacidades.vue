@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="abrirModal">
+  <q-dialog persistent v-model="abrirModal">
     <q-card style="min-width: 50vw;">
       <q-card-section class="bg-primary text-white row items-center q-pb-none">
         <h2 class="text-h4">Incapacidades</h2>
@@ -185,6 +185,10 @@
                   v-model="documento"
                   :label="'Click aquí para subir archivo'"
                   accept=".pdf, .PDF pdf/*"
+                  counter
+                  :counter-label="counterLabel"
+                  max-file-size="15000000"
+                  @rejected="onRejected"
                 >
               </q-file>
               <div class="row items-start q-col-gutter-sm q-mb-xs">
@@ -197,6 +201,10 @@
                     :disable="documento"
                     :label="documento?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
                     accept=".pdf, .PDF pdf/*"
+                    counter
+                    :counter-label="counterLabel"
+                    max-file-size="15000000"
+                    @rejected="onRejected"
                   >
                   </q-file>
                 </div>
@@ -227,6 +235,10 @@
                   v-model="documentoSt7"
                   :label="'Click aquí para subir archivo'"
                   accept=".pdf, .PDF pdf/*"
+                  counter
+                  :counter-label="counterLabel"
+                  max-file-size="15000000"
+                  @rejected="onRejected"
                 >
               </q-file>
               <div class="row items-start q-col-gutter-sm q-mb-md">
@@ -239,6 +251,10 @@
                     :disable="documentoSt7"
                     :label="documentoSt7?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
                     accept=".pdf, .PDF pdf/*"
+                    counter
+                    :counter-label="counterLabel"
+                    max-file-size="15000000"
+                    @rejected="onRejected"
                   >
                   </q-file>
                 </div>
@@ -255,6 +271,10 @@
                   v-model="documentoSt2"
                   :label="'Click aquí para subir archivo'"
                   accept=".pdf, .PDF pdf/*"
+                  counter
+                  :counter-label="counterLabel"
+                  max-file-size="15000000"
+                  @rejected="onRejected"
                 >
               </q-file>
               <div class="row items-start q-col-gutter-sm q-mb-md">
@@ -267,6 +287,10 @@
                     :disable="documentoSt2"
                     :label="documentoSt2?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
                     accept=".pdf, .PDF pdf/*"
+                    counter
+                    :counter-label="counterLabel"
+                    max-file-size="15000000"
+                    @rejected="onRejected"
                   >
                   </q-file>
                 </div>
@@ -282,6 +306,10 @@
                   v-model="documentoSiaat"
                   :label="'Click aquí para subir archivo'"
                   accept=".pdf, .PDF pdf/*"
+                  counter
+                  :counter-label="counterLabel"
+                  max-file-size="15000000"
+                  @rejected="onRejected"
                 >
               </q-file>
               <div class="row items-start q-col-gutter-sm q-mb-xs">
@@ -294,6 +322,10 @@
                     :disable="documentoSiaat"
                     :label="documentoSiaat?'***Documento cargado anteriormente***':'Click aquí para subir archivo'"
                     accept=".pdf, .PDF pdf/*"
+                    counter
+                    :counter-label="counterLabel"
+                    max-file-size="15000000"
+                    @rejected="onRejected"
                   >
                   </q-file>
                 </div>
@@ -307,6 +339,7 @@
       <q-card-section>
           <q-card-actions align="right">
             <q-btn
+              :disable="cargando"
               icon-right="close"
               flat
               label="Cerrar"
@@ -316,6 +349,7 @@
             />
             <q-btn
               v-if="!edicion && !lectura && !actualizacion"
+              :loading="cargando"
               icon-right="save"
               type="submit"
               label="Guardar"
@@ -323,6 +357,7 @@
             />
             <q-btn
               v-if="edicion || actualizacion"
+              :loading="cargando"
               icon-right="save"
               label="Actualizar"
               color="primary"
@@ -355,6 +390,7 @@ export default {
 
     const useIncapacidades = useIncapacidadesStore()
     const { agregarIncapacidades, actualizarIncapacidades } = useIncapacidades
+    const { cargando } = storeToRefs(useIncapacidades)
 
     const useAutenticacion = useAutenticacionStore()
     const { usuarioAutenticado } = storeToRefs(useAutenticacion)
@@ -442,6 +478,7 @@ export default {
           }
           usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
           incapacidadesObj.value = { ...incapacidad }
+          verificarFechas(incapacidadesObj.value.fechaTermino)
         }else if(incapacidad && leer){
           lectura.value = true
           documento.value = true
@@ -462,6 +499,7 @@ export default {
           }
           usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
           incapacidadesObj.value = { ...incapacidad }
+          verificarFechas(incapacidadesObj.value.fechaTermino)
         }else if(incapacidad && editarDocumentos){
           actualizacion.value = true
           documento.value = true
@@ -482,6 +520,7 @@ export default {
           }
           usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
           incapacidadesObj.value = { ...incapacidad }
+          verificarFechas(incapacidadesObj.value.fechaTermino)
         }else{
           incapacidadesObj.value = { ...incapacidadesObjInit }
         }
@@ -636,11 +675,20 @@ export default {
       checkArchivos.value = nuevosValores
     }
 
+    const onRejected = (rejectedEntries) => {
+      if (rejectedEntries[0].failedPropValidation === 'max-file-size') {
+        notificacion('warning', 'El archivo es mayor a 15 megas')
+      } else if (rejectedEntries[0].failedPropValidation === 'accept') {
+        notificacion('warning', 'El archivo no es un archivo pdf')
+      }
+    }
+
     return {
       abrir,
       abrirUrl,
       abrirModal,
       formulario,
+      cargando,
       incapacidadesObj,
       opcionesEmpleados,
       usuarioSeleccionado,
@@ -673,6 +721,10 @@ export default {
         format24h: true,
         pluralDay: 'dias'
       },
+      onRejected,
+      counterLabel ({ totalSize }) {
+        return `${totalSize} / 15 MB`
+      }
     }
   },
 }

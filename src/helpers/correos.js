@@ -422,53 +422,154 @@ export const mensajeOrdenesDeServicioProceso = (ordenes, ordenesZonas) => {
     return cuerpoTabla + diasSolicitados + finalTabla
   }
 
-  export const mensajeCorreoIncapacidades = (incapacidadObj, url) => {
+  export const mensajeCorreoIncapacidades = (incapacidadObj, url, actualizar, archivoSt7, archivoSt2, archivoSiaat) => {
 
-    const cuerpoTabla = `
-        <p>Se ha registrado una incapacidad: </p>
+    let cuerpoTabla = ''
+    let finalTabla = ''
 
-        <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
-          <thead bgcolor='#1052A0' text='white'>
-              <tr>
-                <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>INCAPACIDAD</th>
-              </tr>
-          </thead>
-          <tbody bgcolor='white' text='black'>
-              <tr>
-                <td style='padding: 12px;'>Folio:</td>
-                <td style='padding: 12px;'>${incapacidadObj.folio}</td>
-              </tr>
-              <tr>
-                <td style='padding: 12px;'>Fecha Expedido:</td>
-                <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaExpedido)}</td>
-              </tr>
-              <tr>
-                <td style='padding: 12px;'>Número de empleado:</td>
-                <td style='padding: 12px;'>${incapacidadObj.numero_empleado}</td>
-              </tr>
-              <tr>
-                <td style='padding: 12px;'>Nombre: </td>
-                <td style='padding: 12px;'>${incapacidadObj.nombre}</td>
-              </tr>
-              <tr>
-                <td style='padding: 12px;'>Centro de trabajo: </td>
-                <td style='padding: 12px;'>${incapacidadObj.nombreSucursal}</td>
-              </tr>
-               <tr>
-                <td style='padding: 12px;'>Fecha A partir:</td>
-                <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaApartir)}</td>
-              </tr>
-              <tr>
-                <td style='padding: 12px;'>Fecha Termino:</td>
-                <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaTermino)}</td>
-              </tr>`
-    const finalTabla = `
-              <tr>
-                <td style='padding: 12px;'>Haz click aqui para ver el documento:</td>
-                <td style='padding: 12px;'><a href='${url}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD </a></td>
-              </tr>
-          </tbody>
-        </table>
-        `
+      if(!actualizar){
+        cuerpoTabla = `
+          <p>Se ha registrado una incapacidad: </p>
+          <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
+            <thead bgcolor='#1052A0' text='white'>
+                <tr>
+                  <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>INCAPACIDAD</th>
+                </tr>
+            </thead>
+            <tbody bgcolor='white' text='black'>
+                <tr>
+                  <td style='padding: 12px;'>Folio:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.folio}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha Expedido:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaExpedido)}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Número de empleado:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.numero_empleado}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Nombre: </td>
+                  <td style='padding: 12px;'>${incapacidadObj.nombre}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Centro de trabajo: </td>
+                  <td style='padding: 12px;'>${incapacidadObj.nombreSucursal}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha A partir:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaApartir)}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha Termino:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaTermino)}</td>
+                </tr>`
+
+        finalTabla = `
+                <tr>
+                  <td style='padding: 12px;'>Haz click aqui para ver el documento:</td>
+                  <td style='padding: 12px;'><a href='${url}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD </a></td>
+                </tr>
+              `
+
+        if (incapacidadObj.urlDocumentoSt7) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento St7:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSt7}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD ST7</a></td>
+            </tr>
+          `
+        }
+
+        if (incapacidadObj.urlDocumentoSt2) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento St2:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSt2}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD ST2</a></td>
+            </tr>
+          `
+        }
+
+        if (incapacidadObj.urlDocumentoSiaat) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento Siaat:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSiaat}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD SIAAT</a></td>
+            </tr>
+          `
+        }
+      }else{
+        cuerpoTabla = `
+          <p>Se agrego un nuevo archivo de seguimiento de incapacidad: </p>
+          <table border='1' style='border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;'>
+            <thead bgcolor='#1052A0' text='white'>
+                <tr>
+                  <th colspan='2' style='padding: 16px; background-color: #408493; color: white;'>ARCHIVO DE SEGUIMIENTO INCAPACIDAD</th>
+                </tr>
+            </thead>
+            <tbody bgcolor='white' text='black'>
+                <tr>
+                  <td style='padding: 12px;'>Folio:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.folio}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha Expedido:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaExpedido)}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Número de empleado:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.numero_empleado}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Nombre: </td>
+                  <td style='padding: 12px;'>${incapacidadObj.nombre}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Centro de trabajo: </td>
+                  <td style='padding: 12px;'>${incapacidadObj.nombreSucursal}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha A partir:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaApartir)}</td>
+                </tr>
+                <tr>
+                  <td style='padding: 12px;'>Fecha Termino:</td>
+                  <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaTermino)}</td>
+                </tr>`
+
+        if (archivoSt7) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento St7:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSt7}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD ST7</a></td>
+            </tr>
+          `
+        }
+
+        if (archivoSt2) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento St2:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSt2}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD ST2</a></td>
+            </tr>
+          `
+        }
+
+        if (archivoSiaat) {
+          finalTabla += `
+            <tr>
+              <td style='padding: 12px;'>Haz click aqui para ver el documento Siaat:</td>
+              <td style='padding: 12px;'><a href='${incapacidadObj.urlDocumentoSiaat}' style='color: #58ACFA; text-decoration: none;'>INCAPACIDAD SIAAT</a></td>
+            </tr>
+          `
+        }
+      }
+
+    finalTabla += `
+      </tbody>
+    </table>
+    `
+
     return cuerpoTabla + finalTabla
   }

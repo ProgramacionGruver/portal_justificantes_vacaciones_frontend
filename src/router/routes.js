@@ -94,6 +94,13 @@ const routes = [
         name: 'catalogoVacaciones',
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/catalogo/CatalogoVacacionesModule.vue')
       },
+      {
+        path: 'diasFeriados',
+        icono: 'event_available',
+        label: 'Días Feriados',
+        name: 'diasFeriados',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/diasFeriados/DiasFeriadosModule.vue')
+      },
 
     ]
   },
