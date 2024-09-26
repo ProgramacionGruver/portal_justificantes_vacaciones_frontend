@@ -28,9 +28,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const todasProrrogasEmpleado = ref([])
   const historialSolicitudes = ref([])
   const historialSolicitudesFiltradas = ref([])
+  const justificantesMasivos = ref([])
+  const justificantesMasivosFiltrados = ref([])
   const cargandoMisSolicitudes = ref(false)
   const cargandoHistorialSolicitudes = ref(false)
   const cargandoEnvioSolicitud = ref(false)
+  const cargandoJustificantesMasivos = ref(false)
 
   const usuarioSeleccionado = ref(null)
   const emailJefeDirecto = ref('')
@@ -423,6 +426,32 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
+  const obtenerJustificantesMasivos = async (objBusqueda) => {
+    try {
+      cargandoJustificantesMasivos.value = true
+      const { data } = await api.post('/obtenerJustificantesMasivos', objBusqueda)
+      justificantesMasivos.value = data
+      justificantesMasivosFiltrados.value = data
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoJustificantesMasivos.value = false
+    }
+  }
+
+  const agregarJustificantesMasivos = async (justificanteObj) => {
+    try {
+      cargandoJustificantesMasivos.value = true
+      const { data } = await api.post('/agregarJustificantesMasivos', justificanteObj)
+      justificantesMasivos.value = [data, ...justificantesMasivos.value]
+      justificantesMasivosFiltrados.value = [data, ...justificantesMasivosFiltrados.value]
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    } finally {
+      cargandoJustificantesMasivos.value = false
+    }
+  }
+
   return {
     todosEstatus,
     todosEstatusFiltrados,
@@ -444,9 +473,12 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     todasProrrogasEmpleado,
     historialSolicitudes,
     historialSolicitudesFiltradas,
+    justificantesMasivos,
+    justificantesMasivosFiltrados,
     cargandoMisSolicitudes,
     cargandoHistorialSolicitudes,
     cargandoEnvioSolicitud,
+    cargandoJustificantesMasivos,
     urlForm,
     usuarioSeleccionado,
     emailJefeDirecto,
@@ -468,6 +500,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     solicitarSabados5s,
     solicitarProrroga,
     solicitarCapacitaciones,
-    obtenerAutorizacionesPorEmpleado
+    obtenerAutorizacionesPorEmpleado,
+    obtenerJustificantesMasivos,
+    agregarJustificantesMasivos
   }
 })

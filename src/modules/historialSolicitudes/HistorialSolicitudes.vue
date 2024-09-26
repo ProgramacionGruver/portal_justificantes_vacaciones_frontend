@@ -107,7 +107,7 @@ import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
 import { filtrarElementos, filtrarElementosPorEmpresaSucursalDepartamento, filtrarOpcionesHistorialSolicitudes } from 'src/helpers/filtros'
-import ModalVerDetalleSolicitud from '../../components/ModalVerDetalleSolicitud.vue'
+import ModalVerDetalleSolicitud from 'src/components/ModalVerDetalleSolicitud.vue'
 
 export default {
   components: {

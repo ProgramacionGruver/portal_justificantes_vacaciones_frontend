@@ -67,6 +67,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/FaltasModule.vue')
       },
       {
+        path: 'justificantesMasivos',
+        icono: 'playlist_add_check',
+        label: 'Justificantes Masivos',
+        name: 'justificantesMasivos',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/justificantesMasivos/JustificantesMasivosModule.vue')
+      },
+      {
         path: 'diasGanados',
         icono: 'fact_check',
         label: 'Días Ganados',

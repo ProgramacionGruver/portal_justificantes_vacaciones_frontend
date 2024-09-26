@@ -22,13 +22,13 @@
 
 <script>
 import { ref} from 'vue'
-import StepperSolicitud from '../../components/StepperSolicitud.vue'
+import StepperSolicitud from 'src/components/StepperSolicitud.vue'
 import { useAutenticacionStore } from 'src/stores/autenticaciones'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
-import ModalVerDetalleSolicitud from '../../components/ModalVerDetalleSolicitud.vue'
+import ModalVerDetalleSolicitud from 'src/components/ModalVerDetalleSolicitud.vue'
 
 export default {
   components: {
