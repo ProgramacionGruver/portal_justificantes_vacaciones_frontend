@@ -28,6 +28,7 @@
                 v-model="objBusqueda.fechaInicio"
                 type="date"
                 @update:model-value="limpiarFechaFin()"
+                :disable="cargando"
               />
             </div>
             <div>
@@ -37,9 +38,19 @@
                 v-model="objBusqueda.fechaFin"
                 type="date"
                 @update:model-value="busquedaFechas()"
+                :disable="cargando"
               />
             </div>
           </div>
+          <q-btn
+            color="green"
+            label="Exportar a Excel"
+            icon="get_app"
+            dense
+            :disable="cargando"
+            @click="exportarExcel"
+            v-if="permisoDescargar"
+          />
         </div>
         <div class="asistencias--select">
           <q-btn-dropdown
@@ -48,6 +59,7 @@
             class="q-my-sm"
             color="grey"
             label="Empresas"
+            :disable="cargando"
           >
             <q-checkbox
               class="q-pa-md"
@@ -73,6 +85,7 @@
             class="q-my-sm"
             color="grey"
             label="Sucursales"
+            :disable="cargando"
           >
             <q-checkbox
               class="q-pa-md"
@@ -98,6 +111,7 @@
             class="q-my-sm"
             color="grey"
             label="Departamentos"
+            :disable="cargando"
           >
             <q-checkbox
               class="q-pa-md"
@@ -175,6 +189,9 @@ import {
   filtrarElementosPorEmpresaSucursalDepartamento,
 } from "src/helpers/filtros";
 import ModalVerSolicitud from "src/components/ModalVerSolicitud.vue";
+import { notificacion } from "src/helpers/mensajes";
+import { generarExcel } from "src/helpers/generarExcel";
+import { useAutenticacionStore } from "src/stores/autenticaciones";
 
 export default {
   components: {
@@ -215,6 +232,11 @@ export default {
     const { obtenerAsistencias } = useAsistencias;
     const { asistencias, asistenciasFiltradas } = storeToRefs(useAsistencias);
 
+    const useAutenticacion = useAutenticacionStore();
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion);
+
+    const permisoDescargar = ref(false);
+
     const cargando = ref(false);
     const dynamicColumns = ref([]);
     const columns = ref([]);
@@ -230,21 +252,21 @@ export default {
         label: "No Empleado",
         align: "left",
         field: "numero_empleado",
-        sortable: true
+        sortable: true,
       },
       {
         name: "nombre",
         label: "Nombre",
         align: "left",
         field: "nombre",
-        sortable: true
+        sortable: true,
       },
       {
         name: "puesto",
         label: "Puesto",
         align: "left",
         field: "puesto",
-        sortable: true
+        sortable: true,
       },
     ];
 
@@ -256,6 +278,11 @@ export default {
     onMounted(async () => {
       try {
         cargando.value = true;
+
+        permisoDescargar.value = usuarioAutenticado.value.modulos.find(
+          (modulo) => modulo.moduloPortale.nombreModulo === "asistencia"
+        ).leer;
+
         if (primeraCarga.value) {
           primeraCarga.value = false;
           await obtenerEmpresas();
@@ -265,7 +292,8 @@ export default {
         await obtenerAsistencias(objBusqueda.value);
         await columnasDinamicas();
         await filtrar("TODASEMPRESAS");
-      } catch {
+      } catch (error) {
+        // console.log(error);
       } finally {
         cargando.value = false;
       }
@@ -336,23 +364,23 @@ export default {
                       estado: "COMPLETO",
                       retardo: diaData.retardo,
                     };
-                  }else if (diaData.incapacidad) {
+                  } else if (diaData.incapacidad) {
                     return {
                       value: "INCAPACIDAD",
                       estado: "INCAPACIDAD",
                       solicitud: diaData.incapacidad,
                     };
-                  }else if (diaData.diaFeriado) {
+                  } else if (diaData.diaFeriado) {
                     return {
                       value: "DIA FERIADO",
-                      estado: "DIA FERIADO"
+                      estado: "DIA FERIADO",
                     };
-                  }else if (row.turnoEspecialSabado && dia === "sabado") {
+                  } else if (row.turnoEspecialSabado && dia === "sabado") {
                     return {
                       value: `${row.turnoEspecialSabado.turno}`,
                       estado: `TURNO ESPECIAL`,
                     };
-                  }else if (row.turnoEspecialSemana) {
+                  } else if (row.turnoEspecialSemana) {
                     return {
                       value: `${row.turnoEspecialSemana.turno}`,
                       estado: `TURNO ESPECIAL`,
@@ -363,7 +391,7 @@ export default {
                   value: "FALTA",
                   estado: "FALTA",
                   retardo: false,
-                }
+                };
               },
             });
           }
@@ -445,15 +473,63 @@ export default {
       }
     };
 
+    const exportarExcel = async () => {
+      if (objBusqueda.value.fechaInicio > objBusqueda.value.fechaFin) {
+        notificacion(
+          "warning",
+          "La fecha de inicio no puede ser mayor a la fecha fin"
+        );
+        return;
+      }
+
+      const data = asistenciasFiltradas.value.map((asistencia) => {
+        const asistenciaExportar = {
+          "NUMERO EMPLEADO": asistencia.numero_empleado,
+          NOMBRE: asistencia.nombre,
+          PUESTO: asistencia.puesto,
+          EMPRESA: asistencia.claveEmpresa,
+          SUCURSAL: asistencia.claveSucursal,
+          DEPARTAMENTO: asistencia.claveDepartamento,
+        };
+        Object.keys(asistencia.semanas).forEach((semana) => {
+          Object.keys(asistencia.semanas[semana]).forEach((dia) => {
+            const registroDia = asistencia.semanas[semana][dia];
+            if (registroDia) {
+              asistenciaExportar[
+                `${formatearFecha(registroDia.fechaRegistro)}`
+              ] = registroDia.solicitud
+                ? registroDia.solicitud.nombreSolicitud
+                : registroDia.retardo
+                ? "RETARDO"
+                : registroDia.sinTurno
+                ? "SIN TURNO"
+                : registroDia.horaRegistro
+                ? registroDia.horaRegistro
+                : "FALTA";
+            }
+          });
+        });
+        return asistenciaExportar;
+      });
+
+      const fechaInicio = objBusqueda.value.fechaInicio.replace(/-/g, "_");
+      const fechaFin = objBusqueda.value.fechaFin.replace(/-/g, "_");
+
+      await generarExcel(
+        data,
+        `Reporte_asistencias_${fechaInicio}_${fechaFin}`,
+        "Asistencias"
+      );
+    };
+
     return {
+      // States
       columns,
       buscar: ref(""),
       asistenciasFiltradas,
       objBusqueda,
-      colorBoton,
       cargando,
       modalVerSolicitud,
-      verSolicitud,
       empresasFiltradas,
       modelEmpresasSeleccionadas,
       todasEmpresasSeleccionadas,
@@ -463,9 +539,14 @@ export default {
       departamentosFiltrados,
       modelDepartamentosSeleccionados,
       todosDepartamentosSeleccionados,
+      permisoDescargar,
+      // Methods
+      colorBoton,
+      verSolicitud,
       filtrar,
       limpiarFechaFin,
       busquedaFechas,
+      exportarExcel,
     };
   },
 };
