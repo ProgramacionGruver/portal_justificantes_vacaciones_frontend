@@ -41,7 +41,7 @@
                 <div class="col-6">
                   <label>No. Seguro Social: <span style="color: red;">*</span></label>
                   <q-input
-                    :readonly="lectura"
+                    readonly
                     dense
                     outlined
                     v-model="incapacidadesObj.numeroSeguroSocial"
@@ -146,6 +146,44 @@
                 <div class="col-4">
                   <label>Expedido: <span style="color: red;">*</span></label>
                   <q-input :readonly="lectura" dense type="date" outlined v-model="incapacidadesObj.fechaExpedido" :rules="[(val) => { return val !== null && val !== undefined && val !== '' ? true : 'Seleccione una fecha' }]" ></q-input>
+                </div>
+              </div>
+              <div v-if="!actualizacion" class="row items-start q-col-gutter-sm q-pb-md">
+                <div class="col-6">
+                  <label>Descuento Dias Economicos: </label>
+                  <q-checkbox
+                    :disable="lectura || !incapacidadesObj.nombreSucursal || (usuarioSeleccionado?.diasEconomicosRestantes === 0 && !edicion)"
+                    v-model="incapacidadesObj.descuentoDiasEconomicos" @update:model-value="updateDescuentoDiasEconomicos"
+                    >
+                    <q-tooltip class="bg-red" v-if="usuarioSeleccionado?.diasEconomicosRestantes === 0 && incapacidadesObj.numeroDiasEconomicos === 0">Sin dias disponibles</q-tooltip>
+                  </q-checkbox>
+                </div>
+                <div v-if="incapacidadesObj.descuentoDiasEconomicos" class="col-6">
+                  <label>Número de dias a descontar: <span style="color: red;">*</span> <br>(Disponibles {{ usuarioSeleccionado?.diasEconomicosRestantes }} días)</label>
+                  <q-input
+                    v-if="!edicion"
+                    :readonly="lectura || !incapacidadesObj.descuentoDiasEconomicos"
+                    ref="lista"
+                    dense
+                    outlined
+                    type="number"
+                    v-model="incapacidadesObj.numeroDiasEconomicos"
+                    label="Agrega los días a descontar"
+                    :rules="[val => (val <= usuarioSeleccionado?.diasEconomicosRestantes && val > 0 && val <= incapacidadesObj.diasIncapacidad) || 'Digite una cantidad valida de días']"
+                  />
+                  <q-input
+                    v-if="edicion"
+                    :readonly="lectura || !incapacidadesObj.descuentoDiasEconomicos"
+                    ref="lista"
+                    dense
+                    outlined
+                    type="number"
+                    v-model="incapacidadesObj.numeroDiasEconomicos"
+                    min="0"
+                    :hint="`${incapacidadesObj?.diasEconomicosPrevios?incapacidadesObj?.diasEconomicosPrevios:0} días previamente descontados`"
+                    :rules="[val => revisarDiasEconomicos(val)]"
+                    @update:model-value="revisarDiasEconomicos"
+                  />
                 </div>
               </div>
               <label v-if="!actualizacion">Tipo de riesgo:</label>
@@ -438,6 +476,8 @@ export default {
       st7: false,
       st2: false,
       siaat: false,
+      descuentoDiasEconomicos: false,
+      numeroDiasEconomicos: null,
       editedBy: ""
     }
 
@@ -476,8 +516,10 @@ export default {
             opcionesArchivosExtras[2].disable = true
             documentoSiaat.value = true
           }
-          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          const usuario = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado)
+          usuarioSeleccionado.value = {label:  usuario.label, value: usuario.value, ...usuario.value}
           incapacidadesObj.value = { ...incapacidad }
+          incapacidadesObj.value.diasEconomicosPrevios = incapacidadesObj.value.numeroDiasEconomicos
           verificarFechas(incapacidadesObj.value.fechaTermino)
         }else if(incapacidad && leer){
           lectura.value = true
@@ -497,7 +539,8 @@ export default {
             opcionesArchivosExtras[2].disable = true
             documentoSiaat.value = true
           }
-          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          const usuario = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado)
+          usuarioSeleccionado.value = {label:  usuario.label, value: usuario.value, ...usuario.value}
           incapacidadesObj.value = { ...incapacidad }
           verificarFechas(incapacidadesObj.value.fechaTermino)
         }else if(incapacidad && editarDocumentos){
@@ -518,7 +561,8 @@ export default {
             opcionesArchivosExtras[2].disable = true
             documentoSiaat.value = true
           }
-          usuarioSeleccionado.value = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado).value
+          const usuario = opcionesColaboradores.value.find(elemento => elemento.value.numero_empleado === incapacidad.numero_empleado)
+          usuarioSeleccionado.value = {label:  usuario.label, value: usuario.value, ...usuario.value}
           incapacidadesObj.value = { ...incapacidad }
           verificarFechas(incapacidadesObj.value.fechaTermino)
         }else{
@@ -614,7 +658,11 @@ export default {
         archivoSt2: documentoSt2.value,
         archivoSiaat: documentoSiaat.value
       }
-      await actualizarIncapacidades(objIncapacidad.value)
+      const incapacidad = await actualizarIncapacidades(objIncapacidad.value)
+      if(incapacidad.usuario){
+        const index = opcionesColaboradores.value.findIndex(empleado => empleado.value.numero_empleado === usuarioSeleccionado.value.numero_empleado)
+        opcionesColaboradores.value[index].value = incapacidad.usuario
+      }
       abrirModal.value = false
     }
 
@@ -683,6 +731,32 @@ export default {
       }
     }
 
+    const revisarDiasEconomicos = (nuevoValor) => {
+      if(!nuevoValor){
+        return `Digite una cantidad valida de días.`
+      }
+
+      if( nuevoValor == 0){
+        incapacidadesObj.value.descuentoDiasEconomicos = false
+        incapacidadesObj.value.numeroDiasEconomicos = null
+        return true
+      }
+
+      const diferencia = nuevoValor - incapacidadesObj.value.diasEconomicosPrevios // Diferencia entre lo que ya se descontó y lo nuevo
+      if (diferencia <= usuarioSeleccionado.value.diasEconomicosRestantes && nuevoValor <= incapacidadesObj.value.diasIncapacidad) {
+        return true
+      } else {
+        return `No puedes descontar más días de los disponibles.`
+      }
+    }
+
+    const updateDescuentoDiasEconomicos = (value) => {
+        incapacidadesObj.value.descuentoDiasEconomicos = value
+        if (!value) {
+          incapacidadesObj.value.numeroDiasEconomicos = null
+        }
+    }
+
     return {
       abrir,
       abrirUrl,
@@ -724,7 +798,9 @@ export default {
       onRejected,
       counterLabel ({ totalSize }) {
         return `${totalSize} / 15 MB`
-      }
+      },
+      revisarDiasEconomicos,
+      updateDescuentoDiasEconomicos
     }
   },
 }

@@ -73,7 +73,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
               'Content-Type': 'multipart/form-data'
             }
           })
-          if(incapacidadesObj.archivoSt7.name || incapacidadesObj.archivoSt2.name || incapacidadesObj.archivoSiaat.name){
+          if(incapacidadesObj.archivoSt7?.name || incapacidadesObj.archivoSt2?.name || incapacidadesObj.archivoSiaat?.name){
             await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nuevo archivo seguimiento de Incapacidad`, usuarioNomina.data[0]?.usuario?.correo?usuarioNomina.data[0]?.usuario?.correo:['amagdaleno@gruver.mx'], true, incapacidadesObj.archivoSt7?.name, incapacidadesObj.archivoSt2?.name, incapacidadesObj.archivoSiaat?.name)
           }
           const index = incapacidades.value.findIndex(incapacidad => incapacidad.idIncapacidadNomina === incapacidadesObj.diasIncapacidadesNomina.idIncapacidadNomina)
@@ -81,6 +81,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
           incapacidades.value[index] = data
           incapacidadesFiltrados.value[indexFiltro] = data
           notificacion('positive', 'Registro actualizado exitosamente')
+          return data
       } catch (error) {
           notificacion('negative', error.response.data.message)
       }finally{

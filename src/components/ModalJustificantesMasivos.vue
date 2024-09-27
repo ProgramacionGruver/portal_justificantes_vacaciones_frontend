@@ -14,7 +14,6 @@
               class="q-mb-md"
               outlined
               v-model="solicitudObj.motivo"
-              label="Escribe el motivo"
             />
             <label>Descripción: <span style="color: red;">*</span></label>
             <q-input
@@ -23,7 +22,6 @@
               outlined
               autogrow
               v-model="solicitudObj.descripcionMotivo"
-              label="Describe del motivo"
             />
             <q-card-section class="col-6 q-py-none">
                   <label>Tipo de pase <span style="color: red;">*</span></label>

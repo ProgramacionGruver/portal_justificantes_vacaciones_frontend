@@ -12,15 +12,15 @@
       row-key="numero_empleado"
     >
       <template v-slot:top>
-        <div class="contenedor--top">
-          <div>
-            <q-input outlined dense v-model="buscar" placeholder="Buscar">
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </div>
-          <div class="fechas--asistencias">
+        <div class="fit row q-gutter-sm q-mb-sm justify-end">
+          <div class="col">
+              <q-input outlined dense v-model="buscar" :disable="cargando" placeholder="Buscar">
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </div>
+          <div class="fechas--asistencias q-pr-md">
             <div>
               <q-input
                 dense
@@ -44,8 +44,9 @@
           </div>
           <q-btn
             color="green"
-            label="Exportar a Excel"
-            icon="get_app"
+            icon-right="description"
+            label="Descargar"
+            no-caps
             dense
             :disable="cargando"
             @click="exportarExcel"
