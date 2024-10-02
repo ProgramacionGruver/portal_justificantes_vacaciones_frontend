@@ -50,6 +50,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
           incapacidades.value = [data, ...incapacidades.value]
           incapacidadesFiltrados.value = [data, ...incapacidadesFiltrados.value]
           notificacion('positive', 'Registro agregado exitosamente')
+          return data
       } catch (error) {
           notificacion('negative', error.response.data.message)
       }finally{

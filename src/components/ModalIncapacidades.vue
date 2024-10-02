@@ -225,7 +225,7 @@
                   accept=".pdf, .PDF pdf/*"
                   counter
                   :counter-label="counterLabel"
-                  max-file-size="15000000"
+                  max-file-size="5000000"
                   @rejected="onRejected"
                 >
               </q-file>
@@ -241,7 +241,7 @@
                     accept=".pdf, .PDF pdf/*"
                     counter
                     :counter-label="counterLabel"
-                    max-file-size="15000000"
+                    max-file-size="5000000"
                     @rejected="onRejected"
                   >
                   </q-file>
@@ -275,7 +275,7 @@
                   accept=".pdf, .PDF pdf/*"
                   counter
                   :counter-label="counterLabel"
-                  max-file-size="15000000"
+                  max-file-size="5000000"
                   @rejected="onRejected"
                 >
               </q-file>
@@ -291,7 +291,7 @@
                     accept=".pdf, .PDF pdf/*"
                     counter
                     :counter-label="counterLabel"
-                    max-file-size="15000000"
+                    max-file-size="5000000"
                     @rejected="onRejected"
                   >
                   </q-file>
@@ -311,7 +311,7 @@
                   accept=".pdf, .PDF pdf/*"
                   counter
                   :counter-label="counterLabel"
-                  max-file-size="15000000"
+                  max-file-size="5000000"
                   @rejected="onRejected"
                 >
               </q-file>
@@ -327,7 +327,7 @@
                     accept=".pdf, .PDF pdf/*"
                     counter
                     :counter-label="counterLabel"
-                    max-file-size="15000000"
+                    max-file-size="5000000"
                     @rejected="onRejected"
                   >
                   </q-file>
@@ -346,7 +346,7 @@
                   accept=".pdf, .PDF pdf/*"
                   counter
                   :counter-label="counterLabel"
-                  max-file-size="15000000"
+                  max-file-size="5000000"
                   @rejected="onRejected"
                 >
               </q-file>
@@ -362,7 +362,7 @@
                     accept=".pdf, .PDF pdf/*"
                     counter
                     :counter-label="counterLabel"
-                    max-file-size="15000000"
+                    max-file-size="5000000"
                     @rejected="onRejected"
                   >
                   </q-file>
@@ -612,7 +612,11 @@ export default {
         archivoSt2: documentoSt2.value,
         archivoSiaat: documentoSiaat.value
       }
-      await agregarIncapacidades(objIncapacidad.value)
+      const incapacidad = await agregarIncapacidades(objIncapacidad.value)
+      if(incapacidad.usuario){
+        const index = opcionesColaboradores.value.findIndex(empleado => empleado.value.numero_empleado === usuarioSeleccionado.value.numero_empleado)
+        opcionesColaboradores.value[index].value = incapacidad.usuario
+      }
       abrirModal.value = false
     }
 
@@ -725,7 +729,7 @@ export default {
 
     const onRejected = (rejectedEntries) => {
       if (rejectedEntries[0].failedPropValidation === 'max-file-size') {
-        notificacion('warning', 'El archivo es mayor a 15 megas')
+        notificacion('warning', 'El archivo es mayor a 5 megas')
       } else if (rejectedEntries[0].failedPropValidation === 'accept') {
         notificacion('warning', 'El archivo no es un archivo pdf')
       }
@@ -746,7 +750,7 @@ export default {
       if (diferencia <= usuarioSeleccionado.value.diasEconomicosRestantes && nuevoValor <= incapacidadesObj.value.diasIncapacidad) {
         return true
       } else {
-        return `No puedes descontar más días de los disponibles.`
+        return `Digite una cantidad valida de días.`
       }
     }
 
@@ -797,7 +801,7 @@ export default {
       },
       onRejected,
       counterLabel ({ totalSize }) {
-        return `${totalSize} / 15 MB`
+        return `${totalSize} / 5 MB`
       },
       revisarDiasEconomicos,
       updateDescuentoDiasEconomicos

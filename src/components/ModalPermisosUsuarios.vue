@@ -103,6 +103,7 @@ export default {
     }
 
     const seleccionarUsuario = async () => {
+      tickedSeleccionados.value = []
       if (usuarioSeleccionado.value !== null) {
         // Itera sobre cada módulo
       listaModulos.value.forEach((modulo) => {
