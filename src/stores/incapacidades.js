@@ -32,7 +32,8 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
 
     const agregarIncapacidades = async (incapacidadesObj) => {
       try {
-          const usuarioNomina = await apiUsuarios.post('/obtener/cargos', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuesto: 'CONOM' })
+          const usuariosNomina = await apiUsuarios.post('/obtener/cargos/multiples', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuestos: ['CONOM', 'AUXNOM'] })
+          const correosDestinatarios = [ usuariosNomina.data[0]?.usuario?.correo, usuariosNomina.data[1]?.usuario?.correo]
           cargando.value= true
           const formData = new FormData()
           formData.append('archivo', incapacidadesObj.archivo)
@@ -46,7 +47,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
               'Content-Type': 'multipart/form-data'
             }
           })
-          await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nueva Incapacidad`, usuarioNomina.data[0]?.usuario?.correo?usuarioNomina.data[0]?.usuario?.correo:['amagdaleno@gruver.mx'])
+          await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nueva Incapacidad`, correosDestinatarios?correosDestinatarios:['amagdaleno@gruver.mx'])
           incapacidades.value = [data, ...incapacidades.value]
           incapacidadesFiltrados.value = [data, ...incapacidadesFiltrados.value]
           notificacion('positive', 'Registro agregado exitosamente')
@@ -60,7 +61,8 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
 
     const actualizarIncapacidades = async (incapacidadesObj) => {
       try {
-          const usuarioNomina = await apiUsuarios.post('/obtener/cargos', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuesto: 'CONOM' })
+          const usuariosNomina = await apiUsuarios.post('/obtener/cargos/multiples', { claveEmpresa: incapacidadesObj.diasIncapacidadesNomina.claveEmpresa, claveSucursal: incapacidadesObj.diasIncapacidadesNomina.claveSucursal, clavePuestos: ['CONOM', 'AUXNOM'] })
+          const correosDestinatarios = [ usuariosNomina.data[0]?.usuario?.correo, usuariosNomina.data[1]?.usuario?.correo]
           cargando.value= true
           const formData = new FormData()
           formData.append('archivo', incapacidadesObj.archivo)
@@ -75,7 +77,7 @@ export const useIncapacidadesStore = defineStore("incapacidades", () => {
             }
           })
           if(incapacidadesObj.archivoSt7?.name || incapacidadesObj.archivoSt2?.name || incapacidadesObj.archivoSiaat?.name){
-            await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nuevo archivo seguimiento de Incapacidad`, usuarioNomina.data[0]?.usuario?.correo?usuarioNomina.data[0]?.usuario?.correo:['amagdaleno@gruver.mx'], true, incapacidadesObj.archivoSt7?.name, incapacidadesObj.archivoSt2?.name, incapacidadesObj.archivoSiaat?.name)
+            await enviarCorreoForm(incapacidadesObj.diasIncapacidadesNomina, incapacidadesObj.diasIncapacidadesNomina.urlDocumento, `Nuevo archivo seguimiento de Incapacidad`, correosDestinatarios?correosDestinatarios:['amagdaleno@gruver.mx'], true, incapacidadesObj.archivoSt7?.name, incapacidadesObj.archivoSt2?.name, incapacidadesObj.archivoSiaat?.name)
           }
           const index = incapacidades.value.findIndex(incapacidad => incapacidad.idIncapacidadNomina === incapacidadesObj.diasIncapacidadesNomina.idIncapacidadNomina)
           const indexFiltro = incapacidadesFiltrados.value.findIndex(incapacidad => incapacidad.idIncapacidadNomina === incapacidadesObj.diasIncapacidadesNomina.idIncapacidadNomina)
