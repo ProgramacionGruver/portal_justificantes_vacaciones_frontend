@@ -95,10 +95,17 @@ export default {
 
     const columns = [
       {
+        name: 'nombreCompleto',
+        label: 'Nombre Completo',
+        field: (row) => row.usuario?.nombre,
+        align: 'center',
+        sortable: true
+      },
+      {
         name: 'folio',
         label: 'Folio',
-        field: 'folio',
-        align: 'center',
+        field: row => row.folio.slice(-4),
+        align: 'left',
         sortable: true
       },
       {
