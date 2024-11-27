@@ -93,7 +93,7 @@
   </div>
 </template>
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed  } from 'vue'
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { useEmpresasStore } from 'src/stores/empresas'
@@ -149,8 +149,10 @@ export default {
     const cargando = ref(false)
     const modalCatalogo = ref(null)
     const permisoEditar = ref(false)
+    const permisoAgregar = ref(true)
 
-    const columns = [
+    const columns = computed(() => {
+      return  [
       {
         name: "numero_empleado",
         label: "Numero Empleado",
@@ -226,21 +228,24 @@ export default {
         label: "Días Ganados",
         align: "left",
         field: "diasGanados",
-        sortable: true
+        sortable: true,
+        visible: permisoAgregar.value
       },
       {
         name: "sabados5s",
         label: "Sabados 5s",
         align: "left",
         field: "sabados5s",
-        sortable: true
+        sortable: true,
+        visible: permisoAgregar.value
       },
       {
         name: "vacacionesVencidas",
         label: "Días Vacaciones Vencidos",
         align: "left",
         field: "vacacionesVencidas",
-        sortable: true
+        sortable: true,
+        visible: permisoAgregar.value
       },
       {
         name: "turnoLunesViernes",
@@ -261,7 +266,8 @@ export default {
         align: "left",
         field: "acciones",
       },
-    ]
+      ].filter(column => column.visible !== false);
+    })
 
     onMounted(async () => {
       try{
@@ -276,6 +282,7 @@ export default {
         await obtenerCatalogoTurnos()
         await filtrar('TODASEMPRESAS')
         permisoEditar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.actualizar === true)
+        permisoAgregar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.agregar === true)
       }catch{
 
       }finally{
@@ -342,7 +349,6 @@ export default {
 
     }
 
-
     return {
       buscar: ref(''),
       columns,
@@ -379,7 +385,8 @@ export default {
       listaTurnosSabados,
       todosTurnosSabadosSeleccionados,
       opcionesTurnos,
-      permisoEditar
+      permisoEditar,
+      permisoAgregar
     }
   }
 }

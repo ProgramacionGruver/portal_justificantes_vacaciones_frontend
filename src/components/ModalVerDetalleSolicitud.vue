@@ -57,6 +57,15 @@
             <q-td v-for="columna in props.cols" :key="columna.name" :props="props">
               {{ columna.value }}
             </q-td>
+            <q-td>
+              <q-btn
+                v-if="eliminar && props.row.catalogo_estatus?.idEstatusSolicitud === 2"
+                label="Cancelar"
+                color="red"
+                dense
+                @click="cancelarDias(props.row)"
+              />
+            </q-td>
           </q-tr>
           <q-tr v-show="filasExpandidas[props.row.idSolicitudDetalle]" :props="props">
             <q-td colspan="100%">
@@ -85,6 +94,9 @@
 <script>
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useJustificantesVacacionesStore } from "src/stores/justificantesVacaciones"
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 
 export default {
   setup() {
@@ -93,6 +105,13 @@ export default {
     const modalDetalleSolicitud = ref(false)
     const solicitud = ref(null)
     const filasExpandidas = ref({})
+    const eliminar = ref(null)
+
+    const useJustificantesVacaciones = useJustificantesVacacionesStore()
+    const { cancelarAutorizaciones } = useJustificantesVacaciones
+
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
     const columnasDetalles = [
       {
@@ -125,10 +144,18 @@ export default {
       filasExpandidas.value[id] = !filasExpandidas.value[id]
     }
 
-    const abrir = (detalle) => {
+    const cancelarDias = async(row) => {
+      const objAutorizacion = {...row, ...usuarioAutenticado.value}
+      const nuevaAutorizacion = await cancelarAutorizaciones(objAutorizacion)
+      const detalleIndex = solicitud.value.solicitud_detalles.findIndex(e => e.idSolicitudDetalle === objAutorizacion.idSolicitudDetalle)
+      solicitud.value.solicitud_detalles[detalleIndex] = nuevaAutorizacion
+    }
+
+    const abrir = (detalle, permisoEliminar) => {
       solicitud.value = detalle
       filasExpandidas.value = {}
       modalDetalleSolicitud.value = true
+      eliminar.value = permisoEliminar
     }
 
     return {
@@ -141,6 +168,8 @@ export default {
       alternarExpandir,
       abrir,
       formatearFecha,
+      eliminar,
+      cancelarDias
     }
   }
 }

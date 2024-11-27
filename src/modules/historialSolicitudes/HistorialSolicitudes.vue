@@ -103,6 +103,7 @@ import { useEmpresasStore } from 'src/stores/empresas'
 import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
+import { useAutenticacionStore } from "src/stores/autenticaciones"
 import { storeToRefs } from 'pinia'
 import { formatearFecha } from 'src/helpers/formatearFecha'
 import { obtenerPropsQChip, obtenerTextoAutorizacion } from 'src/helpers/autorizacionesSolicitud.js'
@@ -126,6 +127,9 @@ export default {
     const { listaClavesDepartamentos, departamentos, departamentosFiltrados, modelDepartamentosSeleccionados, todosDepartamentosSeleccionados } = storeToRefs(useDepartamentos)
     const { obtenerDepartamentos } = useDepartamentos
 
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
+
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
     const { obtenerTodasSolicitudes } = useJustificantesVacaciones
     const { todosMotivosFiltrados, todosMotivosSeleccionados, motivosSeleccionados, listaIdsMotivos, todosTipoSolicitudesFiltrados
@@ -133,6 +137,8 @@ export default {
 
     const modalDetalle = ref(null)
     const cargandoHistorialSolicitudes = ref(false)
+    const modulo = ref({})
+    const eliminar = ref(false)
     const hoy = new Date()
     hoy.setDate(hoy.getDate() - 1)
     const unaSemanaAntes = new Date()
@@ -198,6 +204,8 @@ export default {
         }
         await obtenerTodasSolicitudes(objBusqueda.value)
         await filtrar('TODASEMPRESAS')
+        modulo.value = usuarioAutenticado.value.modulos.find(modulo => modulo.idModulo === 53)
+        eliminar.value = modulo.value.eliminar
       } catch {
 
       } finally {
@@ -206,7 +214,7 @@ export default {
     })
 
     const verDetalleSolicitud = (row) => {
-      modalDetalle.value.abrir(row)
+      modalDetalle.value.abrir(row, eliminar.value)
     }
 
     const filtrar = async (tipoFiltro) => {

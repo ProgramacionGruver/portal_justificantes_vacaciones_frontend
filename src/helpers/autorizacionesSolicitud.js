@@ -1,10 +1,12 @@
 export const obtenerPropsQChip = (detalles) => {
   const AUTORIZADO = 2
   const RECHAZADO = 3
+  const CANCELADO = 4
 
   const todosTerminados = detalles.every(detalle =>
     detalle.idEstatusSolicitud === AUTORIZADO ||
-    detalle.idEstatusSolicitud === RECHAZADO
+    detalle.idEstatusSolicitud === RECHAZADO  ||
+    detalle.idEstatusSolicitud === CANCELADO
   )
 
   return todosTerminados

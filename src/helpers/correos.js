@@ -466,6 +466,15 @@ export const mensajeOrdenesDeServicioProceso = (ordenes, ordenesZonas) => {
                   <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaTermino)}</td>
                 </tr>`
 
+        if (incapacidadObj.descuentoDiasEconomicos) {
+          cuerpoTabla += `
+               <tr>
+                  <td style='padding: 12px;'>Descuento dias economicos:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.numeroDiasEconomicos}</td>
+              </tr>
+          `
+        }
+
         finalTabla = `
                 <tr>
                   <td style='padding: 12px;'>Haz click aqui para ver el documento:</td>
@@ -537,6 +546,15 @@ export const mensajeOrdenesDeServicioProceso = (ordenes, ordenesZonas) => {
                   <td style='padding: 12px;'>Fecha Termino:</td>
                   <td style='padding: 12px;'>${formatearFechaCorreo(incapacidadObj.fechaTermino)}</td>
                 </tr>`
+
+        if (incapacidadObj.descuentoDiasEconomicos) {
+          cuerpoTabla += `
+               <tr>
+                  <td style='padding: 12px;'>Descuento dias economicos:</td>
+                  <td style='padding: 12px;'>${incapacidadObj.numeroDiasEconomicos}</td>
+              </tr>
+          `
+        }
 
         if (archivoSt7) {
           finalTabla += `

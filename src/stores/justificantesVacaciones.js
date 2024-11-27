@@ -452,6 +452,30 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
+  const cancelarAutorizaciones = async (autorizacionObj) => {
+    try {
+      const { data } = await api.post('/cancelarAutorizaciones', autorizacionObj)
+      actualizarArreglo(historialSolicitudes.value, autorizacionObj, data)
+      actualizarArreglo(historialSolicitudesFiltradas.value, autorizacionObj, data)
+      notificacion('positive', 'Dia cancelado exitosamente')
+      return data
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    }
+  }
+
+  const actualizarArreglo = (arreglo, autorizacionObj, data) => {
+    const solicitudIndex = arreglo.findIndex(solicitud => solicitud.folio === autorizacionObj.folio)
+    if (solicitudIndex !== -1) {
+      const detalleIndex = arreglo[solicitudIndex].solicitud_detalles.findIndex(
+        detalle => detalle.idSolicitudDetalle === autorizacionObj.idSolicitudDetalle
+      )
+      if (detalleIndex !== -1) {
+        arreglo[solicitudIndex].solicitud_detalles[detalleIndex] = { ...arreglo[solicitudIndex].solicitud_detalles[detalleIndex], data }
+      }
+    }
+  }
+
   return {
     todosEstatus,
     todosEstatusFiltrados,
@@ -502,6 +526,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     solicitarCapacitaciones,
     obtenerAutorizacionesPorEmpleado,
     obtenerJustificantesMasivos,
-    agregarJustificantesMasivos
+    agregarJustificantesMasivos,
+    cancelarAutorizaciones
   }
 })
