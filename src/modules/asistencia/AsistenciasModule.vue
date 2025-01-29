@@ -2,135 +2,54 @@
   <div class="q-pa-md">
     <h2>Reporte de Asistencias</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table
-      :columns="columns"
-      :rows="asistenciasFiltradas"
-      :loading="cargando"
-      :filter="buscar"
-      no-data-label="No se encontró informacion disponible."
-      loading-label="Buscando información. . . "
-      row-key="numero_empleado"
-    >
+    <q-table :columns="columns" :rows="asistenciasFiltradas" :loading="cargando" :filter="buscar"
+      no-data-label="No se encontró informacion disponible." loading-label="Buscando información. . . "
+      row-key="numero_empleado">
       <template v-slot:top>
         <div class="fit row q-gutter-sm q-mb-sm justify-end">
           <div class="col">
-              <q-input outlined dense v-model="buscar" :disable="cargando" placeholder="Buscar">
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </div>
+            <q-input outlined dense v-model="buscar" :disable="cargando" placeholder="Buscar">
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
           <div class="fechas--asistencias q-pr-md">
             <div>
-              <q-input
-                dense
-                filled
-                v-model="objBusqueda.fechaInicio"
-                type="date"
-                @update:model-value="limpiarFechaFin()"
-                :disable="cargando"
-              />
+              <q-input dense filled v-model="objBusqueda.fechaInicio" type="date"
+                @update:model-value="limpiarFechaFin()" :disable="cargando" />
             </div>
             <div>
-              <q-input
-                dense
-                filled
-                v-model="objBusqueda.fechaFin"
-                type="date"
-                @update:model-value="busquedaFechas()"
-                :disable="cargando"
-              />
+              <q-input dense filled v-model="objBusqueda.fechaFin" type="date" @update:model-value="busquedaFechas()"
+                :disable="cargando" />
             </div>
           </div>
-          <q-btn
-            color="green"
-            icon-right="description"
-            label="Descargar"
-            no-caps
-            dense
-            :disable="cargando"
-            @click="exportarExcel"
-            v-if="permisoDescargar"
-          />
+          <q-btn color="green" icon-right="description" label="Descargar" no-caps dense :disable="cargando"
+            @click="exportarExcel" v-if="permisoDescargar" />
         </div>
         <div class="asistencias--select">
-          <q-btn-dropdown
-            dense
-            outline
-            class="q-my-sm"
-            color="grey"
-            label="Empresas"
-            :disable="cargando"
-          >
-            <q-checkbox
-              class="q-pa-md"
-              dense
-              :disable="todasEmpresasSeleccionadas"
-              v-model="todasEmpresasSeleccionadas"
-              label="Todas"
-              @update:model-value="filtrar('TODASEMPRESAS')"
-            />
+          <q-btn-dropdown dense outline class="q-my-sm" color="grey" label="Empresas" :disable="cargando">
+            <q-checkbox class="q-pa-md" dense :disable="todasEmpresasSeleccionadas" v-model="todasEmpresasSeleccionadas"
+              label="Todas" @update:model-value="filtrar('TODASEMPRESAS')" />
             <q-separator class="q-mx-md bg-gray"></q-separator>
-            <q-option-group
-              class="q-pa-md"
-              dense
-              :options="empresasFiltradas"
-              v-model="modelEmpresasSeleccionadas"
-              @update:model-value="filtrar('OPCIONESEMPRESAS')"
-              type="checkbox"
-            />
+            <q-option-group class="q-pa-md" dense :options="empresasFiltradas" v-model="modelEmpresasSeleccionadas"
+              @update:model-value="filtrar('OPCIONESEMPRESAS')" type="checkbox" />
           </q-btn-dropdown>
-          <q-btn-dropdown
-            dense
-            outline
-            class="q-my-sm"
-            color="grey"
-            label="Sucursales"
-            :disable="cargando"
-          >
-            <q-checkbox
-              class="q-pa-md"
-              dense
-              :disable="todasSucursalesSeleccionadas"
-              v-model="todasSucursalesSeleccionadas"
-              label="Todas"
-              @update:model-value="filtrar('TODASSUCURSALES')"
-            />
+          <q-btn-dropdown dense outline class="q-my-sm" color="grey" label="Sucursales" :disable="cargando">
+            <q-checkbox class="q-pa-md" dense :disable="todasSucursalesSeleccionadas"
+              v-model="todasSucursalesSeleccionadas" label="Todas" @update:model-value="filtrar('TODASSUCURSALES')" />
             <q-separator class="q-mx-sm bg-gray"></q-separator>
-            <q-option-group
-              class="q-pa-md"
-              dense
-              :options="sucursalesFiltradas"
-              v-model="modelSucursalesSeleccionadas"
-              @update:model-value="filtrar('OPCIONESSUCURSALES')"
-              type="checkbox"
-            />
+            <q-option-group class="q-pa-md" dense :options="sucursalesFiltradas" v-model="modelSucursalesSeleccionadas"
+              @update:model-value="filtrar('OPCIONESSUCURSALES')" type="checkbox" />
           </q-btn-dropdown>
-          <q-btn-dropdown
-            dense
-            outline
-            class="q-my-sm"
-            color="grey"
-            label="Departamentos"
-            :disable="cargando"
-          >
-            <q-checkbox
-              class="q-pa-md"
-              dense
-              :disable="todosDepartamentosSeleccionados"
-              v-model="todosDepartamentosSeleccionados"
-              label="Todos"
-              @update:model-value="filtrar('TODOSDEPARTAMENTOS')"
-            />
+          <q-btn-dropdown dense outline class="q-my-sm" color="grey" label="Departamentos" :disable="cargando">
+            <q-checkbox class="q-pa-md" dense :disable="todosDepartamentosSeleccionados"
+              v-model="todosDepartamentosSeleccionados" label="Todos"
+              @update:model-value="filtrar('TODOSDEPARTAMENTOS')" />
             <q-separator class="q-mx-sm bg-gray"></q-separator>
-            <q-option-group
-              class="q-pa-md"
-              dense
-              :options="departamentosFiltrados"
-              v-model="modelDepartamentosSeleccionados"
-              @update:model-value="filtrar('OPCIONESDEPARTAMENTOS')"
-              type="checkbox"
-            />
+            <q-option-group class="q-pa-md" dense :options="departamentosFiltrados"
+              v-model="modelDepartamentosSeleccionados" @update:model-value="filtrar('OPCIONESDEPARTAMENTOS')"
+              type="checkbox" />
           </q-btn-dropdown>
         </div>
       </template>
@@ -144,30 +63,15 @@
               <div v-if="col.value.estado === 'COMPLETO'">
                 {{ col.value.value }}
               </div>
-              <q-btn
-                v-else-if="
-                  col.value.estado === 'RETARDO' ||
-                  col.value.estado === 'FALTA' ||
-                  col.value.estado === 'TURNO ESPECIAL' ||
-                  col.value.estado === 'DIA FERIADO'
-                "
-                class="q-mx-sm text-white"
-                size="1.2rem"
-                unelevated
-                rounded
-                :color="colorBoton(col.value)"
-                :label="col.value.value"
-              />
-              <q-btn
-                v-else
-                class="q-mx-sm text-white"
-                size="1.2rem"
-                unelevated
-                rounded
-                :color="colorBoton(col.value)"
-                :label="col.value.value"
-                @click="verSolicitud(col.value.solicitud)"
-              />
+              <q-btn v-else-if="
+                col.value.estado === 'RETARDO' ||
+                col.value.estado === 'FALTA' ||
+                col.value.estado === 'TURNO ESPECIAL' ||
+                col.value.estado === 'DIA FERIADO'
+              " class="q-mx-sm text-white" size="1.2rem" unelevated rounded :color="colorBoton(col.value)"
+                :label="col.value.value" />
+              <q-btn v-else class="q-mx-sm text-white" size="1.2rem" unelevated rounded :color="colorBoton(col.value)"
+                :label="col.value.value" @click="verSolicitud(col.value.solicitud)" />
             </template>
           </q-td>
         </q-tr>
@@ -329,9 +233,8 @@ export default {
             const fechaRegistro = fechasPorSemanaYDia[semana][dia];
             dynamicColumns.value.push({
               name: columnName,
-              label: `${formatearFecha(fechaRegistro)} ${
-                dia.charAt(0).toUpperCase() + dia.slice(1)
-              }`,
+              label: `${formatearFecha(fechaRegistro)} ${dia.charAt(0).toUpperCase() + dia.slice(1)
+                }`,
               align: "center",
               field: (row) => {
                 const diaData = row.semanas[semana] && row.semanas[semana][dia];
@@ -492,24 +395,32 @@ export default {
           SUCURSAL: asistencia.claveSucursal,
           DEPARTAMENTO: asistencia.claveDepartamento,
         };
+
         Object.keys(asistencia.semanas).forEach((semana) => {
           Object.keys(asistencia.semanas[semana]).forEach((dia) => {
             const registroDia = asistencia.semanas[semana][dia];
             if (registroDia) {
-              asistenciaExportar[
-                `${formatearFecha(registroDia.fechaRegistro)}`
-              ] = registroDia.solicitud
-                ? registroDia.solicitud.nombreSolicitud
-                : registroDia.retardo
-                ? "RETARDO"
-                : registroDia.sinTurno
-                ? "SIN TURNO"
-                : registroDia.horaRegistro
-                ? registroDia.horaRegistro
-                : "FALTA";
+              let valor;
+
+              if (asistencia.turnoEspecialSemana) {
+                valor = asistencia.turnoEspecialSemana.turno.toUpperCase();
+              } else if (registroDia.solicitud) {
+                valor = registroDia.solicitud.nombreSolicitud;
+              } else if (registroDia.retardo) {
+                valor = "RETARDO";
+              } else if (registroDia.sinTurno) {
+                valor = "SIN TURNO";
+              } else if (registroDia.horaRegistro) {
+                valor = registroDia.horaRegistro;
+              } else {
+                valor = "FALTA";
+              }
+
+              asistenciaExportar[`${formatearFecha(registroDia.fechaRegistro)}`] = valor;
             }
           });
         });
+
         return asistenciaExportar;
       });
 
