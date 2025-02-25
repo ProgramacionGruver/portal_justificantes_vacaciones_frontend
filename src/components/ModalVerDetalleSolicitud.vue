@@ -145,7 +145,7 @@ export default {
     }
 
     const cancelarDias = async(row) => {
-      const objAutorizacion = {...row, ...usuarioAutenticado.value}
+      const objAutorizacion = {...row, solicitud:{...solicitud.value}, usuarioCancelacion:{...usuarioAutenticado.value}}
       const nuevaAutorizacion = await cancelarAutorizaciones(objAutorizacion)
       const detalleIndex = solicitud.value.solicitud_detalles.findIndex(e => e.idSolicitudDetalle === objAutorizacion.idSolicitudDetalle)
       solicitud.value.solicitud_detalles[detalleIndex] = nuevaAutorizacion
