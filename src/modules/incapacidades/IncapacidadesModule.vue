@@ -3,7 +3,7 @@
     <h2>Incapacidades</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
     <q-table :columns="columns" :rows="incapacidadesFiltrados" :loading="cargando" :filter="buscar" no-data-label="No se encontró informacion disponible."
-    loading-label="Buscando información. . . "  row-key="numero_empleado">
+    loading-label="Buscando información. . . " >
     <template v-slot:top>
           <div class="fit row q-gutter-sm q-mb-sm justify-end">
             <div class="col">
@@ -523,7 +523,7 @@ export default {
       }
 
       return {
-        buscar: ref(''),
+        buscar: ref(""),
         columns,
         cargando,
         incapacidadesFiltrados,

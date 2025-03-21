@@ -41,7 +41,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     try {
       const { data } = await apiUsuarios.post('/usuarios/login', usuario)
       isLogin.value = true
-      localStorage.setItem('token', data)
+      localStorage.setItem(`token${ID_SERVIDOR}`, data)
     } catch (error) {
       notificacion('negative', error.response.data.message)
     }
@@ -51,7 +51,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
   const cerrarSesion = async () => {
     try {
       usuarioAutenticado.value = null
-      localStorage.removeItem('token')
+      localStorage.removeItem(`token${ID_SERVIDOR}`)
       isLogin.value = false
     } catch (error) {
       // console.log(error)
@@ -59,7 +59,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
   }
 
   const autenticarUsuario = async () => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem(`token${ID_SERVIDOR}`)
     if (!token) {
       // console.log('No hay token')
       return
@@ -112,7 +112,7 @@ export const useAutenticacionStore = defineStore('autenticaciones', () => {
     try {
       const { data } = await apiUsuarios.post('/usuarios/loginNumEmpleado', { usuario })
       isLogin.value = true
-      localStorage.setItem('token', data)
+      localStorage.setItem(`token${ID_SERVIDOR}`, data)
     } catch (error) {
       notificacion('negative', error.response.data.message)
     }
