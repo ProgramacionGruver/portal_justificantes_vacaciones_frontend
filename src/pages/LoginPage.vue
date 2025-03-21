@@ -152,7 +152,33 @@
                   </q-input>
                 </div>
                 <div class="btn-login">
-                  <q-btn color="primary" type="submit" label="Iniciar Sesión" />
+                  <q-btn
+                    color="primary"
+                    type="submit"
+                    label="Iniciar Sesión"
+                    class="q-ml-md"
+                  />
+                  <q-btn
+                    color="primary"
+                    label="Olvidé mi contraseña"
+                    @click="redirigir"
+                    outline
+                  >
+                    <q-tooltip
+                      style="
+                        color: black;
+                        background-color: white;
+                        text-align: center;
+                        border: 1px solid black;
+                      "
+                    >
+                      <p class="text-bold text-h5">¿Olvidaste tu contraseña?</p>
+                      <p class="text-h5">
+                        Si olvidaste tu contraseña, da clic aquí para
+                        recuperarla.
+                      </p>
+                    </q-tooltip>
+                  </q-btn>
                 </div>
               </div>
             </q-form>
@@ -214,7 +240,10 @@ export default {
             objUsuario.value.usuario === null ||
             objUsuario.value.usuario === ""
           ) {
-            router.push("/cambiar/contrasena");
+            window.open(
+              `https://www.gruver.com.mx/portal_formularios/#/contrasenias/${ID_SERVIDOR}`,
+              "_self"
+            );
           } else {
             try {
               const infoUsuarioInicarSesion = {
@@ -246,6 +275,10 @@ export default {
       }
     };
 
+    const redirigir = () => {
+      window.location.href = `https://www.gruver.com.mx/portal_formularios/#/contrasenias/${ID_SERVIDOR}`;
+    };
+
     return {
       usuarioObj,
       isPassword,
@@ -253,6 +286,7 @@ export default {
       formulario,
       isLogin,
       tab,
+      redirigir,
     };
   },
 };
