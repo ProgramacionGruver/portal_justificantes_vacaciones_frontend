@@ -6,6 +6,7 @@ import { notificacion } from 'src/helpers/mensajes'
 import { apiForm } from 'src/boot/axiosForm'
 import { ID_FORM_JUSTIFICANTES_VACACIONES } from 'src/constant/servidor'
 import { mensajeCorreoAutorizacionJustificantesVacaciones } from 'src/helpers/correos'
+import { apiCorreo } from 'src/boot/axiosCorreo'
 
 export const useJustificantesVacacionesStore = defineStore('justificantesVacaciones', () => {
   const todosEstatus = ref([])
@@ -160,7 +161,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if(detalleJefeDirecto.value.numero_empleado === 1028){
+      if (detalleJefeDirecto.value.numero_empleado === 1028) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }
@@ -180,7 +181,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -208,7 +209,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -222,7 +223,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if(detalleJefeDirecto.value.numero_empleado === 1028){
+      if (detalleJefeDirecto.value.numero_empleado === 1028) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }
@@ -241,7 +242,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -255,7 +256,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if(detalleJefeDirecto.value.numero_empleado === 1028){
+      if (detalleJefeDirecto.value.numero_empleado === 1028) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }
@@ -274,7 +275,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -301,7 +302,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -315,7 +316,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if(detalleJefeDirecto.value.numero_empleado === 1028){
+      if (detalleJefeDirecto.value.numero_empleado === 1028) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }
@@ -334,7 +335,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -361,7 +362,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [destinatario])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [destinatario])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -375,7 +376,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if(detalleJefeDirecto.value.numero_empleado === 1028){
+      if (detalleJefeDirecto.value.numero_empleado === 1028) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }
@@ -395,7 +396,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
       await crearEventoForm(eventoObj)
 
-      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud}`, [emailJefeDirecto.value])
+      await enviarCorreoForm(data, urlForm.value, `Autorización de ${data.catalogo_tipo_solicitude.nombreSolicitud} - ${data.folio}`, [emailJefeDirecto.value])
 
       notificacion('positive', 'Solicitud generada exitosamente')
     } catch (error) {
@@ -418,7 +419,8 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
 
   const enviarCorreoForm = async (solicitudObj, url, titulo, destinatarios) => {
     try {
-      await apiForm.post('/eventoCorreo', { correo: destinatarios, titulo: titulo, mensaje: mensajeCorreoAutorizacionJustificantesVacaciones(solicitudObj, url) })
+      // await apiForm.post('/eventoCorreo', { correo: destinatarios, titulo: titulo, mensaje: mensajeCorreoAutorizacionJustificantesVacaciones(solicitudObj, url) })
+      await apiCorreo.post('/envio/correo', { destinatarios, copia: [], copiaOculta: [], asunto: titulo, html: mensajeCorreoAutorizacionJustificantesVacaciones(solicitudObj, url), adjuntos: [] })
     } catch (error) {
       notificacion('negative', 'Error al enviar el correo')
       console.error(error)

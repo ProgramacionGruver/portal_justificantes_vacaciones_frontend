@@ -7,8 +7,8 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const apiCorreo = axios.create({ baseURL: 'https://backend.gruver.com.mx/formularios/api/' })
-// const apiCorreo = axios.create({ baseURL: 'http://localhost:4001/api' })
+const apiCorreo = axios.create({ baseURL: 'https://backend.gruver.com.mx/correos/api/' })
+// const apiCorreo = axios.create({ baseURL: 'http://localhost:4014/correos/api/'})
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
