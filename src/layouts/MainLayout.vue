@@ -24,7 +24,7 @@
 
         <q-toolbar-title>
           <q-avatar class="logo-inicio">
-            <img src="https://backend.gruver.com.mx/componentes/navbar-26.webp" />
+            <img src="../img/logog.png" />
           </q-avatar>
           <span class="q-ml-sm">
             Portal de Justificantes, Vacaciones y Días económicos
