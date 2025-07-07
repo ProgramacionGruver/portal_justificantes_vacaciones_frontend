@@ -449,6 +449,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       justificantesMasivosFiltrados.value = [data, ...justificantesMasivosFiltrados.value]
     } catch (error) {
       notificacion('negative', error.response.data.message)
+      cargandoJustificantesMasivos.value = false
     } finally {
       cargandoJustificantesMasivos.value = false
     }

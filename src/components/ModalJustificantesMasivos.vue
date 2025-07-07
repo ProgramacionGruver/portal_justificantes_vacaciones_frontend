@@ -52,19 +52,51 @@
                <label>Seleccione los colaboradores a justificar <span style="color: red;">*</span></label>
                <q-table
                       class="q-mt-md"
-                      :rows="usuariosFiltrados"
+                      :rows="usuariosFiltradosVisibles"
                       :columns="columns"
                       row-key="numero_empleado"
                       :filter="buscar"
                       :pagination="{ rowsPerPage: 0 }"
                     >
                 <template v-slot:top>
-                  <div class="row q-gutter-sm q-mb-sm">
-                      <q-input outlined dense v-model="buscar" placeholder="Buscar">
-                        <template v-slot:append>
-                          <q-icon name="search" />
-                        </template>
-                      </q-input>
+                  <div class="q-mb-sm" style="width: 100%;">
+                    <q-input
+                      outlined
+                      dense
+                      v-model="buscar"
+                      placeholder="Buscar"
+                      class="full-width"
+                    >
+                      <template v-slot:append>
+                        <q-icon name="search" />
+                      </template>
+                    </q-input>
+                  </div>
+
+                  <div class="row justify-between q-gutter-sm q-mb-sm full-width">
+                    <q-btn
+                      dense
+                      outline
+                      label="Seleccionar todos"
+                      icon="done_all"
+                      @click="seleccionarTodos"
+                    />
+                    <q-btn
+                      dense
+                      outline
+                      label="Deseleccionar todos"
+                      icon="clear_all"
+                      color="negative"
+                      @click="deseleccionarTodos"
+                    />
+                    <q-btn
+                      dense
+                      outline
+                      :label="mostrarSoloSeleccionados ? 'Mostrar todos' : 'Solo seleccionados'"
+                      :icon="mostrarSoloSeleccionados ? 'list' : 'check'"
+                      color="info"
+                      @click="toggleMostrarSoloSeleccionados"
+                    />
                   </div>
                   <div class="filtros--historial">
                     <q-btn-dropdown dense outline class="col q-my-sm" color="grey" label="Empresas">
@@ -128,7 +160,7 @@
 </template>
 
 <script>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { storeToRefs } from "pinia"
 import { useCatalogosStore } from "src/stores/catalogos"
 import { useEmpresasStore } from "src/stores/empresas"
@@ -158,7 +190,7 @@ export default {
     const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { cargandoJustificantesMasivos } = useJustificantesVacaciones
+    const { cargandoJustificantesMasivos } = storeToRefs(useJustificantesVacaciones)
     const { agregarJustificantesMasivos } = useJustificantesVacaciones
 
     const opcionesTipoPase = [
@@ -184,6 +216,7 @@ export default {
     const usuarios = ref(catalogoUsuarios.value)
     const usuariosFiltrados = ref(catalogoUsuariosFiltrados.value)
     const solicitudObj = ref(solicitudObjInit)
+    const mostrarSoloSeleccionados = ref(false)
 
     const columns = [
       {
@@ -223,8 +256,8 @@ export default {
         solicitudObj.value = { ...solicitudObjInit }
         usuarios.value = catalogoUsuarios.value.filter(usuario => usuario.estatus === true)
         usuariosFiltrados.value = catalogoUsuariosFiltrados.value.filter(usuario => usuario.estatus === false)
-        usuarios.value.forEach(usuario => { usuario.selected = true})
-        usuariosFiltrados.value.forEach(usuario => { usuario.selected = true})
+        usuarios.value.forEach(usuario => { usuario.selected = false})
+        usuariosFiltrados.value.forEach(usuario => { usuario.selected = false})
         await filtrar('TODASEMPRESAS')
         abrirModal.value = true
     }
@@ -326,6 +359,29 @@ export default {
       abrirModal.value = false
     }
 
+    const seleccionarTodos = () => {
+      usuariosFiltrados.value.forEach(usuario => {
+        usuario.selected = true
+      })
+    }
+
+    const deseleccionarTodos = () => {
+      usuariosFiltrados.value.forEach(usuario => {
+        usuario.selected = false
+      })
+    }
+
+    const usuariosFiltradosVisibles = computed(() => {
+      if (mostrarSoloSeleccionados.value) {
+        return usuariosFiltrados.value.filter(u => u.selected)
+      }
+      return usuariosFiltrados.value
+    })
+
+    const toggleMostrarSoloSeleccionados = () => {
+      mostrarSoloSeleccionados.value = !mostrarSoloSeleccionados.value
+    }
+
     return {
       buscar: ref(''),
       abrir,
@@ -348,7 +404,22 @@ export default {
       modelDepartamentosSeleccionados,
       todosDepartamentosSeleccionados,
       validarPasoDos,
-      cargandoJustificantesMasivos
+      cargandoJustificantesMasivos,
+      seleccionarTodos,
+      deseleccionarTodos,
+      toggleMostrarSoloSeleccionados,
+      mostrarSoloSeleccionados,
+      usuariosFiltradosVisibles,
+      myLocale: {
+        /* starting with Sunday */
+        days: 'Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado'.split('_'),
+        daysShort: 'Dom_Lun_Mar_Mié_Jue_Vie_Sáb'.split('_'),
+        months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+        monthsShort: 'Ene_Feb_Mar_Abr_May_Jun_Jul_Ago_Sep_Oct_Nov_Dic'.split('_'),
+        firstDayOfWeek: 1, // 0-6, 0 - Sunday, 1 Monday, ...
+        format24h: true,
+        pluralDay: 'dias'
+      },
     }
   },
 }
