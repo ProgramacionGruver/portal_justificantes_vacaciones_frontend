@@ -2,7 +2,7 @@
   <div class="q-pa-md">
     <h2>Reporte de Asistencias</h2>
     <q-separator color="primary" class="q-mb-lg"></q-separator>
-    <q-table :columns="columns" :rows="asistenciasFiltradas" :loading="cargando" :filter="buscar"
+    <q-table class="copiable-tabla" :columns="columns" :rows="asistenciasFiltradas" :loading="cargando" :filter="buscar"
       no-data-label="No se encontró informacion disponible." loading-label="Buscando información. . . "
       row-key="numero_empleado">
       <template v-slot:top>
@@ -63,15 +63,41 @@
               <div v-if="col.value.estado === 'COMPLETO'">
                 {{ col.value.value }}
               </div>
-              <q-btn v-else-if="
+              <div v-else-if="
                 col.value.estado === 'RETARDO' ||
                 col.value.estado === 'FALTA' ||
                 col.value.estado === 'TURNO ESPECIAL' ||
-                col.value.estado === 'DIA FERIADO'
-              " class="q-mx-sm text-white" size="1.2rem" unelevated rounded :color="colorBoton(col.value)"
-                :label="col.value.value" />
-              <q-btn v-else class="q-mx-sm text-white" size="1.2rem" unelevated rounded :color="colorBoton(col.value)"
-                :label="col.value.value" @click="verSolicitud(col.value.solicitud)" />
+                col.value.estado === 'DIA FERIADO'"
+                class="q-mx-sm"
+                style="display: inline-flex;
+                align-items: center;">
+                <q-btn class="q-mx-sm text-white" size="1.2rem" unelevated rounded :color="colorBoton(col.value)"
+                  :label="col.value.value" />
+                <span
+                    style="position: absolute; left: -9999px; user-select: text;"
+                    aria-hidden="true"
+                  >
+                    {{ col.value.value }}
+                </span>
+              </div>
+              <div v-else class="q-mx-sm" style="display: inline-flex; align-items: center;">
+                  <q-btn
+                    class="text-white"
+                    size="1.2rem"
+                    unelevated
+                    rounded
+                    :color="colorBoton(col.value)"
+                    :label="col.value.value"
+                    @click="verSolicitud(col.value.solicitud)"
+                  />
+                  <span
+                    style="position: absolute; left: -9999px; user-select: text;"
+                    aria-hidden="true"
+                  >
+                    {{ col.value.value }}
+                  </span>
+              </div>
+
             </template>
           </q-td>
         </q-tr>
@@ -404,7 +430,9 @@ export default {
 
               if (asistencia.turnoEspecialSemana) {
                 valor = asistencia.turnoEspecialSemana.turno.toUpperCase();
-              } else if (registroDia.solicitud) {
+              } else if (asistencia.turnoEspecialSabado && dia === "sabado") {
+                valor = asistencia.turnoEspecialSabado.turno.toUpperCase();
+              }else if (registroDia.solicitud) {
                 valor = registroDia.solicitud.nombreSolicitud;
               } else if (registroDia.retardo) {
                 valor = "RETARDO";

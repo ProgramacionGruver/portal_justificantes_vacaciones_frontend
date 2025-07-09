@@ -56,3 +56,8 @@
   width: 45%;
   height: 4rem;
 }
+
+.copiable-tabla thead th,
+.copiable-tabla tbody td {
+  user-select: text;
+}
