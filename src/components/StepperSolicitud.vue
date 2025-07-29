@@ -608,10 +608,29 @@ export default {
       if ([VACACIONES, DIAS_ECONOMICOS, DIAS_GANADOS, VACACIONES_VENCIDAS].includes(solicitudObj.value.idTipoSolicitud)) {
         const fechaInvalida = nuevoValor?.some(fecha => dayjs(fecha).isBefore(inicioQuincenaActual, 'day'));
 
+        const fechaAlta = detalleUsuario.value.fechaAlta
+
+        const hoy = dayjs()
+        let aniversario = dayjs(fechaAlta).set('year', hoy.year())
+
+        if (aniversario.isBefore(hoy, 'day')) {
+          aniversario = aniversario.add(1, 'year')
+        }
+
+        detalleUsuario.value.fechaAniversario = aniversario.format('YYYY-MM-DD')
+        const fechaDespuesAniversario = nuevoValor?.some(fecha => !dayjs(fecha).isBefore(aniversario, 'day'))
+
         if (fechaInvalida) {
           errorSeleccion.value = true
           solicitudObj.value.fechasSeleccionadas = []
           notificacion('warning', `No puedes seleccionar días de la quincena anterior, periodo cerrado.`)
+          return
+        }
+
+         if (fechaDespuesAniversario && solicitudObj.value.idTipoSolicitud === VACACIONES) {
+          errorSeleccion.value = true
+          solicitudObj.value.fechasSeleccionadas = []
+          notificacion('warning', `No puedes seleccionar fechas que coincidan o superen tu próximo aniversario.`)
           return
         }
 
