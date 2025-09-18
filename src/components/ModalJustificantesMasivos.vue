@@ -1,6 +1,6 @@
 <template>
   <q-dialog persistent v-model="abrirModal">
-    <q-card style="min-width: 50vw;" >
+    <q-card style="min-width: 70vw;" >
       <q-card-section class="bg-primary text-white row items-center q-pb-none">
         <h2 class="text-h4">Agregar Justificante Masivo</h2>
         <q-space />
@@ -47,6 +47,15 @@
                     :locale="myLocale"></q-date>
                 </div>
               </div>
+              <div v-if="[VACACIONES].includes(solicitudObj.idMotivo)" class=" q-my-sm q-mb-lg">
+                <q-card-section>
+                  <label>Seleccione los días <span style="color: red;">*</span></label>
+                </q-card-section>
+                <div class="q-my-sm flex flex-center">
+                  <q-date landscape multiple mask="YYYY-MM-DD" v-model="solicitudObj.fechasSeleccionadas"
+                    :locale="myLocale"></q-date>
+                </div>
+              </div>
           </div>
           <div class="q-ma-md">
                <label>Seleccione los colaboradores a justificar <span style="color: red;">*</span></label>
@@ -56,7 +65,7 @@
                       :columns="columns"
                       row-key="numero_empleado"
                       :filter="buscar"
-                      :pagination="{ rowsPerPage: 0 }"
+                      :pagination="{ rowsPerPage: 10}"
                     >
                 <template v-slot:top>
                   <div class="q-mb-sm" style="width: 100%;">
@@ -205,6 +214,10 @@ export default {
       {
         label: 'Falta',
         value: 3
+      },
+      {
+        label: 'Vacaciones',
+        value: 7
       }
     ]
 
@@ -213,6 +226,8 @@ export default {
     const PASE_DE_ENTRADA = 1
     const PASE_DE_SALIDA = 2
     const FALTA = 3
+    const VACACIONES = 7
+
     const usuarios = ref(catalogoUsuarios.value)
     const usuariosFiltrados = ref(catalogoUsuariosFiltrados.value)
     const solicitudObj = ref(solicitudObjInit)
@@ -239,16 +254,18 @@ export default {
         sortable: true
       },
       {
+        name: "diasVacacionesRestantes",
+        label: "Dias Vacaciones Restantes",
+        align: "left",
+        field: "diasVacacionesRestantes",
+        sortable: true
+      },
+      {
         name: "puesto",
         label: "Puesto",
         align: "left",
         field: "puesto",
         sortable: true
-      },
-      {
-        name: "acciones",
-        align: "left",
-        field: "acciones",
       },
     ]
 
@@ -311,8 +328,12 @@ export default {
           notificarError()
         }
       }
-      if (idMotivo === FALTA) {
+      if (idMotivo === FALTA || idMotivo === VACACIONES) {
         if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0) {
+          if(idMotivo === VACACIONES){
+              const valido = validarVacaciones()
+             if (!valido) return
+          }
           validarPasoTres()
         } else {
           notificarError()
@@ -344,10 +365,17 @@ export default {
         return 0
       })
 
+      let idTipoSolicitud
+      if([VACACIONES].includes(idMotivo)){
+        idTipoSolicitud = 2
+      }else{
+        idTipoSolicitud = 1
+      }
+
       //Creo solicitudes por cada usuario seleccionado
       solicitudObj.value.solicitudes = usuariosFiltrados.value.filter(user => user.selected === true).map(usuario => ({
         ...usuario,
-        idTipoSolicitud: 1,
+        idTipoSolicitud,
         motivo,
         idMotivo,
         fechaDiaSolicitado,
@@ -357,6 +385,20 @@ export default {
       }))
       await agregarJustificantesMasivos(solicitudObj.value)
       abrirModal.value = false
+    }
+
+    const validarVacaciones = () => {
+      const diasSolicitados = solicitudObj.value.fechasSeleccionadas.length
+      for (const usuario of usuariosFiltrados.value.filter(u => u.selected === true)) {
+        if ((usuario.diasVacacionesRestantes ?? 0) < diasSolicitados) {
+          notificacion(
+            'warning',
+            `El usuario ${usuario.nombre} no cuenta con los días suficientes de vacaciones (${usuario.diasVacacionesRestantes} disponibles)`
+          )
+          return false
+        }
+      }
+      return true
     }
 
     const seleccionarTodos = () => {
@@ -391,6 +433,7 @@ export default {
       PASE_DE_ENTRADA,
       PASE_DE_SALIDA,
       FALTA,
+      VACACIONES,
       solicitudObj,
       opcionesTipoPase,
       usuariosFiltrados,
