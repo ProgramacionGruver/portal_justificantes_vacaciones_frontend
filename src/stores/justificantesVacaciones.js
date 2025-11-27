@@ -161,7 +161,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     try {
       cargandoEnvioSolicitud.value = true
 
-      if (detalleJefeDirecto.value.numero_empleado === 1028) {
+      if (detalleJefeDirecto.value.numero_empleado === 1028 && !(detalleUsuario.value.puesto === 'GERENTE REGIONAL' || detalleUsuario.value.numero_empleado === 8211 || detalleUsuario.value.numero_empleado === 7380 )) {
         detalleJefeDirecto.value = detalleGerenteSucursal.value
         emailJefeDirecto.value = detalleJefeDirecto.value.correo
       }

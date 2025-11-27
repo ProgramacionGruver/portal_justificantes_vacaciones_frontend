@@ -33,7 +33,7 @@
       <div class="row q-my-sm">
         <div class="col-12">
           <label>Descripción de motivos</label>
-          <q-input autogrow :label="`${solicitud.descripcionMotivo}`" outlined readonly />
+          <q-input autogrow v-model="solicitud.descripcionMotivo" outlined readonly />
         </div>
       </div>
       <p class="q-my-lg text-center">Autorizaciones</p>

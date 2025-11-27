@@ -366,7 +366,11 @@ export default {
     const step = ref(1)
     const previousStep = ref(1)
     const errorSeleccion = ref(false)
-    const opcionesUsuarios = ref(colaboradoresPortalSistemas.value)
+    const opcionesUsuarios = ref(
+      colaboradoresPortalSistemas.value.filter(
+        u => u.numero_empleado !== detalleUsuario.value.numero_empleado
+      )
+    )
 
     const AUSENCIAS_Y_RETARDOS = 1
     const VACACIONES = 2
@@ -598,7 +602,9 @@ export default {
       filtradoBusquedauUsuariosAcceso(
         val,
         update,
-        colaboradoresPortalSistemas.value,
+        colaboradoresPortalSistemas.value.filter(
+          u => u.numero_empleado !== detalleUsuario.value.numero_empleado
+        ),
         opcionesUsuarios
       )
     }
