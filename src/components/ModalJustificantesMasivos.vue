@@ -56,6 +56,23 @@
                     :locale="myLocale"></q-date>
                 </div>
               </div>
+              <div v-if="[DIAS_ECONOMICOS].includes(solicitudObj.idMotivo)" class=" q-my-sm q-mb-lg">
+                <q-card-section>
+                  <label>Seleccione el motivo <span style="color: red;">*</span></label>
+                </q-card-section>
+                <div class="q-my-sm flex flex-center">
+                  <q-option-group inline :options="opcionesMotivos" v-model="motivoDiasEconomicos"
+                    color="primary"></q-option-group>
+                </div>
+                <q-card-section>
+                  <label>Seleccione los días <span style="color: red;">*</span></label>
+                </q-card-section>
+                <div class="q-my-sm flex flex-center">
+                  <q-date landscape multiple mask="YYYY-MM-DD" v-model="solicitudObj.fechasSeleccionadas"
+                    :locale="myLocale"></q-date>
+                </div>
+
+              </div>
           </div>
           <div class="q-ma-md">
                <label>Seleccione los colaboradores a justificar <span style="color: red;">*</span></label>
@@ -218,7 +235,26 @@ export default {
       {
         label: 'Vacaciones',
         value: 7
+      },
+      {
+        label: 'Dias economicos',
+        value: 0
       }
+    ]
+
+    const opcionesMotivos = [
+      {
+        label: 'Fallecimiento de un familiar en primer grado',
+        value: 4
+      },
+      {
+        label: 'Enfermedad del empleado',
+        value: 5
+      },
+      {
+        label: 'Nacimiento de hijo/a',
+        value: 6
+      },
     ]
 
     const abrirModal = ref(false)
@@ -227,11 +263,13 @@ export default {
     const PASE_DE_SALIDA = 2
     const FALTA = 3
     const VACACIONES = 7
+    const DIAS_ECONOMICOS = 0
 
     const usuarios = ref(catalogoUsuarios.value)
     const usuariosFiltrados = ref(catalogoUsuariosFiltrados.value)
     const solicitudObj = ref(solicitudObjInit)
     const mostrarSoloSeleccionados = ref(false)
+    const motivoDiasEconomicos = ref(null)
 
     const columns = [
       {
@@ -258,6 +296,13 @@ export default {
         label: "Dias Vacaciones Restantes",
         align: "left",
         field: "diasVacacionesRestantes",
+        sortable: true
+      },
+      {
+        name: "diasEconomicosRestantes",
+        label: "Dias Economicos Restantes",
+        align: "left",
+        field: "diasEconomicosRestantes",
         sortable: true
       },
       {
@@ -328,11 +373,14 @@ export default {
           notificarError()
         }
       }
-      if (idMotivo === FALTA || idMotivo === VACACIONES) {
+      if (idMotivo === FALTA || idMotivo === VACACIONES || idMotivo === DIAS_ECONOMICOS) {
         if (verificarCamposCompletos([descripcionMotivo]) && fechasSeleccionadas?.length > 0) {
           if(idMotivo === VACACIONES){
               const valido = validarVacaciones()
              if (!valido) return
+          }else if(idMotivo === DIAS_ECONOMICOS){
+            const valido = validarDiasEconomicos()
+            if (!valido) return
           }
           validarPasoTres()
         } else {
@@ -365,11 +413,16 @@ export default {
         return 0
       })
 
-      let idTipoSolicitud
+      let idTipoSolicitud, idMotivoFin
       if([VACACIONES].includes(idMotivo)){
         idTipoSolicitud = 2
+        idMotivoFin = idMotivo
+      }else if([DIAS_ECONOMICOS].includes(idMotivo)){
+        idTipoSolicitud = 3
+        idMotivoFin = motivoDiasEconomicos.value
       }else{
         idTipoSolicitud = 1
+        idMotivoFin = idMotivo
       }
 
       //Creo solicitudes por cada usuario seleccionado
@@ -377,7 +430,7 @@ export default {
         ...usuario,
         idTipoSolicitud,
         motivo,
-        idMotivo,
+        idMotivo: idMotivoFin,
         fechaDiaSolicitado,
         horaDiaSolicitado,
         descripcionMotivo,
@@ -394,6 +447,20 @@ export default {
           notificacion(
             'warning',
             `El usuario ${usuario.nombre} no cuenta con los días suficientes de vacaciones (${usuario.diasVacacionesRestantes} disponibles)`
+          )
+          return false
+        }
+      }
+      return true
+    }
+
+    const validarDiasEconomicos = () => {
+      const diasSolicitados = solicitudObj.value.fechasSeleccionadas.length
+      for (const usuario of usuariosFiltrados.value.filter(u => u.selected === true)) {
+        if ((usuario.diasEconomicosRestantes ?? 0) < diasSolicitados) {
+          notificacion(
+            'warning',
+            `El usuario ${usuario.nombre} no cuenta con los días economicos suficientes (${usuario.diasEconomicosRestantes} disponibles)`
           )
           return false
         }
@@ -426,16 +493,17 @@ export default {
 
     return {
       buscar: ref(''),
-      abrir,
       abrirModal,
-      filtrar,
       columns,
       PASE_DE_ENTRADA,
       PASE_DE_SALIDA,
       FALTA,
       VACACIONES,
+      DIAS_ECONOMICOS,
       solicitudObj,
+      motivoDiasEconomicos,
       opcionesTipoPase,
+      opcionesMotivos,
       usuariosFiltrados,
       empresasFiltradas,
       modelEmpresasSeleccionadas,
@@ -446,11 +514,7 @@ export default {
       departamentosFiltrados,
       modelDepartamentosSeleccionados,
       todosDepartamentosSeleccionados,
-      validarPasoDos,
       cargandoJustificantesMasivos,
-      seleccionarTodos,
-      deseleccionarTodos,
-      toggleMostrarSoloSeleccionados,
       mostrarSoloSeleccionados,
       usuariosFiltradosVisibles,
       myLocale: {
@@ -463,6 +527,12 @@ export default {
         format24h: true,
         pluralDay: 'dias'
       },
+      abrir,
+      seleccionarTodos,
+      deseleccionarTodos,
+      toggleMostrarSoloSeleccionados,
+      validarPasoDos,
+      filtrar,
     }
   },
 }
