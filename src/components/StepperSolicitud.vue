@@ -327,7 +327,7 @@ import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj
 export default {
   setup() {
     const useJustificantesVacaciones = useJustificantesVacacionesStore()
-    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s, solicitarCapacitaciones} = useJustificantesVacaciones
+    const { obtenerDetalleVacacionesDiasEconomicos, solicitarAusenciasYRetardos, solicitarVacaciones, solicitarDiasEconomicos, solicitarDiasGanados, solicitarVacacionesVencidas, solicitarSabados5s, solicitarCapacitaciones, obtenerDetalleEmpleadoYJefeDirecto} = useJustificantesVacaciones
     const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto, usuarioSeleccionado, emailJefeDirecto, emailJefeIncorrecto } = storeToRefs(useJustificantesVacaciones)
 
     const useColaboradores = useColaboradoresStore()
@@ -575,6 +575,7 @@ export default {
             await solicitarCapacitaciones(solicitudObj.value)
             break
         }
+        await obtenerDetalleEmpleadoYJefeDirecto(detalleUsuario.value.numero_empleado)
         stepperSolicitud.value = false
       } else {
         notificacion('warning', 'Revise que la información esté completa')
