@@ -119,6 +119,21 @@
            </q-card-section>
           </div>
           <div class="text-h5 q-pa-sm text-center bg-primary text-white q-mb-md">
+           Anexos
+          </div>
+          <q-table wrap-cells class="q-my-md" :rows="anexos" :columns="columnasAnexos"
+            rows-per-page-label="Registros por página" no-data-label="Sin información">
+            <template v-slot:body-cell-acciones="props">
+              <q-td>
+                <q-btn flat color="primary" icon="visibility" @click="abrirAnexos(props.row.urlArchivo)">
+                  <q-tooltip>
+                    Abrir archivo
+                  </q-tooltip>
+                </q-btn>
+              </q-td>
+            </template>
+          </q-table>
+          <div class="text-h5 q-pa-sm text-center bg-primary text-white q-mb-md">
            Información de Autorizaciones
          </div>
          <div class="row q-my-sm">
@@ -166,17 +181,47 @@
 
 <script>
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { formatearFecha, formatearHora } from 'src/helpers/formatearFecha'
 import { coloresAutorizaciones } from 'src/constant/constantes'
-
-const incapacidad = ref(false)
+import { useJustificantesVacacionesStore } from "src/stores/justificantesVacaciones"
 
 export default {
   setup () {
+
+    const useJustificantesVacaciones = useJustificantesVacacionesStore()
+    const { obtenerAnexos } = useJustificantesVacaciones
+    const { anexos } = storeToRefs(useJustificantesVacaciones)
+
     const modalVerSolicitud = ref(false)
     const solicitudObj = ref(null)
-    const abrir = (movimiento) => {
+    const incapacidad = ref(false)
+
+    const columnasAnexos = [
+      {
+        name: 'idAnexo',
+        label: 'ID',
+        field: 'idAnexo',
+        align: 'center',
+        sortable: true,
+      },
+      {
+        name: 'nombreArchivo',
+        label: 'Nombre',
+        field: 'nombreArchivo',
+        align: 'center',
+        sortable: true,
+      },
+      {
+        name: 'acciones',
+        align: 'center',
+      },
+    ]
+
+    const abrir = async(movimiento) => {
       solicitudObj.value = { ...movimiento }
+      await obtenerAnexos(solicitudObj.value.folio)
+
       solicitudObj.value.createdAt = formatearFecha(solicitudObj.value.createdAt)
       if(solicitudObj.value.fechaDiaSolicitado){
         solicitudObj.value.fechaDiaSolicitado = formatearFecha(solicitudObj.value.fechaDiaSolicitado)
@@ -195,12 +240,19 @@ export default {
       return colores?.color
     }
 
+    const abrirAnexos = (url) => {
+      window.open(url, '_blank')
+    }
+
     return {
       abrir,
       modalVerSolicitud,
       solicitudObj,
       incapacidad,
-      colorAutorizacion
+      anexos,
+      columnasAnexos,
+      colorAutorizacion,
+      abrirAnexos
     }
   }
 }

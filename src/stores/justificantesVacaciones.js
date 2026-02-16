@@ -43,6 +43,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
   const detalleVacacionesDiasEconomicos = ref(null)
 
   const urlForm = ref('')
+  const anexos = ref([])
 
   const obtenerEstatus = async () => {
     try {
@@ -157,7 +158,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarAusenciasYRetardos = async (solicitudObj) => {
+  const solicitarAusenciasYRetardos = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
 
@@ -171,7 +172,18 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
 
-      const { data } = await api.post('/solicitarAusenciasYRetardos', solicitudObj)
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarAusenciasYRetardos', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -192,14 +204,26 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarVacaciones = async (solicitudObj) => {
+  const solicitarVacaciones = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
-      const { data } = await api.post('/solicitarVacaciones', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarVacaciones', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -219,7 +243,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarDiasEconomicos = async (solicitudObj) => {
+  const solicitarDiasEconomicos = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
 
@@ -232,7 +256,19 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
-      const { data } = await api.post('/solicitarDiasEconomicos', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarDiasEconomicos', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -252,7 +288,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarDiasGanados = async (solicitudObj) => {
+  const solicitarDiasGanados = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
 
@@ -265,7 +301,19 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
-      const { data } = await api.post('/solicitarDiasGanados', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarDiasGanados', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -285,14 +333,26 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarVacacionesVencidas = async (solicitudObj) => {
+  const solicitarVacacionesVencidas = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
       const usuariosAutorizanObj = {
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
-      const { data } = await api.post('/solicitarVacacionesVencidas', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarVacacionesVencidas', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -312,7 +372,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarSabados5s = async (solicitudObj) => {
+  const solicitarSabados5s = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
 
@@ -325,7 +385,19 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
         primeraAutorizacion: emailJefeIncorrecto.value === true ? usuarioSeleccionado.value : detalleJefeDirecto.value,
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
-      const { data } = await api.post('/solicitarSabados5s', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarSabados5s', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -345,12 +417,25 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarProrroga = async (solicitudObj) => {
+  const solicitarProrroga = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
+
       const usuariosAutorizan = await obtenerUsuariosAutorizan({ centroTrabajo: detalleUsuario.value.centroTrabajo, departamento: detalleUsuario.value.departamento })
       solicitudObj.usuarioAutoriza = usuariosAutorizan.obtenerGerenteRH
-      const { data } = await api.post('/solicitarProrroga', solicitudObj)
+
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarProrroga', formData)
       todasProrrogasEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -372,7 +457,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
-  const solicitarCapacitaciones = async (solicitudObj) => {
+  const solicitarCapacitaciones = async (solicitudObj, anexos) => {
     try {
       cargandoEnvioSolicitud.value = true
 
@@ -386,7 +471,18 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
       }
       solicitudObj.usuariosAutorizan = usuariosAutorizanObj
 
-      const { data } = await api.post('/solicitarCapacitaciones', solicitudObj)
+      const formData = new FormData();
+      formData.append("solicitud", JSON.stringify(solicitudObj));
+
+      if (anexos.length > 0) {
+        anexos.forEach((anexo) => {
+          formData.append("anexos", anexo);
+        });
+      } else {
+        formData.append("anexos", []);
+      }
+
+      const { data } = await api.post('/solicitarCapacitaciones', formData)
       todasSolicitudesEmpleado.value.unshift(data)
 
       const eventoObj = {
@@ -479,6 +575,15 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     }
   }
 
+  const obtenerAnexos = async (folio) => {
+    try {
+      const { data } = await api.get(`/anexos/${folio}`)
+      anexos.value = data
+    } catch (error) {
+      notificacion('negative', error.response.data.message)
+    }
+  }
+
   return {
     todosEstatus,
     todosEstatusFiltrados,
@@ -507,6 +612,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     cargandoEnvioSolicitud,
     cargandoJustificantesMasivos,
     urlForm,
+    anexos,
     usuarioSeleccionado,
     emailJefeDirecto,
     emailJefeIncorrecto,
@@ -530,6 +636,7 @@ export const useJustificantesVacacionesStore = defineStore('justificantesVacacio
     obtenerAutorizacionesPorEmpleado,
     obtenerJustificantesMasivos,
     agregarJustificantesMasivos,
-    cancelarAutorizaciones
+    cancelarAutorizaciones,
+    obtenerAnexos,
   }
 })

@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="stepperSolicitud" full-width>
+  <q-dialog v-model="stepperSolicitud" full-width persistent>
     <q-card>
       <q-card-section>
         <div class="text-h4 text-center q-mb-sm">CREAR SOLICITUD</div>
@@ -111,7 +111,7 @@
                   <label>Describe los motivos <span style="color: red;">*</span></label>
                 </q-card-section>
               </div>
-              <div class="row q-my-sm">
+              <div class="row">
                 <q-card-section class="col q-pt-none">
                   <q-input maxlength="255" counter autogrow outlined v-model="solicitudObj.descripcionMotivo"></q-input>
                 </q-card-section>
@@ -179,7 +179,7 @@
                   <label>Describe los motivos <span style="color: red;">*</span></label>
                 </q-card-section>
               </div>
-              <div class="row q-my-sm">
+              <div class="row">
                 <q-card-section class="col q-pt-none">
                   <q-input maxlength="255" counter autogrow outlined v-model="solicitudObj.descripcionMotivo"></q-input>
                 </q-card-section>
@@ -231,7 +231,7 @@
                   <label>Describe los motivos <span style="color: red;">*</span></label>
                 </q-card-section>
               </div>
-              <div class="row q-my-sm">
+              <div class="row">
                 <q-card-section class="col q-pt-none">
                   <q-input maxlength="255" counter autogrow outlined v-model="solicitudObj.descripcionMotivo"></q-input>
                 </q-card-section>
@@ -253,12 +253,96 @@
                   <label>Describe los motivos <span style="color: red;">*</span></label>
                 </q-card-section>
               </div>
-              <div class="row q-my-sm">
+              <div class="row">
                 <q-card-section class="col q-pt-none">
                   <q-input maxlength="255" counter autogrow outlined v-model="solicitudObj.descripcionMotivo"></q-input>
                 </q-card-section>
               </div>
             </q-form>
+
+            <div class="row q-my-sm">
+              <q-card-section class="col-12 q-pt-none">
+                <fieldset class="rounded-borders">
+                  <legend class="text-primary text-h5 text-bold">
+                    Archivos adjuntos
+                  </legend>
+
+                  <div class="row q-col-gutter-sm items-center">
+                    <div class="col-12 col-md-10">
+                      <q-file
+                        v-model="archivoCargado"
+                        outlined
+                        dense
+                        use-chips
+                        class="full-width"
+                      >
+                        <template v-slot:prepend>
+                          <q-icon name="attach_file" />
+                        </template>
+
+                        <q-tooltip
+                          anchor="top middle"
+                          self="bottom middle"
+                          style="font-size: 14px"
+                        >
+                          Archivos aceptados: EXCEL, WORD, POWER POINT, CSV, XML, PNG, JPG, JPEG, PDF
+                        </q-tooltip>
+                      </q-file>
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                      <q-btn
+                        color="primary"
+                        label="Agregar"
+                        icon="attach_file"
+                        unelevated
+                        class="full-width"
+                        @click="agregarArchivo"
+                      >
+                        <q-tooltip
+                          anchor="top middle"
+                          self="bottom middle"
+                          style="font-size: 14px"
+                        >
+                          Agregar archivo seleccionado
+                        </q-tooltip>
+                      </q-btn>
+                    </div>
+                  </div>
+
+                  <q-slide-transition>
+                    <div v-if="archivos.length" class="q-mt-md">
+                      <div class="text-bold q-mb-sm">
+                        Lista de archivos:
+                      </div>
+
+                      <q-list bordered separator>
+                        <q-item
+                          v-for="archivo in archivos"
+                          :key="archivo.name"
+                        >
+                          <q-item-section>
+                            <q-item-label class="ellipsis">
+                              {{ archivo.name }}
+                            </q-item-label>
+                          </q-item-section>
+
+                          <q-item-section side>
+                            <q-btn
+                              color="negative"
+                              flat
+                              dense
+                              icon="delete"
+                              @click="eliminarArchivo(archivo)"
+                            />
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </div>
+                  </q-slide-transition>
+                </fieldset>
+              </q-card-section>
+            </div>
 
             <q-stepper-navigation>
               <q-btn color="primary" @click="validarPasoDos" label="continuar" class="q-ml-sm" />
@@ -309,7 +393,7 @@
         </q-stepper>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat label="cerrar" color="primary" v-close-popup />
+        <q-btn flat label="cerrar" color="primary" v-close-popup :disable="cargandoEnvioSolicitud" />
       </q-card-actions>
     </q-card></q-dialog>
 </template>
@@ -323,6 +407,7 @@ import { notificacion } from 'src/helpers/mensajes'
 import { validarCorreo } from 'src/helpers/inputReglas'
 import dayjs from 'dayjs'
 import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj'
+import { ar } from 'date-fns/locale'
 
 export default {
   setup() {
@@ -366,6 +451,9 @@ export default {
     const step = ref(1)
     const previousStep = ref(1)
     const errorSeleccion = ref(false)
+    const archivos = ref([]);
+    const archivoCargado = ref(null);
+
     const opcionesUsuarios = ref(
       colaboradoresPortalSistemas.value.filter(
         u => u.numero_empleado !== detalleUsuario.value.numero_empleado
@@ -434,6 +522,7 @@ export default {
       solicitudObj.value = { ...solicitudInit }
       step.value = 1
       emailJefeIncorrecto.value = false
+      archivos.value = []
 
       const correo = detalleJefeDirecto.value?.correo
       emailJefeDirecto.value = correo != null ? correo : ''
@@ -554,25 +643,25 @@ export default {
       if (detalleJefeDirecto.value?.correo !== '') {
         switch (solicitudObj.value.idTipoSolicitud) {
           case AUSENCIAS_Y_RETARDOS:
-            await solicitarAusenciasYRetardos(solicitudObj.value)
+            await solicitarAusenciasYRetardos(solicitudObj.value, archivos.value)
             break
           case VACACIONES:
-            await solicitarVacaciones(solicitudObj.value)
+            await solicitarVacaciones(solicitudObj.value, archivos.value)
             break
           case DIAS_ECONOMICOS:
-            await solicitarDiasEconomicos(solicitudObj.value)
+            await solicitarDiasEconomicos(solicitudObj.value, archivos.value)
             break
           case DIAS_GANADOS:
-            await solicitarDiasGanados(solicitudObj.value)
+            await solicitarDiasGanados(solicitudObj.value, archivos.value)
             break
           case VACACIONES_VENCIDAS:
-            await solicitarVacacionesVencidas(solicitudObj.value)
+            await solicitarVacacionesVencidas(solicitudObj.value, archivos.value)
             break
           case SABADOS_5S:
-            await solicitarSabados5s(solicitudObj.value)
+            await solicitarSabados5s(solicitudObj.value, archivos.value)
             break
           case CAPACITACIONES:
-            await solicitarCapacitaciones(solicitudObj.value)
+            await solicitarCapacitaciones(solicitudObj.value, archivos.value)
             break
         }
         await obtenerDetalleEmpleadoYJefeDirecto(detalleUsuario.value.numero_empleado)
@@ -598,6 +687,20 @@ export default {
         emailJefeDirecto.value = usuarioSeleccionado.value?.correo
       }
     }
+
+    const agregarArchivo = () => {
+      if (archivoCargado.value === null) {
+        notificacion("warning", "Selecciona un archivo para continuar");
+        return;
+      }
+
+      archivos.value.push(archivoCargado.value);
+      archivoCargado.value = null;
+    };
+
+    const eliminarArchivo = (archivo) => {
+      archivos.value = archivos.value.filter((a) => a !== archivo);
+    };
 
     const parametrosFiltradosEmpleados = (val, update) => {
       filtradoBusquedauUsuariosAcceso(
@@ -743,11 +846,7 @@ export default {
       numeroDiasRestantes,
       opcionesTipoPase,
       detalleVacacionesDiasEconomicos,
-      abrir,
       errorSeleccion,
-      validarPasoUno,
-      validarPasoDos,
-      validarPasoTres,
       opcionesDiaEconomico,
       detalleUsuario,
       detalleJefeDirecto,
@@ -766,21 +865,20 @@ export default {
       emailJefeDirecto,
       validarCorreo,
       formularioCorreos,
-      checkCorreoIncorrectoSeleccionado,
       usuarioSeleccionado,
+      opcionesUsuarios,
+      archivos,
+      archivoCargado,
+      abrir,
+      validarPasoUno,
+      validarPasoDos,
+      validarPasoTres,
+      checkCorreoIncorrectoSeleccionado,
       seleccionarUsuario,
       parametrosFiltradosEmpleados,
-      opcionesUsuarios
+      agregarArchivo,
+      eliminarArchivo
     }
   }
 }
 </script>
-
-<style scoped>
-/* .checkbox-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-} */
-</style>

@@ -36,6 +36,19 @@
           <q-input autogrow v-model="solicitud.descripcionMotivo" outlined readonly />
         </div>
       </div>
+      <p class="q-my-lg text-center">Anexos</p>
+      <q-table wrap-cells class="q-my-md" :rows="solicitud.anexos" :columns="columnasAnexos"
+        rows-per-page-label="Registros por página" no-data-label="Sin información">
+        <template v-slot:body-cell-acciones="props">
+          <q-td>
+            <q-btn flat color="primary" icon="visibility" @click="abrirAnexos(props.row.urlArchivo)">
+              <q-tooltip>
+                Abrir archivo
+              </q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+      </q-table>
       <p class="q-my-lg text-center">Autorizaciones</p>
       <q-table wrap-cells class="q-my-md" :rows="solicitud.solicitud_detalles" :columns="columnasDetalles"
         rows-per-page-label="Registros por página" no-data-label="Sin información">
@@ -140,6 +153,27 @@ export default {
 
     ]
 
+    const columnasAnexos = [
+      {
+        name: 'idAnexo',
+        label: 'ID',
+        field: 'idAnexo',
+        align: 'center',
+        sortable: true,
+      },
+      {
+        name: 'nombreArchivo',
+        label: 'Nombre',
+        field: 'nombreArchivo',
+        align: 'center',
+        sortable: true,
+      },
+      {
+        name: 'acciones',
+        align: 'center',
+      },
+    ]
+
     const alternarExpandir = (id) => {
       filasExpandidas.value[id] = !filasExpandidas.value[id]
     }
@@ -158,18 +192,24 @@ export default {
       eliminar.value = permisoEliminar
     }
 
+    const abrirAnexos = (url) => {
+      window.open(url, '_blank')
+    }
+
     return {
       PRORROGA,
       modalDetalleSolicitud,
       solicitud,
       columnasDetalles,
       columnasAutorizaciones,
+      columnasAnexos,
       filasExpandidas,
+      eliminar,
       alternarExpandir,
       abrir,
       formatearFecha,
-      eliminar,
-      cancelarDias
+      cancelarDias,
+      abrirAnexos
     }
   }
 }
