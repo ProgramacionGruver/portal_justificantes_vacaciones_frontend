@@ -435,7 +435,7 @@ export default {
               }else if (registroDia.solicitud) {
                 valor = registroDia.solicitud.nombreSolicitud;
               } else if (registroDia.retardo) {
-                valor = "RETARDO";
+                valor = `${registroDia.horaRegistro ? `${registroDia.horaRegistro} (RETARDO)` : "RETARDO"}`;
               } else if (registroDia.sinTurno) {
                 valor = "SIN TURNO";
               } else if (registroDia.horaRegistro) {
