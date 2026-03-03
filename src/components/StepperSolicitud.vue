@@ -401,13 +401,13 @@
 <script>
 import { ref, computed, watch } from 'vue'
 import { useJustificantesVacacionesStore } from 'src/stores/justificantesVacaciones'
+import { useAutenticacionStore } from 'src/stores/autenticaciones'
 import { useColaboradoresStore } from 'src/stores/colaboradores'
 import { storeToRefs } from 'pinia'
 import { notificacion } from 'src/helpers/mensajes'
 import { validarCorreo } from 'src/helpers/inputReglas'
 import dayjs from 'dayjs'
 import { filtradoBusquedauUsuariosAcceso } from 'src/helpers/filtradoBusquedaObj'
-import { ar } from 'date-fns/locale'
 
 export default {
   setup() {
@@ -416,7 +416,11 @@ export default {
     const { cargandoEnvioSolicitud, detalleVacacionesDiasEconomicos, detalleUsuario, detalleJefeDirecto, usuarioSeleccionado, emailJefeDirecto, emailJefeIncorrecto } = storeToRefs(useJustificantesVacaciones)
 
     const useColaboradores = useColaboradoresStore()
-    const { colaboradoresPortalSistemas } = storeToRefs(useColaboradores)
+    const { obtenerAdministrativoSucursal } = useColaboradores
+    const { gerentesAdministrativos } = storeToRefs(useColaboradores)
+
+    const useAutenticacion = useAutenticacionStore()
+    const { usuarioAutenticado } = storeToRefs(useAutenticacion)
 
     const opcionesTipoPase = [
       {
@@ -455,7 +459,7 @@ export default {
     const archivoCargado = ref(null);
 
     const opcionesUsuarios = ref(
-      colaboradoresPortalSistemas.value.filter(
+      gerentesAdministrativos.value.filter(
         u => u.numero_empleado !== detalleUsuario.value.numero_empleado
       )
     )
@@ -547,13 +551,15 @@ export default {
       }
     }
 
-    const validarPasoDos = () => {
+    const validarPasoDos = async() => {
       const { idTipoSolicitud, idMotivo, fechaDiaSolicitado, horaDiaSolicitado, descripcionMotivo, fechasSeleccionadas } = solicitudObj.value
 
       const notificarError = () => {
         notificacion('warning', 'Revise que la información esté completa')
         return
       }
+
+      await obtenerAdministrativoSucursal(usuarioAutenticado.value.claveEmpresa, usuarioAutenticado.value.claveSucursal)
 
       switch (idTipoSolicitud) {
         case AUSENCIAS_Y_RETARDOS:
@@ -620,6 +626,7 @@ export default {
           notificacion('warning', 'Tipo de solicitud no válido')
           break
       }
+
     }
 
     const validarPasoTres = async () => {
@@ -706,7 +713,7 @@ export default {
       filtradoBusquedauUsuariosAcceso(
         val,
         update,
-        colaboradoresPortalSistemas.value.filter(
+        gerentesAdministrativos.value.filter(
           u => u.numero_empleado !== detalleUsuario.value.numero_empleado
         ),
         opcionesUsuarios
