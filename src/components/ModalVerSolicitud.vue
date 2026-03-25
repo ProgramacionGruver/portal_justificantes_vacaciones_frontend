@@ -136,6 +136,29 @@
           <div class="text-h5 q-pa-sm text-center bg-primary text-white q-mb-md">
            Información de Autorizaciones
          </div>
+          <div
+            v-if="solicitudObj.idTipoSolicitud === 1 && solicitudObj.idMotivo === 3"
+            class="flex flex-center"
+          >
+          <div class="column items-center">
+              <div class="row items-center q-mb-sm text-primary">
+                <q-icon name="paid" size="18px" class="q-mr-xs" />
+                <span class="text-weight-medium">Goce de sueldo</span>
+              </div>
+              <div class="row items-center q-gutter-lg">
+                <q-radio disable v-model="solicitudObj.goceSueldo" :val="true" color="primary" size="sm">
+                  <div class="row items-center no-wrap">
+                    <span>Con goce</span>
+                  </div>
+                </q-radio>
+                <q-radio disable v-model="solicitudObj.goceSueldo" :val="false" color="primary" size="sm">
+                  <div class="row items-center no-wrap">
+                    <span>Sin goce</span>
+                  </div>
+                </q-radio>
+              </div>
+            </div>
+          </div>
          <div class="row q-my-sm">
            <q-card-section v-if="!incapacidad" class="col-3 q-pt-none">
              <label class="label-negritas">Estatus</label>

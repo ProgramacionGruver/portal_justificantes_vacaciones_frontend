@@ -67,6 +67,13 @@ const routes = [
         component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/FaltasModule.vue')
       },
       {
+        path: 'faltasRetardos',
+        icono: 'alarm',
+        label: 'Faltas y Retardos',
+        name: 'faltasRetardos',
+        component: () => import(/* webpackChunkName: "dashboard" */'src/modules/asistencia/FaltasRetardosModule.vue')
+      },
+      {
         path: 'justificantesMasivos',
         icono: 'playlist_add_check',
         label: 'Justificantes Masivos',

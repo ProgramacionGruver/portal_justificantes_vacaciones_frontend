@@ -50,6 +50,29 @@
         </template>
       </q-table>
       <p class="q-my-lg text-center">Autorizaciones</p>
+       <div
+         v-if="solicitud.idTipoSolicitud === 1 && solicitud.idMotivo === 3"
+         class="flex flex-center q-pt-md"
+       >
+      <div class="column items-center">
+          <div class="row items-center q-mb-sm text-primary">
+            <q-icon name="paid" size="18px" class="q-mr-xs" />
+            <span class="text-weight-medium">Goce de sueldo</span>
+          </div>
+          <div class="row items-center q-gutter-lg">
+            <q-radio disable v-model="solicitud.goceSueldo" :val="true" color="primary" size="sm">
+              <div class="row items-center no-wrap">
+                <span>Con goce</span>
+              </div>
+            </q-radio>
+            <q-radio disable v-model="solicitud.goceSueldo" :val="false" color="primary" size="sm">
+              <div class="row items-center no-wrap">
+                <span>Sin goce</span>
+              </div>
+            </q-radio>
+          </div>
+        </div>
+      </div>
       <q-table wrap-cells class="q-my-md" :rows="solicitud.solicitud_detalles" :columns="columnasDetalles"
         rows-per-page-label="Registros por página" no-data-label="Sin información">
         <template v-slot:header="props">
