@@ -14,6 +14,16 @@
               </template>
             </q-input>
           </div>
+          <q-btn
+            color="green"
+            icon-right="description"
+            label="Descargar"
+            no-caps
+            dense
+            :disable="cargando"
+            @click="exportarExcel"
+            v-if="permisoDescargar"
+          />
         </div>
         <div class="fit row q-gutter-sm">
           <q-btn-dropdown dense outline class="col q-ma-sm" color="grey" label="Empresas">
@@ -101,6 +111,7 @@ import { useSucursalesStore } from 'src/stores/sucursales'
 import { useDepartamentosStore } from 'src/stores/departamentos'
 import { useCatalogosStore } from 'src/stores/catalogos.js'
 import { useAutenticacionStore } from "src/stores/autenticaciones"
+import { generarExcel } from 'src/helpers/generarExcel'
 import ModalCatalogoUsuarios from 'src/components/ModalCatalogoUsuarios.vue'
 import { filtrarOpcionesCatalogoUsuarios, filtrarElementosPorEmpresaSucursalDepartamento, filtrarElementos } from 'src/helpers/filtros'
 
@@ -150,6 +161,7 @@ export default {
     const modalCatalogo = ref(null)
     const permisoEditar = ref(false)
     const permisoAgregar = ref(true)
+    const permisoDescargar = ref(false);
 
     const columns = computed(() => {
       return  [
@@ -283,6 +295,7 @@ export default {
         await filtrar('TODASEMPRESAS')
         permisoEditar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.actualizar === true)
         permisoAgregar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.agregar === true)
+        permisoDescargar.value = usuarioAutenticado.value.modulos.some(modulo => modulo.idModulo === 56 && modulo.leer === true)
       }catch{
 
       }finally{
@@ -349,6 +362,16 @@ export default {
 
     }
 
+    const exportarExcel = async () => {
+      await generarExcel(
+        catalogoUsuariosFiltrados.value,
+        'Catalogo_Usuarios',
+        'Usuarios',
+        columns.value
+      );
+    };
+
+
     return {
       buscar: ref(''),
       columns,
@@ -386,7 +409,9 @@ export default {
       todosTurnosSabadosSeleccionados,
       opcionesTurnos,
       permisoEditar,
-      permisoAgregar
+      permisoAgregar,
+      permisoDescargar,
+      exportarExcel
     }
   }
 }
