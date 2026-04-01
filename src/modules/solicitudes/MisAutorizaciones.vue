@@ -111,6 +111,7 @@ export default {
       {
         name: 'estatus',
         label: 'Estatus',
+        field: (row) => obtenerPropsQChip(row.solicitud_detalles).nombre,
         align: 'left',
         sortable: true
       },
