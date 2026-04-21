@@ -73,6 +73,29 @@
                 </div>
 
               </div>
+              <div
+                v-if="solicitudObj.idMotivo === 3"
+                class="flex flex-center q-pt-md"
+              >
+              <div class="column items-center">
+                  <div class="row items-center q-mb-sm text-primary">
+                    <q-icon name="paid" size="18px" class="q-mr-xs" />
+                    <span class="text-weight-medium">Goce de sueldo</span>
+                  </div>
+                  <div class="row items-center q-gutter-lg">
+                    <q-radio v-model="solicitudObj.goceSueldo" :val="true" color="primary" size="sm">
+                      <div class="row items-center no-wrap">
+                        <span>Con goce</span>
+                      </div>
+                    </q-radio>
+                    <q-radio v-model="solicitudObj.goceSueldo" :val="false" color="primary" size="sm">
+                      <div class="row items-center no-wrap">
+                        <span>Sin goce</span>
+                      </div>
+                    </q-radio>
+                  </div>
+                </div>
+              </div>
           </div>
           <div class="q-ma-md">
                <label>Seleccione los colaboradores a justificar <span style="color: red;">*</span></label>
@@ -413,6 +436,10 @@ export default {
         return 0
       })
 
+      if(idMotivo !== 3){
+        solicitudObj.value.goceSueldo = null
+      }
+
       let idTipoSolicitud, idMotivoFin
       if([VACACIONES].includes(idMotivo)){
         idTipoSolicitud = 2
@@ -434,7 +461,8 @@ export default {
         fechaDiaSolicitado,
         horaDiaSolicitado,
         descripcionMotivo,
-        fechasSeleccionadas: [...solicitudObj.value.fechasSeleccionadas]  // Agregar el array de fechas seleccionadas
+        fechasSeleccionadas: [...solicitudObj.value.fechasSeleccionadas],
+        goceSueldo: solicitudObj.value.goceSueldo
       }))
       await agregarJustificantesMasivos(solicitudObj.value)
       abrirModal.value = false
